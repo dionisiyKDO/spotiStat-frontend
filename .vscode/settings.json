@@ -9,7 +9,12 @@
         "**/__pycache__/": true,
         "**/.svelte-kit/": true,
         "**/.vscode/": true,
-        "**/node_modules/": true
+        "**/node_modules/": true,
+        "package-lock.json": true,
+        ".npmrc": true
     },
-    "hide-files.files": []
+    "hide-files.files": [
+        "package-lock.json",
+        ".npmrc"
+    ]
 }

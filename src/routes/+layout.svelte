@@ -4,7 +4,7 @@
 </script>
 
 
-<div class="app">
+<div class="container app">
 	<Header />
 
 	<main>
