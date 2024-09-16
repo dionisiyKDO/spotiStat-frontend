@@ -2,6 +2,15 @@
     let topTracks = $state([]);
     let error = $state('');
     let timeRange = $state('medium_term');
+    let strTimeRange = $derived.by(() => {
+        if (timeRange === 'short_term') {
+            return '4 weeks';
+        } else if (timeRange === 'medium_term') {
+            return '6 months';
+        } else {
+            return '12 months';
+        }
+    });
 
     // Fetch top tracks when the component is mounted
     async function fetchTopTracks() {
@@ -35,7 +44,7 @@
 {:else}
 
     <div class="title-wrapper">
-        <h2>Top tracks</h2>
+        <h2>Top tracks for {strTimeRange}</h2>
         <div class="time-ranges">
             <p>Time ranges:</p>
             <div class="time-range-group">
