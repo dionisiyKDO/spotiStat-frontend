@@ -9,6 +9,7 @@
     <a href="/liked_tracks">Liked tracks</a>
     <a href="/top/tracks">Top tracks</a>
     <a href="/top/artists">Top artists</a>
+    <a href="/tracks_by_year">Tracks by year</a>
 </div>
 
 
