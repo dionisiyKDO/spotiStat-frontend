@@ -8,10 +8,11 @@
     <D3Chart />
 </div>
 <div class="section">
-    <h2>Search track</h2>
     <SearchTrack />
 </div>
 
 <style>
-
+    .section {
+        margin-bottom: 2rem;
+    }
 </style>

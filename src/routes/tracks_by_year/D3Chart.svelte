@@ -265,6 +265,5 @@
 
 
 <style>
-@import '$lib/css/track_list.css';
 
 </style>
