@@ -36,7 +36,7 @@
 </script>
 
 {#if error}
-    <p>{error}</p>
+    <p style="color: darkred">{error}</p>
 {:else}
     <div class="container container-narrow">
         <div class="section-title">

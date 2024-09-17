@@ -2,9 +2,8 @@
     import * as d3 from "d3";
     import { onMount } from "svelte";
 
+    let { year } = $props();
     let tracksByYear = $state([]);
-    let years = $state([]);
-    let values = $state([]);
     let error = $state('');
 
     // Fetch amount of tracks by year on component mount
@@ -23,26 +22,11 @@
         }
     }
 
-    onMount(() => {
-        fetchTracksByYear().then(() => {
-            console.log(tracksByYear);
-
-            tracksByYear.sort(function(a, b) {
-                return a.release_date - b.release_date;
-            });
-
-            for (let i = 0; i < tracksByYear.length; i++) {
-                tracksByYear[i].release_date = new Date(tracksByYear[i].release_date);
-            }
-            drawChart();
-        });
-    });
-
     function drawChart() {
         d3.select("#chart").selectAll("*").remove();
 
-        // const tooltipColor = 'var(--pico-primary-hover)';
-
+        // Create the styles for the chart
+        // #region
         const chartFontSize = '14px';
         const chartColor = 'var(--pico-color)';
         const chartBG = '#777';
@@ -68,13 +52,18 @@
         const tooltipLineStroke = chartStroke;
         const tooltipLineStrokeWidth = 1;
         const tooltipLineStrokeOpacity = 0.66;
+        // #endregion
 
-
+        // Create the chart variables
+        // #region
         const container = d3.select("#chart-container");
         const margin = {top: 20, right: 20, bottom: 30, left: 40};
         const width  = container.node().getBoundingClientRect().width - margin.left - margin.right;
         const height = 400 - margin.top - margin.bottom;
+        // #endregion
 
+        // Create the SVG elements
+        // #region
         const svg = d3.select("#chart")
             .attr("viewBox", `0 0 ${width + margin.left + margin.right} ${height + margin.top + margin.bottom}`)
             .append("g")
@@ -109,8 +98,6 @@
             .call(g => g.select(".domain").remove())
             .selectAll(".tick line")
                 .style("stroke-opacity", 0);
-
-
 
         // add x-grid
         svg.selectAll("xGrid")
@@ -156,8 +143,6 @@
                 .y(function(d) { return yScale(d.count) })
                 );
 
-
-
         const tooltipLine = svg.append('line');
         const tooltip = d3.select('#tooltip').style('opacity', 0)
             .style('position', 'absolute')
@@ -171,13 +156,29 @@
             .style("border-radius", tooltipBorderRadius)
             .style('box-shadow', tooltipBoxShadow);
 
+
         const listeningRect = svg.append('rect')
             .attr('width', width)
             .attr('height', height)
             .attr('opacity', 0)
             .on('mousemove', drawTooltip)
-            .on('mouseout', removeTooltip);
-        
+            .on('mouseout', removeTooltip)
+            .on('click', handleClick);
+        // #endregion
+
+        function handleClick(event) {
+            const [mouseXsvg, mouseYsvg] = d3.pointer(event);
+            const mouseX = event.clientX;
+            const mouseY = event.clientY;
+            const xDate = xScale.invert(mouseXsvg);
+
+            const closestPoint = d3.least(tracksByYear, d => Math.abs(xScale(d.release_date) - mouseXsvg));
+
+            year(closestPoint.release_date.getFullYear());
+            // year = closestPoint.release_date.getFullYear();
+            // console.log(year);
+        }
+
         function drawTooltip(event) {
             const [mouseXsvg, mouseYsvg] = d3.pointer(event);
             const mouseX = event.clientX;
@@ -191,15 +192,16 @@
             const tooltipWidth = tooltip.node().offsetWidth;
             const tooltipHeight = tooltip.node().offsetHeight;
 
-            let tooltipLeft = mouseX + 20;
-            let tooltipTop = mouseY - 40;
+            // Modified: Account for page scroll
+            let tooltipLeft = mouseX + 15 + window.scrollX;
+            let tooltipTop = mouseY - 30 + window.scrollY;
 
             // Adjust tooltip position if it goes out of viewport
-            if (tooltipLeft + tooltipWidth > window.innerWidth) {
-                tooltipLeft = mouseX - tooltipWidth - 10;
+            if (tooltipLeft + tooltipWidth + 15 >= window.innerWidth + window.scrollX) {
+                tooltipLeft = mouseX - tooltipWidth - 10 + window.scrollX;
             }
-            if (tooltipTop + tooltipHeight > window.innerHeight) {
-                tooltipTop = mouseY - tooltipHeight - 10;
+            if (tooltipTop + tooltipHeight >= window.innerHeight + window.scrollY) {
+                tooltipTop = mouseY - tooltipHeight - 10 + window.scrollY;
             }
 
             tooltip
@@ -213,7 +215,6 @@
                     ${closestPoint.count} tracks released in ${d3.timeFormat("%Y")(closestPoint.release_date)}
                 </div>
             `);
-
 
             // Update tooltip line
             tooltipLine
@@ -243,18 +244,29 @@
                 .attr("fill-opacity", tooltipCircleOpacity);
         }
 
-        // Tooltip removal function
+
         function removeTooltip() {
             tooltip.style("opacity", 0);
             tooltipLine.attr("stroke-width", 0);
             svg.selectAll(".tooltip-circle").remove();
         }
     }
+
+    onMount(() => {
+        fetchTracksByYear().then(() => {
+            tracksByYear.sort(function(a, b) { return a.release_date - b.release_date; });
+            for (let i = 0; i < tracksByYear.length; i++) { tracksByYear[i].release_date = new Date(tracksByYear[i].release_date); }
+            
+            drawChart();
+        });
+    });
 </script>
 
 {#if error}
     <p style="color: darkred">{error}</p>
 {:else}
+    <h2>Tracks by year</h2>
+    <p>This line chart shows the number of tracks in your saves released in each year, showing your preferences by time range. (you can click on chart for selecting a year to search)</p> 
     <div id="chart-container">
         <svg id="chart"/>
         <div id="tooltip"></div>

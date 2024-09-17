@@ -1,9 +1,7 @@
 <script>
-    import { onMount } from "svelte";
-    // TODO: on chart click search for track
-
-    let year = $state('1976');
+    let { year } = $props();
     let tracks = $state([]);
+    let error = $state('');
 
     async function fetchTracksByYear() {
         try {
@@ -14,15 +12,13 @@
             } else {
                 const data = await response.json();
                 tracks = data.results;
-                console.log(tracks);
-                console.log(data);
             }
         } catch (err) {
             error = 'Error fetching tracks by year';
         }
     }
 
-    onMount(() => {
+    $effect(() => {
         fetchTracksByYear();
     });
 
@@ -38,9 +34,6 @@
                 month: 'long',
                 day: '2-digit',
                 year: 'numeric',
-                hour: '2-digit',
-                minute: '2-digit',
-                second: '2-digit',
                 hour12: false
             });
         }
@@ -48,30 +41,36 @@
 </script>
 
 
-
-<div class="track-list">
-    <h2>Search track</h2>
-    <div class="search-track">
-        <input type="text" name="year" id="year" bind:value={year}>
-        <button onclick={fetchTracksByYear}>Search</button>
+{#if error}
+    <p style="color: darkred">{error}</p>
+{:else}
+    <div class="track-list">
+        
+        <div class="search-track">
+            <h2>Search track</h2>
+            <input type="text" name="year" id="year" bind:value={year}>
+            <!-- <button onclick={fetchTracksByYear}>Search</button> -->
+        </div>
+        {#each tracks as track, i}
+            <li class="track-item">
+                <div class="track-number">{i + 1}</div>
+                <div class="album-image-wrapper">
+                    <img src="{track.album_image_url}" alt="Album art" class="album-image">
+                </div>
+                <div class="track-info">
+                    <div class="track-name">{track.name}</div>
+                    <div class="track-artist">{track.artist}</div>
+                    <div class="track-meta"><div class="track-time-played">Released on: {formatDate(track.release_date)}</div></div>
+                </div>
+            </li>
+        {/each}
+        {#if tracks.length === 0}
+            <p>No tracks found</p>
+        {/if}
     </div>
-    {#each tracks as track, i}
-        <li class="track-item">
-            <div class="track-number">{i + 1}</div>
-            <div class="album-image-wrapper">
-                <img src="{track.album_image_url}" alt="Album art" class="album-image">
-            </div>
-            <div class="track-info">
-                <div class="track-name">{track.name}</div>
-                <div class="track-artist">{track.artist}</div>
-                <div class="track-meta"><div class="track-time-played">Released on: {formatDate(track.release_date)}</div></div>
-            </div>
-        </li>
-    {/each}
-    {#if tracks.length === 0}
-        <p>No tracks found</p>
-    {/if}
-</div>
+{/if}
+
+
 
 
 
@@ -83,6 +82,10 @@
         align-items: center;
         gap: 1rem;
         margin-bottom: 1rem;
+        margin-top: 2rem;
+    }
+    .search-track h2 {
+        margin: 0;
     }
     .search-track input {
         text-align: center;

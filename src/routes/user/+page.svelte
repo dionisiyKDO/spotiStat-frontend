@@ -1,0 +1,117 @@
+<script>
+    import { onMount } from "svelte";
+
+    let user_info = $state([]);
+
+    let user_nickname = $state('');
+    let avatar_url = $state('');
+    let avatar_height = $state(0);
+    let avatar_width = $state(0);
+    let error = $state('');
+    
+    async function fetchUserInfo() {
+        try {
+            const response = await fetch('/api/user_info');
+            if (!response.ok) {
+                const data = await response.json();
+                error = data.error || 'Something went wrong!';
+            } else {
+                const data = await response.json();
+                user_info = data.user_info;
+
+                user_nickname = user_info.display_name;
+                avatar_url = user_info.images[1].url;
+                avatar_height = 100;
+                avatar_width  = 100;
+            }
+        } catch (err) {
+            error = 'Error fetching tracks by year';
+        }
+    }
+
+    onMount(() => {
+        fetchUserInfo()
+    });
+</script>
+
+<div class="profile-header">
+    <image class="avatar" style="height: {avatar_height}px; width: {avatar_width}px;" src={avatar_url} />
+    <h1>{user_nickname}</h1>
+</div>
+<div class="profile-content">
+    <a href="/user/import_history">Import history</a>
+
+    <!-- <div class="section">
+        <div class="section-column">
+            a
+        </div>
+        <div class="section-column">
+            a
+        </div>
+    </div> -->
+</div>
+
+
+<style>
+    .profile-content {
+        padding: 1rem;
+        display: flex;
+        gap: 1rem;
+    }
+
+    .section {
+        width: 100%;
+        display: flex;
+        gap: 1rem;
+        flex-direction: row;
+    }
+
+    .section-column {
+        width: 50%;
+        background-color: aliceblue;
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+   }
+
+    .profile-header {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        margin-bottom: 1rem;
+    }
+    .profile-header h1 {
+        font-size: 3em;
+        margin: 0;
+    }
+    .avatar {
+        border-radius: 50%;
+        object-fit: cover;
+    }
+
+
+    a {
+        display: inline-block;
+
+        margin-bottom: 10px;
+        padding: 10px;
+
+        text-decoration: none;
+        font-size: 20px;
+        font-weight: bold;
+
+        border: 1px solid var(--pico-color);
+        border-radius: 5px;
+
+        cursor: pointer;
+        text-align: center;
+
+        transition: all 0.3s ease-in-out;
+    }
+    a:hover {
+        color: var(--pico-primary-hover);
+        box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+        transition: all 0.3s ease-in-out;
+
+    }
+</style>

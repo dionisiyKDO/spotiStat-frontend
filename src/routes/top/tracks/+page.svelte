@@ -40,7 +40,7 @@
 
 
 {#if error}
-    <p>{error}</p>
+    <p style="color: darkred">{error}</p>
 {:else}
 
     <div class="title-wrapper">

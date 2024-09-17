@@ -1,15 +1,17 @@
 <script>
     import D3Chart from './D3Chart.svelte';
     import SearchTrack from './SearchTrack.svelte';
+
+    let year = $state(1976);
 </script>
 
+
 <div class="section">
-    <h2>Tracks by year</h2>
-    <D3Chart />
+    <D3Chart year={(value) => { year = value; }} />
+
+    <SearchTrack year={year} />
 </div>
-<div class="section">
-    <SearchTrack />
-</div>
+
 
 <style>
     .section {

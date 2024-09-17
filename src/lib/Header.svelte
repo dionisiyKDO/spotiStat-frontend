@@ -23,6 +23,7 @@
         </ul>
         <ul>
             {#if loggedIn}
+                <li><a href="/user">Profile</a></li>
                 <li><a href="/api/auth/logout">Logout</a></li>
             {:else}
                 <li><a href="/api/auth/login">Login with Spotify</a></li>
