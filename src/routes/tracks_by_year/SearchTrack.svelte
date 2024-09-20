@@ -2,6 +2,7 @@
     let { year } = $props();
     let tracks = $state([]);
     let error = $state('');
+    // TODO: add waiting response from server indicator
 
     async function fetchTracksByYear() {
         try {

@@ -1,4 +1,5 @@
 <script>
+    import TopPlayedTracks from "./top_played_tracks.svelte";
     import { onMount } from "svelte";
 
     let user_info = $state([]);
@@ -34,13 +35,12 @@
     });
 </script>
 
+
 <div class="profile-header">
     <image class="avatar" style="height: {avatar_height}px; width: {avatar_width}px;" src={avatar_url} />
     <h1>{user_nickname}</h1>
 </div>
 <div class="profile-content">
-    <a href="/user/import_history">Import history</a>
-
     <!-- <div class="section">
         <div class="section-column">
             a
@@ -50,6 +50,8 @@
         </div>
     </div> -->
 </div>
+
+<TopPlayedTracks />
 
 
 <style>
@@ -87,31 +89,5 @@
     .avatar {
         border-radius: 50%;
         object-fit: cover;
-    }
-
-
-    a {
-        display: inline-block;
-
-        margin-bottom: 10px;
-        padding: 10px;
-
-        text-decoration: none;
-        font-size: 20px;
-        font-weight: bold;
-
-        border: 1px solid var(--pico-color);
-        border-radius: 5px;
-
-        cursor: pointer;
-        text-align: center;
-
-        transition: all 0.3s ease-in-out;
-    }
-    a:hover {
-        color: var(--pico-primary-hover);
-        box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
-        transition: all 0.3s ease-in-out;
-
     }
 </style>
