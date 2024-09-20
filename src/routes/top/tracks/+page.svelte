@@ -2,39 +2,26 @@
     let topTracks = $state([]);
     let error = $state('');
     let timeRange = $state('medium_term');
-    let strTimeRange = $derived.by(() => {
-        if (timeRange === 'short_term') {
-            return '4 weeks';
-        } else if (timeRange === 'medium_term') {
-            return '6 months';
-        } else {
-            return '12 months';
-        }
-    });
 
-    // Fetch top tracks when the component is mounted
+
     async function fetchTopTracks() {
         topTracks = [];
         try {
             const response = await fetch(`/api/top_tracks?time_range=${timeRange}`);
+            const data = await response.json();
             if (!response.ok) {
-                const data = await response.json();
                 error = data.error || 'Failed to fetch top tracks';
             } else {
-                const data = await response.json();
                 topTracks = data.top_tracks;
             }
         } catch (err) {
-            error = 'Error fetching top tracks';
+            error = err;
         }
     }
 
-    function handleTermChange(newTerm) {
-        timeRange = newTerm;
+    $effect(() => {
         fetchTopTracks();
-    }
-
-    fetchTopTracks();
+    });
 </script>
 
 
@@ -44,18 +31,17 @@
 {:else}
 
     <div class="title-wrapper">
-        <h2>Top tracks for {strTimeRange}</h2>
+        <h2>Top tracks</h2>
         <div class="time-ranges">
-            <p>Time ranges:</p>
-            <div class="time-range-group">
-                <button onclick={() => handleTermChange('short_term')}>Short term (4 weeks)</button>
-                <button onclick={() => handleTermChange('medium_term')}>Medium term (6 months)</button>
-                <button onclick={() => handleTermChange('long_term')}>Long term (12 months)</button>
-            </div>
+            <select name="time_range" id="time_range" bind:value={timeRange}>
+                <option value="short_term" >Short term (4 weeks)  </option>
+                <option value="medium_term">Medium term (6 months)</option>
+                <option value="long_term"  >Long term (12 months) </option>
+            </select>
         </div>
     </div>
 
-    <!-- TODO: loading animation when page loading for different time ranges -->
+    <!-- TODO: skeleton loading animation when page is loading -->
 
     <ul class="track-list">
         {#each topTracks as track, i}
@@ -74,6 +60,7 @@
             </li>
         {/each}
     </ul>
+    
 {/if}
 
 <style>

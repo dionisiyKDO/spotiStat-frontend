@@ -1,34 +1,33 @@
 <script>
-    import { onMount } from "svelte";
-
     let tracks = $state([]);
     let error = $state('');
+    
     
     async function fetchTracks() {
         try {
             const response = await fetch('/api/db/top_played_tracks');
+            const data = await response.json();
             if (!response.ok) {
-                const data = await response.json();
-                error = data.error || 'Something went wrong!';
+                error = data.error || 'Failed to fetch top played tracks from database';
             } else {
-                const data = await response.json();
                 tracks = data;
-                console.log(tracks);    
-                
             }
         } catch (err) {
-            error = 'Error fetching tracks by year';
+            error = err;
         }
     }
 
-    $effect(async () => {
-        await fetchTracks();
-    });
 
+    $effect(() => {
+        fetchTracks();
+    });
 </script>
 
-<div class="section">
-    <div class="section-column">
+
+{#if error}
+    <p style="color: darkred">{error}</p>
+{:else}
+    <div>
         <h2>Top played tracks</h2>
         {#if tracks.length > 0}
             <ul>
@@ -45,4 +44,4 @@
             <p>No tracks found</p>
         {/if}
     </div>
-</div>
+{/if}

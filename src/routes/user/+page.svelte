@@ -1,6 +1,5 @@
 <script>
     import TopPlayedTracks from "./top_played_tracks.svelte";
-    import { onMount } from "svelte";
 
     let user_info = $state([]);
 
@@ -13,11 +12,10 @@
     async function fetchUserInfo() {
         try {
             const response = await fetch('/api/user_info');
+            const data = await response.json();
             if (!response.ok) {
-                const data = await response.json();
-                error = data.error || 'Something went wrong!';
+                error = data.error || 'Failed to fetch user info';
             } else {
-                const data = await response.json();
                 user_info = data.user_info;
 
                 user_nickname = user_info.display_name;
@@ -26,32 +24,37 @@
                 avatar_width  = 100;
             }
         } catch (err) {
-            error = 'Error fetching tracks by year';
+            error = err;
         }
     }
 
-    onMount(() => {
+    
+    $effect(() => {
         fetchUserInfo()
     });
 </script>
 
 
-<div class="profile-header">
-    <image class="avatar" style="height: {avatar_height}px; width: {avatar_width}px;" src={avatar_url} />
-    <h1>{user_nickname}</h1>
-</div>
-<div class="profile-content">
-    <!-- <div class="section">
-        <div class="section-column">
-            a
+{#if error}
+    <p style="color: darkred">{error}</p>
+{:else}
+    <div>
+        <div class="profile-header">
+            <image class="avatar" style="height: {avatar_height}px; width: {avatar_width}px;" src={avatar_url} />
+            <h1>{user_nickname}</h1>
         </div>
-        <div class="section-column">
-            a
+        <div class="profile-content">
+            <div class="section">
+                <div class="section-column">
+                    <TopPlayedTracks />
+                </div>
+                <div class="section-column">
+                    <TopPlayedTracks />
+                </div>
+            </div>
         </div>
-    </div> -->
-</div>
-
-<TopPlayedTracks />
+    </div>
+{/if}
 
 
 <style>
@@ -70,7 +73,7 @@
 
     .section-column {
         width: 50%;
-        background-color: aliceblue;
+        background-color: rgb(53, 53, 53);
         display: flex;
         flex-direction: column;
         gap: 1rem;

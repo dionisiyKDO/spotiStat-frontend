@@ -1,24 +1,22 @@
 <script>
     import * as d3 from "d3";
-    import { onMount } from "svelte";
 
     let { year } = $props();
     let tracksByYear = $state([]);
     let error = $state('');
 
-    // Fetch amount of tracks by year on component mount
+
     async function fetchTracksByYear() {
         try {
             const response = await fetch('/api/tracks_by_year');
+            const data = await response.json();
             if (!response.ok) {
-                const data = await response.json();
-                error = data.error || 'Something went wrong!';
+                error = data.error || 'Failed to fetch tracks by year';
             } else {
-                const data = await response.json();
                 tracksByYear = data.tracks_by_year;
             }
         } catch (err) {
-            error = 'Error fetching tracks by year';
+            error = err;
         }
     }
 
@@ -252,30 +250,38 @@
         }
     }
 
-    onMount(() => {
+
+    $effect(() => {
         fetchTracksByYear().then(() => {
-            tracksByYear.sort(function(a, b) { return a.release_date - b.release_date; });
-            for (let i = 0; i < tracksByYear.length; i++) { tracksByYear[i].release_date = new Date(tracksByYear[i].release_date); }
+            tracksByYear.sort(function(a, b) { return a.release_date - b.release_date; }); // sort by release date
+            for (let i = 0; i < tracksByYear.length; i++) { tracksByYear[i].release_date = new Date(tracksByYear[i].release_date); } // convert to date type
             
             drawChart();
         });
     });
 </script>
 
+
 {#if error}
     <p style="color: darkred">{error}</p>
 {:else}
+
+    <!-- TODO: skeleton loading animation when page is loading -->
     <h2>Tracks by year</h2>
-    <p>This line chart shows the number of tracks in your saves released in each year, showing your preferences by time range. (you can click on chart for selecting a year to search)</p> 
+
+    <p>This line chart shows the number of tracks in your saves released in each year, showing your preferences by time range. </p>
+    <p style="opacity: 0.5;">(you can click on chart for selecting a year to search)</p>
+    
     <div id="chart-container">
         <svg id="chart"/>
         <div id="tooltip"></div>
     </div>
-{/if}
 
-{#if false}<div class="red" ></div>{/if} 
+{/if}
 
 
 <style>
-
+    p {
+        display: inline;
+    }
 </style>

@@ -1,26 +1,26 @@
 <script>
-    let playHistory = [];
-    let error = '';
+    let playHistory = $state([]);
+    let error = $state('');
 
-    // Fetch play history on component mount
+
     async function fetchPlayHistory() {
         try {
             const response = await fetch('/api/play_history');
+            const data = await response.json();
             if (!response.ok) {
-                const data = await response.json();
-                error = data.error || 'Something went wrong!';
+                error = data.error || 'Failed to fetch play history';
             } else {
-                const data = await response.json();
                 playHistory = data.play_history;
             }
         } catch (err) {
-            error = 'Error fetching play history';
+            error = err;
         }
     }
 
+    // Format date as MM/DD/YYYY, HH:MM:SS
     function formatDate(dateString) {
         const date = new Date(dateString);
-        return date.toLocaleString('en-US', { // Using 'en-GB' locale for day-month-year format
+        return date.toLocaleString('en-US', {
             day: '2-digit',
             month: '2-digit',
             year: 'numeric',
@@ -31,14 +31,18 @@
         });
     }
 
-    fetchPlayHistory();
+    $effect(() => {
+        fetchPlayHistory();
+    });
 </script>
 
 
 {#if error}
     <p style="color: darkred">{error}</p>
 {:else}
+
     <h2>Play history</h2>
+    <!-- TODO: Hide paragraphs to onHover question mark -->
     <p>A track must be played for more than 30 seconds to be included in play history</p>
     <p>Tracks listened to while in "Private Session" will not be shown here.</p>
     
@@ -60,5 +64,9 @@
 {/if}
 
 <style>
-@import '$lib/css/track_list.css';
+    @import '$lib/css/track_list.css';
+
+    p {
+        margin-bottom: 0.5em;
+    }
 </style>

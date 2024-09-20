@@ -4,33 +4,28 @@
     let error = $state('');
     // TODO: add waiting response from server indicator
 
-    async function fetchTracksByYear() {
+
+    async function fetchSavedTracks() {
         try {
             const response = await fetch(`/api/search_saved_tracks?year=${year}`);
+            const data = await response.json();
             if (!response.ok) {
-                const data = await response.json();
-                error = data.error || 'Something went wrong!';
+                error = data.error || 'failed to fetch saved tracks';
             } else {
-                const data = await response.json();
                 tracks = data.results;
             }
         } catch (err) {
-            error = 'Error fetching tracks by year';
+            error = err;
         }
     }
-
-    $effect(() => {
-        fetchTracksByYear();
-    });
 
     function formatDate(dateString) {
         const date = new Date(dateString);
         if (date.getFullYear() === new Date(dateString).getFullYear() && 
-            date.getMonth() === 0 && date.getDate() === 1) {
-            // Return just the year if it's the only available date information
+            date.getMonth() === 0 && date.getDate() === 1) { // Return just the year if it's the only available date information
+            
             return date.toLocaleString('en-US', { year: 'numeric' });
-        } else {
-            // Format date as Month Day, Year, HH:MM:SS
+        } else { // Format date as - Month Day, Year
             return date.toLocaleString('en-US', {
                 month: 'long',
                 day: '2-digit',
@@ -39,18 +34,23 @@
             });
         }
     }
+
+
+    $effect(() => {
+        fetchSavedTracks();
+    });
 </script>
 
 
 {#if error}
     <p style="color: darkred">{error}</p>
 {:else}
+    <!-- TODO: skeleton loading animation when page is loading -->
     <div class="track-list">
         
         <div class="search-track">
             <h2>Search track</h2>
             <input type="text" name="year" id="year" bind:value={year}>
-            <!-- <button onclick={fetchTracksByYear}>Search</button> -->
         </div>
         {#each tracks as track, i}
             <li class="track-item">
