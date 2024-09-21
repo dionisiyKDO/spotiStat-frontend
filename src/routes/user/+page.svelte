@@ -1,5 +1,6 @@
 <script>
     import TopPlayedTracks from "./top_played_tracks.svelte";
+    import TopCountOfPlays from "./top_count_of_plays.svelte";
 
     let user_info = $state([]);
 
@@ -49,7 +50,7 @@
                     <TopPlayedTracks />
                 </div>
                 <div class="section-column">
-                    <TopPlayedTracks />
+                    <TopCountOfPlays />
                 </div>
             </div>
         </div>

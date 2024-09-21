@@ -5,18 +5,18 @@
     
     async function fetchTracks() {
         try {
-            const response = await fetch('/api/db/top_played_tracks');
+            const response = await fetch('/api/db/top_count_of_plays');
             const data = await response.json();
             if (!response.ok) {
                 error = data.error || 'Failed to fetch top played tracks from database';
             } else {
                 // Find the maximum total_ms_played
-                const maxTotalMsPlayed = Math.max(...data.map(track => track.total_ms_played));
+                const maxCountOfPlays = Math.max(...data.map(track => track.count_of_plays));
 
                 // Add percentage key to each track
                 const tracksWithPercentage = data.map(track => ({
                     ...track,  // Spread the existing properties
-                    percentage_of_max: (track.total_ms_played / maxTotalMsPlayed) * 100
+                    percentage_of_max: (track.count_of_plays / maxCountOfPlays) * 100
                 }));
 
                 tracks = tracksWithPercentage;
@@ -40,12 +40,13 @@
 {:else}
 
     <div>
-        <h2>Top played tracks</h2>
+        <h2>Top count of plays</h2>
         {#if tracks.length > 0}
 
             <ul class="track-list">
                 {#each tracks as track}
                     <li class="track-item">
+                        <!-- <Track {track} /> -->
                         <div class="track-bar">
                             <div class="track-bar-fill" style="--bar-value: {track.percentage_of_max}%"></div>
                         </div>
@@ -61,7 +62,7 @@
                             <div class="flex-1"></div>
                             <div class="space"></div>
                         <div class="track-meta">
-                            <div class="track-time-played">{Math.round(track.total_hours_played * 100) / 100} hours</div>
+                            <div class="track-time-played">{track.count_of_plays} times</div>
                         </div>
                     </li>
                 {/each}
