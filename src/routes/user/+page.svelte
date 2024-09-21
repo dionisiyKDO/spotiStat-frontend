@@ -59,6 +59,8 @@
 
 
 <style>
+    @import "$lib/css/profile_track_list.css";
+    
     .profile-content {
         padding: 1rem;
         display: flex;
