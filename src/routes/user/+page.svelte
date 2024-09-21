@@ -73,10 +73,18 @@
 
     .section-column {
         width: 50%;
-        background-color: rgb(53, 53, 53);
         display: flex;
         flex-direction: column;
         gap: 1rem;
+   }
+
+   @media (max-width: 1024px) {
+        .section { 
+            flex-direction: column;
+        }
+        .section-column {
+            width: 100%;
+        }
    }
 
     .profile-header {
