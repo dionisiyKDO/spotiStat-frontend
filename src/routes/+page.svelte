@@ -7,11 +7,11 @@
     <h2>Welcome to SpotiStat!</h2>
     <div class="links sp_api_links">
         <h3>Spotify API links</h3>
-        <a href="/play_history">Play history</a>
-        <a href="/liked_tracks">Liked tracks</a>
-        <a href="/top/tracks">Top tracks</a>
-        <a href="/top/artists">Top artists</a>
-        <a href="/tracks_by_year">Tracks by year</a>
+        <a href="/spotify/recently_played">Recently played</a>
+        <a href="/spotify/saved_tracks">Saved tracks</a>
+        <a href="/spotify/top/tracks">Top tracks</a>
+        <a href="/spotify/top/artists">Top artists</a>
+        <a href="/spotify/tracks_by_year">Tracks by year</a>
     </div>
     <div class="links file_api_links"> 
         <h3>From file stats</h3>

@@ -7,7 +7,7 @@
     async function fetchTopTracks() {
         topTracks = [];
         try {
-            const response = await fetch(`/api/top_tracks?time_range=${timeRange}`);
+            const response = await fetch(`/api/spotify/top_tracks?time_range=${timeRange}`);
             const data = await response.json();
             if (!response.ok) {
                 error = data.error || 'Failed to fetch top tracks';

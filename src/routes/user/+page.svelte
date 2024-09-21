@@ -12,7 +12,7 @@
     
     async function fetchUserInfo() {
         try {
-            const response = await fetch('/api/user_info');
+            const response = await fetch('/api/spotify/profile');
             const data = await response.json();
             if (!response.ok) {
                 error = data.error || 'Failed to fetch user info';

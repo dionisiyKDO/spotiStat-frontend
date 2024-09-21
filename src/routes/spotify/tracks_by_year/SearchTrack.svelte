@@ -7,7 +7,7 @@
 
     async function fetchSavedTracks() {
         try {
-            const response = await fetch(`/api/search_saved_tracks?year=${year}`);
+            const response = await fetch(`/api/spotify/saved_tracks/filter?year=${year}`);
             const data = await response.json();
             if (!response.ok) {
                 error = data.error || 'failed to fetch saved tracks';

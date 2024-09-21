@@ -1,18 +1,18 @@
 <script>
-    let likedTracks = $state([]);
+    let savedTracks = $state([]);
     let sortBy = $state('index');
     let order = $state('asc');
     let error = $state('');
 
 
-    async function fetchLikedTracks() {
+    async function fetchSavedTracks() {
         try {
-            const response = await fetch(`/api/liked_tracks?sort_by=${sortBy}&order=${order}`);
+            const response = await fetch(`/api/spotify/saved_tracks?sort_by=${sortBy}&order=${order}`);
             const data = await response.json();
             if (!response.ok) {
                 error = data.error || 'Failed to fetch liked tracks';
             } else {
-                likedTracks = data.liked_tracks;
+                savedTracks = data.saved_tracks;
             }
         } catch (err) {
             error = err;
@@ -20,7 +20,7 @@
     }
 
     $effect(() => {
-        fetchLikedTracks();
+        fetchSavedTracks();
     });
 </script>
 
@@ -31,7 +31,7 @@
 
     <div class="container container-narrow">
         <div class="section-title">
-            <h2>Liked Tracks</h2>
+            <h2>Saved Tracks</h2>
 
             <div class="sort-options">
                 <label for="sort_by">Sort by:</label>
@@ -51,7 +51,7 @@
         </div>
 
         <ul class="track-list">
-            {#each likedTracks as track}
+            {#each savedTracks as track}
                 <li class="track-item">
                     <div class="track-popularity-bar">
                         <div class="track-popularity-bar-fill" style="--popularity: {track.popularity}%"></div>

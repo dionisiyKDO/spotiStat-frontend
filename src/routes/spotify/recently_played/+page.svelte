@@ -5,7 +5,7 @@
 
     async function fetchPlayHistory() {
         try {
-            const response = await fetch('/api/play_history');
+            const response = await fetch('/api/spotify/recently_played');
             const data = await response.json();
             if (!response.ok) {
                 error = data.error || 'Failed to fetch play history';

@@ -5,7 +5,7 @@
     
     async function fetchTracks() {
         try {
-            const response = await fetch('/api/db/top_played_tracks');
+            const response = await fetch('/api/db/history/top_tracks_by_playtime?limit=10');
             const data = await response.json();
             if (!response.ok) {
                 error = data.error || 'Failed to fetch top played tracks from database';

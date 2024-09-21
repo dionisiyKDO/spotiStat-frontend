@@ -8,7 +8,7 @@
 
     async function fetchTracksByYear() {
         try {
-            const response = await fetch('/api/tracks_by_year');
+            const response = await fetch('/api/spotify/tracks_by_year');
             const data = await response.json();
             if (!response.ok) {
                 error = data.error || 'Failed to fetch tracks by year';
