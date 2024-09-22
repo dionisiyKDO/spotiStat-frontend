@@ -44,6 +44,7 @@
             <image class="avatar" style="height: {avatar_height}px; width: {avatar_width}px;" src={avatar_url} />
             <h1>{user_nickname}</h1>
         </div>
+        <a href="/user/track_stats">Track stats</a>
         <div class="profile-content">
             <div class="section">
                 <div class="section-column">
@@ -61,6 +62,32 @@
 <style>
     @import "$lib/css/profile_track_list.css";
     
+    a {
+        display: inline-block;
+
+        margin-bottom: 10px;
+        padding: 10px;
+
+        text-decoration: none;
+        font-size: 20px;
+        font-weight: bold;
+
+        border: 1px solid var(--pico-color);
+        border-radius: 5px;
+
+        cursor: pointer;
+        text-align: center;
+
+        transition: all 0.3s ease-in-out;
+    }
+    a:hover {
+        color: var(--pico-primary-hover);
+        box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+        transition: all 0.3s ease-in-out;
+
+    }
+
+
     .profile-content {
         padding: 1rem;
         display: flex;
