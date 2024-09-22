@@ -2,10 +2,17 @@
     import D3Chart from './D3Chart.svelte';
     
     let track_id = $state('3UhNeRObinbV3mtqPddGux');
+    let track_meta = $state({});
+    let album_info = $state({});
+    
     let track_stats = $state({});
     let timeline_data = $state([]);
     let error = $state('');
 
+    // 4DMKwE2E2iYDKY01C335Uw carry on
+    // 2UZtI2HUyLRzqBjodvcUmY rx medicate
+    // 3UhNeRObinbV3mtqPddGux pyrolisis
+    
     async function fetchTrackStats() {
         try {
             const response = await fetch(`/api/db/history/track/${track_id}/stats`);
@@ -25,6 +32,22 @@
             error = err;
         }
     }
+    async function fetchTrackMeta() {
+        try {
+            const response = await fetch(`/api/spotify/track_meta?track_id=${track_id}`);
+            const data = await response.json();
+            if (!response.ok) {
+                error = data.error || 'Failed to fetch track stats';
+            } else {
+                track_meta = data.track_meta;
+                album_info = track_meta.album;
+            }
+        } catch (err) {
+            error = err;
+        }
+    }
+
+
 
     function fillMissingDates(data) {
         // Get all unique dates from existing data (optional)
@@ -59,6 +82,10 @@
     }
 
     $effect(() => {
+        fetchTrackMeta().then(() => {
+            console.log(track_meta.album.name);
+        });
+        
         fetchTrackStats().then(() => {
             timeline_data = fillMissingDates(track_stats);
         });
@@ -71,12 +98,28 @@
 {:else}
 
     <div>
+        <h1>{track_meta.name}</h1>
+        <div style="margin-bottom: 30px;">
+            <p>Artists: </p>
+            {#each track_meta.artists as artist, index}
+                <p>{index + 1} {artist.name}</p> 
+            {/each}
+        </div>
+        <div style="margin-bottom: 30px;">
+            <p>Album:</p>
+            <p>{album_info.name}</p>
+            <p>{album_info.release_date}</p>
+        </div>
+        <p>Track popularity: {track_meta.popularity}</p>
+    </div>
+
+
+    <div>
         {#if timeline_data.length > 0}
             <D3Chart {timeline_data}/>
         {/if}
 
-
-        <p> Total plays: {track_stats.total_plays}</p>
+        <p>Total plays: {track_stats.total_plays}</p>
         <p>Total time played: {(track_stats.total_ms_played / 3600000).toFixed(2)} hours</p>
         <p>First played: {new Date(track_stats.first_played).toLocaleDateString()}</p>    
         <p>Last played: {new Date(track_stats.last_played).toLocaleDateString()}</p>

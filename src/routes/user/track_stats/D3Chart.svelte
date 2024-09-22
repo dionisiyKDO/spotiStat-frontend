@@ -57,9 +57,6 @@
             .range([0, width])
             .domain(d3.extent(timeline_data, d => d.date));
         
-        console.log(d3.max(timeline_data, d => d.total_minutes_played));
-        console.log(timeline_data[0].total_minutes_played);
-        
         const yScale = d3.scaleLinear()
             .range([height, 0])
             .domain([0, d3.max(timeline_data, d => d.total_minutes_played)])

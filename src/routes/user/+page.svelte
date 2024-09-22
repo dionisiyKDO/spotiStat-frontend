@@ -28,6 +28,7 @@
             error = err;
         }
     }
+    // TODO: at backend add meta info about track like name, artist, popularity, etc
 
     
     $effect(() => {

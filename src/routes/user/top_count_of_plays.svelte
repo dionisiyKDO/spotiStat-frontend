@@ -20,8 +20,6 @@
                 }));
 
                 tracks = tracksWithPercentage;
-                console.log(tracks);
-                
             }
         } catch (err) {
             error = err;

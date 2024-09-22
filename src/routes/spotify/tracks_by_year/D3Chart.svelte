@@ -173,8 +173,6 @@
             const closestPoint = d3.least(tracksByYear, d => Math.abs(xScale(d.release_date) - mouseXsvg));
 
             year(closestPoint.release_date.getFullYear());
-            // year = closestPoint.release_date.getFullYear();
-            // console.log(year);
         }
 
         function drawTooltip(event) {
