@@ -31,42 +31,32 @@
     <p style="color: darkred">{error}</p>
 {:else}
 
-    <div class="title-wrapper">
-        <h2>Play history</h2>
-        <div class="time-ranges">
-            <select name="time_range" id="time_range" bind:value={timeRange}>
-                <option value="short_term" >Short term (4 weeks)  </option>
-                <option value="medium_term">Medium term (6 months)</option>
-                <option value="long_term"  >Long term (12 months) </option>
-            </select>
-        </div>
+    <div class="ml-8 flex gap-2">
+        <h2 class="text-3xl font-semibold mb-2">Top artists</h2>
+        <select class="text-xl" name="time_range" id="time_range" bind:value={timeRange}>
+            <option value="short_term" >Short term (4 weeks)  </option>
+            <option value="medium_term">Medium term (6 months)</option>
+            <option value="long_term"  >Long term (12 months) </option>
+        </select>
     </div>
 
     <!-- TODO: Check screen sizes display off all cards -->
-    <!-- TODO: skeleton loading animation when page is loading -->
 
-    <div class="top-artists-list grid">
+    <div class="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 2xl:grid-cols-5 p-4 pt-6">
         {#each topArtists as artist, i}
-            <div class="top-artist-item">
-                <div class="top-artist-image-wrapper">
+            <div class="flex flex-col items-center justify-center">
+                <div >
                     {#if artist.images && artist.images.length > 0}
-                        <img src="{artist.images[0].url}" alt="Artist art" class="top-artist-image">
+                        <div class="bg-cover bg-center rounded-xl border-2 border-emerald-800 min-w-44 min-h-44 xl:min-w-64 xl:min-h-64" style="background-image: url({artist.images[0].url});"></div>
                     {:else}
-                        <p>No image available</p> <!-- TODO: some mock image if artist doesn't have one -->
+                        <p>No image available :(</p> <!-- TODO: some mock image if artist doesn't have one -->
                     {/if}
                 </div>
-                <div class="top-artist-info">
-                    <div class="top-artist-name">{i + 1}. {artist.name} 
-                        <a href="{artist.external_urls.spotify}"><i class="fab fa-spotify"></i></a>
-                    </div>
+                <div class="p-0 mt-2 text-center">
+                    {i + 1}. {artist.name} <a href="{artist.external_urls.spotify}"><i class="fab fa-spotify"></i></a>
                 </div>
             </div>
         {/each}
     </div>
     
 {/if}
-
-
-<style>
-    @import '$lib/css/top_artists.css';
-</style>

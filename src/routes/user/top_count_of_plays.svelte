@@ -2,6 +2,7 @@
     let tracks = $state([]);
     let error = $state('');
     
+    // HUGE TODO: This component and top_played_tracks.svelte should be merged into one component
     
     async function fetchTracks() {
         try {
@@ -37,34 +38,31 @@
     <p style="color: darkred">{error}</p>
 {:else}
 
-    <div>
-        <h2>Top count of plays</h2>
+    <div class="mt-6">
+        <h2 class="text-3xl font-semibold mb-4 ">Top count of plays</h2>
         {#if tracks.length > 0}
 
-            <ul class="track-list">
-                {#each tracks as track}
-                    <li class="track-item">
-                        <!-- <Track {track} /> -->
-                        <div class="track-bar">
-                            <div class="track-bar-fill" style="--bar-value: {track.percentage_of_max}%"></div>
+        <ul class="flex flex-col gap-2">
+            {#each tracks as track}
+                <li class="relative p-1.5 pl-2 flex flex-row rounded-lg border-2 border-emerald-800 hover:border-emerald-400 transition-all duration-200 ease-in-out">
+                    <div class="absolute top-0 left-0 w-full h-full opacity-50 -z-10"> <!-- TODO: background: linear-gradient(to right, #000000 66.6%, transparent 66.6%); -->
+                        <div class="h-full bg-emerald-900/50 absolute top-0 left-0 track-bar-fill" style="--bar-value: {track.percentage_of_max}%"></div>
+                    </div>
+                    <div class="shrink-0 w-8 my-auto text-2xl font-bold text-emerald-600 text-right">{track.index + 1}</div>
+                    <div class="w-4 shrink-0"></div>
+                    <div class="flex flex-row">
+                        <div class="w-12 h-12 my-auto bg-cover bg-center rounded-md mr-2 border-2 border-black" style="background-image: url({track.album_image_url});"> </div>
+                        <div class="flex flex-col">
+                            <div class="text-xl -mt-1 font-semibold">{track.name}</div>
+                            <div class="text-base mt-0.5">{track.artist}</div>
                         </div>
-                        <div class="track-number">{track.index + 1}</div>
-                            <div class="space"></div>
-                        <div class="track-info">
-                            <div class="album-image" style="background-image: url({track.album_image_url});"> </div>
-                            <div class="track-name-artist">
-                                <div class="track-name">{track.name}</div>
-                                <div class="track-artist">{track.artist}</div>
-                            </div>
-                        </div>
-                            <div class="flex-1"></div>
-                            <div class="space"></div>
-                        <div class="track-meta">
-                            <div class="track-time-played">{track.count_of_plays} times</div>
-                        </div>
-                    </li>
-                {/each}
-            </ul>
+                    </div>
+                        <div class="flex-1"></div>
+                        <div class="w-4 shrink-0"></div>
+                    <div>{track.count_of_plays} times</div>
+                </li>
+            {/each}
+        </ul>
 
         {:else}
             <p>No tracks found</p>
@@ -74,4 +72,7 @@
 {/if}
 
 <style>
+    .track-bar-fill {
+        width: var(--bar-value);
+    }
 </style>

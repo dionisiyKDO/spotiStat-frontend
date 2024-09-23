@@ -1,0 +1,57 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* 
+sm	640px	@media (min-width: 640px) { ... }
+md	768px	@media (min-width: 768px) { ... }
+lg	1024px	@media (min-width: 1024px) { ... }
+xl	1280px	@media (min-width: 1280px) { ... }
+2xl	1536px	@media (min-width: 1536px) { ... } 
+*/
+
+@layer base {
+    html {
+        font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+    }
+}
+
+@layer components {
+    /* a {
+        @apply text-primary hover:text-light;
+    }
+
+    .link {
+        @apply text-primary hover:text-light px-2 py-1 m-2 rounded-lg border-2 border-primary hover:border-light transition-all duration-200 ease-in-out box-border inline-block;
+    } */
+    a {
+        @apply text-emerald-600 hover:text-emerald-400 transition-all duration-200 ease-in-out;
+    }
+
+    .link {
+        @apply text-emerald-600 hover:text-emerald-400 px-2 py-1 m-2 rounded-lg border-2 border-emerald-600 hover:border-emerald-400 transition-all duration-200 ease-in-out box-border inline-block;
+    }
+    select, input {
+        @apply px-4 py-1 rounded-md
+    }
+}
+
+:root {
+    color-scheme: dark;
+    color: rgba(255, 255, 255, 0.95);
+    background-color: #0c0c0c;
+}
+
+body {
+    font-size: 18px;
+    margin: 0;
+    display: flex;
+    min-width: 100vw;
+    min-height: 100dvh;
+    box-sizing: border-box;
+    overflow-x: hidden;
+}
+
+#app {
+    display: contents;
+}

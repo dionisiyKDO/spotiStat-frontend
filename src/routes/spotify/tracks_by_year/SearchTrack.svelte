@@ -1,4 +1,6 @@
 <script>
+    import TrackList from "$lib/TrackList.svelte";
+
     let { year } = $props();
     let tracks = $state([]);
     let error = $state('');
@@ -19,23 +21,6 @@
         }
     }
 
-    function formatDate(dateString) {
-        const date = new Date(dateString);
-        if (date.getFullYear() === new Date(dateString).getFullYear() && 
-            date.getMonth() === 0 && date.getDate() === 1) { // Return just the year if it's the only available date information
-            
-            return date.toLocaleString('en-US', { year: 'numeric' });
-        } else { // Format date as - Month Day, Year
-            return date.toLocaleString('en-US', {
-                month: 'long',
-                day: '2-digit',
-                year: 'numeric',
-                hour12: false
-            });
-        }
-    }
-
-
     $effect(() => {
         fetchSavedTracks();
     });
@@ -45,55 +30,15 @@
 {#if error}
     <p style="color: darkred">{error}</p>
 {:else}
-    <!-- TODO: skeleton loading animation when page is loading -->
-    <div class="track-list">
-        
-        <div class="search-track">
-            <h2>Search track</h2>
-            <input type="text" name="year" id="year" bind:value={year}>
+
+    <div class="m-8">
+        <div class="flex gap-2 mb-2"> 
+            <h2 class="py-1 text-3xl font-semibold">Tracks from: </h2>
+            <input class="w-24 text-center text-2xl font-semibold" type="text" name="year" id="year" bind:value={year}>
         </div>
-        {#each tracks as track, i}
-            <li class="track-item">
-                <div class="track-number">{i + 1}</div>
-                <div class="album-image-wrapper">
-                    <img src="{track.album_image_url}" alt="Album art" class="album-image">
-                </div>
-                <div class="track-info">
-                    <div class="track-name">{track.name}</div>
-                    <div class="track-artist">{track.artist}</div>
-                    <div class="track-meta"><div class="track-time-played">Released on: {formatDate(track.release_date)}</div></div>
-                </div>
-            </li>
-        {/each}
-        {#if tracks.length === 0}
-            <p>No tracks found</p>
-        {/if}
+        <div class="mt-4">
+            <TrackList tracks={tracks} />
+        </div>
     </div>
+
 {/if}
-
-
-
-
-
-<style>
-    @import '$lib/css/track_list.css';
-    .search-track {
-        display: flex;
-        flex-direction: row;
-        align-items: center;
-        gap: 1rem;
-        margin-bottom: 1rem;
-        margin-top: 2rem;
-    }
-    .search-track h2 {
-        margin: 0;
-    }
-    .search-track input {
-        text-align: center;
-        margin: 0;
-        width: 100px;
-    }
-    .search-track button {
-        margin: 0;
-    }
-</style>

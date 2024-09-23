@@ -41,95 +41,27 @@
     <p style="color: darkred">{error}</p>
 {:else}
     <div>
-        <div class="profile-header">
-            <image class="avatar" style="height: {avatar_height}px; width: {avatar_width}px;" src={avatar_url} />
-            <h1>{user_nickname}</h1>
+
+        <div class="p-4 flex items-center gap-4">
+            <div class="rounded-full bg-cover bg-center w-24 h-24" style="background-image:url({avatar_url});"></div>
+            <h1 class="mt-3 text-5xl font-semibold">{user_nickname}</h1>
         </div>
-        <a href="/user/track_stats">Track stats</a>
-        <div class="profile-content">
-            <div class="section">
-                <div class="section-column">
-                    <TopPlayedTracks />
-                </div>
-                <div class="section-column">
-                    <TopCountOfPlays />
-                </div>
+
+        <a class="link" href="/user/track_stats">Track stats</a>
+
+        <div class="w-full flex gap-4 flex-col lg:flex-row">
+            <div class="w-full flex flex-col gap-4 lg:w-1/2">
+                <TopPlayedTracks />
+            </div>
+            <div class="w-full flex flex-col gap-4 lg:w-1/2">
+                <TopCountOfPlays />
             </div>
         </div>
+
     </div>
 {/if}
 
 
 <style>
-    @import "$lib/css/profile_track_list.css";
-    
-    a {
-        display: inline-block;
 
-        margin-bottom: 10px;
-        padding: 10px;
-
-        text-decoration: none;
-        font-size: 20px;
-        font-weight: bold;
-
-        border: 1px solid var(--pico-color);
-        border-radius: 5px;
-
-        cursor: pointer;
-        text-align: center;
-
-        transition: all 0.3s ease-in-out;
-    }
-    a:hover {
-        color: var(--pico-primary-hover);
-        box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
-        transition: all 0.3s ease-in-out;
-
-    }
-
-
-    .profile-content {
-        padding: 1rem;
-        display: flex;
-        gap: 1rem;
-    }
-
-    .section {
-        width: 100%;
-        display: flex;
-        gap: 1rem;
-        flex-direction: row;
-    }
-
-    .section-column {
-        width: 50%;
-        display: flex;
-        flex-direction: column;
-        gap: 1rem;
-   }
-
-   @media (max-width: 1024px) {
-        .section { 
-            flex-direction: column;
-        }
-        .section-column {
-            width: 100%;
-        }
-   }
-
-    .profile-header {
-        display: flex;
-        align-items: center;
-        gap: 1rem;
-        margin-bottom: 1rem;
-    }
-    .profile-header h1 {
-        font-size: 3em;
-        margin: 0;
-    }
-    .avatar {
-        border-radius: 50%;
-        object-fit: cover;
-    }
 </style>

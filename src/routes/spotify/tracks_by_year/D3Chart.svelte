@@ -1,5 +1,6 @@
 <script>
     import * as d3 from "d3";
+    import * as colors from "tailwindcss/colors"
 
     let { year } = $props();
     let tracksByYear = $state([]);
@@ -23,27 +24,27 @@
     function drawChart() {
         d3.select("#chart").selectAll("*").remove();
 
-        // Create the styles for the chart
+        // styles for the chart
         // #region
         const chartFontSize = '14px';
-        const chartColor = 'var(--pico-color)';
+        const chartColor = '#c2c7d0';
         const chartBG = '#777';
-        const chartStroke = 'var(--pico-muted-color)';
+        const chartStroke = '#7b8495';
         const chartStrokeWidth = 1;
         const chartStrokeOpacity = 0.33;
-        const chartLineStroke = 'var(--pico-primary)';
+        const chartLineStroke = colors.emerald[600];
         const chartLineStrokeWidth = 1.5;
         const chartLineStrokeOpacity = 0.66;
 
         const tooltipFontSize = '18px';
-        const tooltipColor = 'var(--pico-color)';
-        const tooltipBG = 'var(--pico-background-color)';
-        const tooltipBorder = 'solid 1px var(--pico-primary-hover)';
+        const tooltipColor = '#c2c7d0';
+        const tooltipBG = '#0c0c0c';
+        const tooltipBorder = colors.emerald[500];
         const tooltipBorderRadius = '3px';
         const tooltipPadding = '5px';
         const tooltipBoxShadow = '0 0 10px rgba(0, 0, 0, 0.1)';
 
-        const tooltipCircleFill = 'var(--pico-primary-hover)';
+        const tooltipCircleFill = colors.emerald[500];
         const tooltipCircleRadius = 3;
         const tooltipCircleOpacity = 1;
 
@@ -264,22 +265,9 @@
     <p style="color: darkred">{error}</p>
 {:else}
 
-    <!-- TODO: skeleton loading animation when page is loading -->
-    <h2>Tracks by year</h2>
-
-    <p>This line chart shows the number of tracks in your saves released in each year, showing your preferences by time range. </p>
-    <p style="opacity: 0.5;">(you can click on chart for selecting a year to search)</p>
-    
     <div id="chart-container">
         <svg id="chart"/>
         <div id="tooltip"></div>
     </div>
 
 {/if}
-
-
-<style>
-    p {
-        display: inline;
-    }
-</style>

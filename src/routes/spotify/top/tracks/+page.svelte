@@ -1,4 +1,6 @@
 <script>
+    import TrackList from "$lib/TrackList.svelte";
+
     let topTracks = $state([]);
     let error = $state('');
     let timeRange = $state('medium_term');
@@ -30,39 +32,18 @@
     <p style="color: darkred">{error}</p>
 {:else}
 
-    <div class="title-wrapper">
-        <h2>Top tracks</h2>
-        <div class="time-ranges">
-            <select name="time_range" id="time_range" bind:value={timeRange}>
+    <div class="ml-10">
+        <h2 class="text-3xl font-semibold mb-2">Top tracks</h2>
+        <div class="flex flex-col gap-2">
+            <select class="w-72"  name="time_range" id="time_range" bind:value={timeRange}>
                 <option value="short_term" >Short term (4 weeks)  </option>
                 <option value="medium_term">Medium term (6 months)</option>
                 <option value="long_term"  >Long term (12 months) </option>
             </select>
         </div>
     </div>
-
-    <!-- TODO: skeleton loading animation when page is loading -->
-
-    <ul class="track-list">
-        {#each topTracks as track, i}
-            <li class="track-item play-history-track-item">
-                <div class="track-number">{i + 1}</div>
-                <div class="album-image-wrapper">
-                    <img src="{track.album_image_url}" alt="Album art" class="album-image">
-                </div>
-                <div class="track-info">
-                    <div class="track-name">{track.name}</div>
-                    <div class="track-artist">
-                        {track.artist} 
-                        <a href="{track.spotify_url}"><i class="fab fa-spotify"></i></a>
-                    </div>
-                </div>
-            </li>
-        {/each}
-    </ul>
+    <div class="mt-4">
+        <TrackList tracks={topTracks} />
+    </div>
     
 {/if}
-
-<style>
-@import '$lib/css/track_list.css';
-</style>
