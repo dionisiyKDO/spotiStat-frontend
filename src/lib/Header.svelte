@@ -20,7 +20,7 @@
         <a class="block" href="/"><strong>SpotiStat</strong></a>
         <ul class="list-none flex gap-4">
             {#if loggedIn === true}
-                <li><a href="/accounts/{accountId}/profile">Profile</a></li>
+                <li><a href="/accounts/{accountId}">Profile</a></li>
                 <li><a href="/api/auth/logout">Logout</a></li>
             {:else if loggedIn === false}
                 <li><a href="/api/auth/login">Login with Spotify</a></li>
