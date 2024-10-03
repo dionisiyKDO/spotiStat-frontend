@@ -1,4 +1,7 @@
 <script>
+    import { page } from '$app/stores';
+    let accountId = $page.params.accountId; 
+    
     import TopPlayedTracks from "./top_played_tracks.svelte";
     import TopCountOfPlays from "./top_count_of_plays.svelte";
 
@@ -47,7 +50,8 @@
             <h1 class="mt-3 text-5xl font-semibold">{user_nickname}</h1>
         </div>
 
-        <a class="link" href="/user/track_stats">Track stats</a>
+        <a class="link" href="/accounts/{accountId}/profile/track_stats">Track stats</a>
+        <a class="link" href="/accounts/{accountId}/profile/artist_stats">Artist stats</a>
 
         <div class="w-full flex gap-4 flex-col lg:flex-row">
             <div class="w-full flex flex-col gap-4 lg:w-1/2">
