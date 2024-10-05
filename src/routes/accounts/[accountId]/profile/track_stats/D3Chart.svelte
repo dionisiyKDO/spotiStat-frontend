@@ -3,8 +3,6 @@
     import * as colors from "tailwindcss/colors"
 
     let { timeline_data } = $props();
-    // let track_id = $state('3UhNeRObinbV3mtqPddGux');
-
     
     async function drawChart() {
         d3.select("#chart").selectAll("*").remove();
@@ -157,8 +155,6 @@
             const xDate = xScale.invert(mouseXsvg);
 
             const closestPoint = d3.least(timeline_data, d => Math.abs(xScale(d.date) - mouseXsvg));
-
-            year(closestPoint.date.getFullYear());
         }
 
         function drawTooltip(event) {
@@ -233,28 +229,13 @@
         }
     }
 
-
     $effect(() => {
         drawChart();
     });
 </script>
 
 
-<div id="suck">
-    <h2>Tracks stats</h2>
-    <p>Total plays: {timeline_data[0].play_total_ms_played}</p>
-    <p>Total time played: {(timeline_data[0].total_ms_played / 3600000).toFixed(2)} hours</p>
-    
-    <div id="chart-container">
-        <svg id="chart"/>
-        <div id="tooltip"></div>
-    </div>
+<div id="chart-container">
+    <svg id="chart"/>
+    <div id="tooltip"></div>
 </div>
-
-
-<style>
-#suck {
-    margin-bottom: 2rem;
-    border-bottom: 1px solid var(--pico-muted-color);
-}
-</style>

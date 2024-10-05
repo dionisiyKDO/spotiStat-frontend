@@ -16,10 +16,14 @@
 
     let { limit, sortBy }: Props = $props();
 
-    async function fetchTracks(limit: number, sortby: string): Promise<Tracks[] | null> {
+    async function fetchTracks(
+        limit: number,
+        sortby: string
+    ): Promise<Tracks[] | null> {
         try {
-            
-            const response = await fetch(`/api/db/history/top-tracks?limit=${limit}&sort_by=${sortby}`);
+            const response = await fetch(
+                `/api/db/history/top-tracks?limit=${limit}&sort_by=${sortby}`
+            );
             if (!response.ok) {
                 const data = await response.json();
                 const error = data.error || "Failed to fetch top tracks";
@@ -29,19 +33,14 @@
             const data = (await response.json()) as {
                 tracks: Tracks[];
             };
-            console.log(data);
-            
 
             // Find the maximum total_ms_played
-            const max = Math.max(
-                ...data.map((track) => track[sortby])
-            );
+            const max = Math.max(...data.map((track) => track[sortby]));
 
             // Add percentage key to each track
             const tracksWithPercentage = data.map((track) => ({
                 ...track, // Spread the existing properties
-                percentage_of_max:
-                    (track[sortby] / max) * 100,
+                percentage_of_max: (track[sortby] / max) * 100,
             }));
 
             return tracksWithPercentage;
@@ -56,7 +55,7 @@
 
 {#await TracksReq}
     <p class="loading">Loading...</p>
-{:then Tracks} 
+{:then Tracks}
     <div class="mt-6">
         <h2 class="text-3xl font-semibold mb-4">Top count of plays</h2>
         {#if Tracks.length > 0}
@@ -100,7 +99,12 @@
                         {#if sortBy === "play_count"}
                             <div>{track.play_count} times</div>
                         {:else}
-                            <div>{Math.round((track.total_ms_played / (1000 * 60 * 60)) * 100) / 100} hours</div>
+                            <div>
+                                {Math.round(
+                                    (track.total_ms_played / (1000 * 60 * 60)) *
+                                        100
+                                ) / 100} hours
+                            </div>
                         {/if}
                     </li>
                 {/each}
@@ -110,7 +114,6 @@
         {/if}
     </div>
 {/await}
-
 
 <style>
     .track-bar-fill {

@@ -1,4 +1,3 @@
-
 export interface TrackStats {
     avg_playtime_per_play: number;
     distinct_days_played: number;
@@ -31,6 +30,14 @@ export interface TrackMeta {
     track_number: number;
     type: string;
     uri: string;
+}
+
+export interface Tracks {
+    artist: string;
+    play_count: number;
+    spotify_track_uri: string;
+    total_ms_played: number;
+    track_name: string;
 }
 
 interface TimelineData {
@@ -76,6 +83,30 @@ interface Image {
 
 interface ExternalIds {
     isrc: string;
+}
+
+export async function fetchTracks(
+    limit_count: number = 10,
+    limit_play: number = 1000
+): Promise<Tracks[] | null> {
+    try {
+        const response = await fetch(
+            `/api/db/history/played-tracks?limit_count=${limit_count}&limit_play=${limit_play}&group_by=artist,track`
+        );
+
+        if (!response.ok) {
+            const data = await response.json();
+            const error = data.error || "Failed to fetch tracks";
+            console.log(error);
+            return null;
+        }
+
+        const data = (await response.json()) as { played_tracks: Tracks[] };
+        return data.played_tracks;
+    } catch (err) {
+        console.log(err);
+        return null;
+    }
 }
 
 export async function fetchTrackStats(

@@ -1,7 +1,5 @@
 <script lang="ts">
     import { page } from "$app/stores";
-    import TopPlayedTracks from "./top_played_tracks.svelte";
-    import TopCountOfPlays from "./top_count_of_plays.svelte";
     import TopTracks from "./top_tracks.svelte";
 
     let accountId = $page.params.accountId;

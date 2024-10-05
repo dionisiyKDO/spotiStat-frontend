@@ -1,6 +1,8 @@
 <script>
     let { tracks } = $props();
 
+    console.log(tracks);
+
     function formatDateWithTime(dateString) {
         const date = new Date(dateString);
         return date.toLocaleString("en-US", {
@@ -64,7 +66,11 @@
                 <!-- Track name + artist -->
                 <div class="flex flex-col mt-0.5 max-w-96">
                     <div class="text-lg font-semibold truncate-text">
-                        {track.name}
+                        {#if track.track_name}
+                            {track.track_name}
+                        {:else if track.name}
+                            {track.name}
+                        {/if}
                     </div>
                     <div class="text-base -mt-0.5">{track.artist}</div>
                 </div>
@@ -90,6 +96,19 @@
 
                 {#if track.popularity !== undefined}
                     <div class="">Popularity: {track.popularity}</div>
+                {/if}
+
+                {#if track.play_count}
+                    <div class="">Play count: {track.play_count}</div>
+                {/if}
+
+                {#if track.total_ms_played}
+                    <div class="">
+                        Minutes played: {(
+                            track.total_ms_played /
+                            (1000 * 60)
+                        ).toFixed(2)}
+                    </div>
                 {/if}
             </div>
         </li>
