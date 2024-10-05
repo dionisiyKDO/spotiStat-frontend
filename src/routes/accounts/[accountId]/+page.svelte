@@ -1,9 +1,6 @@
-<script>
+<script lang="ts">
     import { page } from "$app/stores";
     let accountId = $page.params.accountId;
-
-    let message = $state("");
-    let error = $state("");
 
     const spotifyLinks = [
         {
@@ -28,42 +25,55 @@
         },
     ];
 
-    async function fetchCheckHistory() {
+    interface Response {
+        message: string;
+    }
+
+    async function fetchCheckHistory(
+        accountId: string
+    ): Promise<Response | null> {
         try {
-            // const response = await fetch(`/api/db/check_history?account_id=${message}`);
             const response = await fetch(
                 `/api/db/check_history?account_id=${accountId}`
             );
-            const data = await response.json();
 
             if (!response.ok) {
+                const data = await response.json();
                 error = data.error || "Failed to fetch user info";
-            } else {
-                message = data.message;
+                return null;
             }
+
+            const data = (await response.json()) as Response;
+            return data;
         } catch (err) {
-            error = err;
+            console.log(err);
+            return null;
         }
     }
 
-    $effect(() => {
-        fetchCheckHistory();
-    });
+    let historyFlagReq = $derived(fetchCheckHistory(accountId));
 </script>
 
 <div>
     <h2 class="text-3xl font-semibold">{accountId}</h2>
 
     <!-- History related block -->
-    <div class="mt-6">
-        {#if error}
-            <p style="color: darkred">{error}</p>
-            <!-- TODO: normal advice to import account listening history -->
-        {:else if message}
-            <h2 class="text-2xl font-semibold mb-4">History links</h2>
-            <a class="link" href="/accounts/{accountId}/profile/">Profile</a>
-        {/if}
-    </div>
+    {#await historyFlagReq}
+        <p class="loading">Loading...</p>
+    {:then historyFlag}
+        <div class="mt-6">
+            {#if historyFlag === null}
+                <p style="color: darkred">
+                    Listening history not found (Import history) <!-- TODO: importing logic -->
+                </p>
+            {:else}
+                <h2 class="text-2xl font-semibold mb-4">History links</h2>
+                <a class="link" href="/accounts/{accountId}/profile/">
+                    Profile
+                </a>
+            {/if}
+        </div>
+    {/await}
 
     <!-- SpotifyAPI related block -->
     <div class="mt-4">

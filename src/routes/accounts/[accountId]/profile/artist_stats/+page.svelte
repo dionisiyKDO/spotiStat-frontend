@@ -27,6 +27,7 @@
         }
     }
 
+    // TODO: extract this function and reuse it across files
     function fillMissingDates(data) {
         const startDate = new Date(data.first_played);
         const endDate = new Date(data.last_played);

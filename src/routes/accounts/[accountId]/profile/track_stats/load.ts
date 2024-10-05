@@ -1,3 +1,4 @@
+
 export interface TrackStats {
     avg_playtime_per_play: number;
     distinct_days_played: number;
@@ -10,12 +11,6 @@ export interface TrackStats {
     total_ms_played: number;
     total_plays: number;
     track_id: string;
-}
-
-export interface TimelineData {
-    date: string | Date;
-    play_count: number;
-    total_ms_played: number;
 }
 
 export interface TrackMeta {
@@ -36,6 +31,12 @@ export interface TrackMeta {
     track_number: number;
     type: string;
     uri: string;
+}
+
+interface TimelineData {
+    date: string | Date;
+    play_count: number;
+    total_ms_played: number;
 }
 
 interface Album {

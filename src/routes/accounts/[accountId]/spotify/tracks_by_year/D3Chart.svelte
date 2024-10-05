@@ -1,25 +1,8 @@
-<script>
-    import * as d3 from "d3";
+<script lang="ts">
     import * as colors from "tailwindcss/colors"
+    import * as d3 from "d3";
 
-    let { year } = $props();
-    let tracksByYear = $state([]);
-    let error = $state('');
-
-
-    async function fetchTracksByYear() {
-        try {
-            const response = await fetch('/api/spotify/tracks_by_year');
-            const data = await response.json();
-            if (!response.ok) {
-                error = data.error || 'Failed to fetch tracks by year';
-            } else {
-                tracksByYear = data.tracks_by_year;
-            }
-        } catch (err) {
-            error = err;
-        }
-    }
+    let { year, tracksByYear } = $props();
 
     function drawChart() {
         d3.select("#chart").selectAll("*").remove();
@@ -249,25 +232,13 @@
         }
     }
 
-
     $effect(() => {
-        fetchTracksByYear().then(() => {
-            tracksByYear.sort(function(a, b) { return a.release_date - b.release_date; }); // sort by release date
-            for (let i = 0; i < tracksByYear.length; i++) { tracksByYear[i].release_date = new Date(tracksByYear[i].release_date); } // convert to date type
-            
-            drawChart();
-        });
+        drawChart();
     });
 </script>
 
 
-{#if error}
-    <p style="color: darkred">{error}</p>
-{:else}
-
-    <div id="chart-container">
-        <svg id="chart"/>
-        <div id="tooltip"></div>
-    </div>
-
-{/if}
+<div id="chart-container">
+    <svg id="chart"/>
+    <div id="tooltip"></div>
+</div>

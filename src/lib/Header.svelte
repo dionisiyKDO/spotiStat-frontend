@@ -1,17 +1,5 @@
 <script>
-    let loggedIn = $state('');
-    let accountId = $state('');
-
-    async function checkLoginStatus() {
-        const res = await fetch('/api/auth/session');
-        const data = await res.json();
-        loggedIn = data.logged_in;
-        accountId = data.account_id;
-    }
-
-    $effect(() => {
-        checkLoginStatus();
-    });
+    let { loggedIn, accountId } = $props();
 </script>
 
 

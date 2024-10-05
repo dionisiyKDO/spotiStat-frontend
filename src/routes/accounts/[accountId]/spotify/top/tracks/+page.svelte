@@ -1,49 +1,65 @@
-<script>
+<script lang="ts">
     import TrackList from "$lib/TrackList.svelte";
 
-    let topTracks = $state([]);
-    let error = $state('');
-    let timeRange = $state('medium_term');
+    let timeRange = $state("medium_term");
 
+    export interface TopTrack {
+        added_at: any;
+        album_image_url: string;
+        artist: string;
+        duration_ms: number;
+        name: string;
+        played_at: any;
+        popularity: number;
+        release_date: string;
+        spotify_url: string;
+    }
 
-    async function fetchTopTracks() {
-        topTracks = [];
+    async function fetchTopTracks(
+        timeRange: string = "medium_term"
+    ): Promise<TopTrack[] | null> {
         try {
-            const response = await fetch(`/api/spotify/top_tracks?time_range=${timeRange}`);
-            const data = await response.json();
+            const response = await fetch(
+                `/api/spotify/top_tracks?time_range=${timeRange}`
+            );
+
             if (!response.ok) {
-                error = data.error || 'Failed to fetch top tracks';
-            } else {
-                topTracks = data.top_tracks;
+                const data = await response.json();
+                const error = data.error || "Failed to fetch top tracks";
+                console.log(error);
+                return null;
             }
+
+            const data = (await response.json()) as { top_tracks: TopTrack[] };
+            return data.top_tracks;
         } catch (err) {
-            error = err;
+            console.log(err);
+            return null;
         }
     }
 
-    $effect(() => {
-        fetchTopTracks();
-    });
+    let topTracksReq = $derived(fetchTopTracks(timeRange));
 </script>
 
-
-
-{#if error}
-    <p style="color: darkred">{error}</p>
-{:else}
-
+{#await topTracksReq}
+    <p class="loading">Loading...</p>
+{:then topTracks}
     <div class="ml-10">
         <h2 class="text-3xl font-semibold mb-2">Top tracks</h2>
         <div class="flex flex-col gap-2">
-            <select class="w-72"  name="time_range" id="time_range" bind:value={timeRange}>
-                <option value="short_term" >Short term (4 weeks)  </option>
+            <select
+                class="w-72"
+                name="time_range"
+                id="time_range"
+                bind:value={timeRange}
+            >
+                <option value="short_term">Short term (4 weeks) </option>
                 <option value="medium_term">Medium term (6 months)</option>
-                <option value="long_term"  >Long term (12 months) </option>
+                <option value="long_term">Long term (12 months) </option>
             </select>
         </div>
     </div>
     <div class="mt-4">
         <TrackList tracks={topTracks} />
     </div>
-    
-{/if}
+{/await}
