@@ -41,26 +41,47 @@
     let tracksByYearReq = $derived(fetchTracksByYear());
 </script>
 
-<div class="">
-    <h2 class="py-1 text-3xl font-semibold">Tracks by year</h2>
-    <p class="inline-block">
-        This line chart shows the number of tracks in your saves released in
-        each year, showing your preferences by time range.
-    </p>
-    <p class="inline-block" style="opacity: 0.5;">
-        (you can click on chart for selecting a year to search)
-    </p>
 
-    {#await tracksByYearReq}
-        <p class="loading">Loading...</p>
-    {:then tracksByYear}
-        <D3Chart
-            year={(value) => {
-                year = value;
-            }}
-            {tracksByYear}
-        />
-    {/await}
+<div class="mt-4">
+    <h2 class="text-3xl font-semibold mb-2 inline-block">Tracks by year</h2>
+    
+    <!-- Question mark with hover effect -->
+    <div class="relative inline-block group">
+        <i
+            class="question-mark fa fa-question-circle ml-2 text-gray-500 hover:text-emerald-500 transition duration-100 ease-in-out"
+        ></i>
 
-    <SearchTrack {year} />
+        <!-- Popup content on hover -->
+        <div
+            class="popup-content hidden absolute left-0 mt-2 w-72 p-3 rounded-lg bg-black border border-gray-200 z-10"
+        >
+            <p>
+                This line chart shows the number of tracks in your saves released in each year, showing your preferences by time range.
+            </p>
+            <p class="mt-2 opacity-50">
+                you can click on chart for selecting a year to search
+            </p>
+        </div>
+    </div>
 </div>
+
+
+{#await tracksByYearReq}
+    <p class="loading">Loading...</p>
+{:then tracksByYear}
+    <D3Chart
+        year={(value) => {
+            year = value;
+        }}
+        {tracksByYear}
+    />
+{/await}
+
+<SearchTrack {year} />
+
+
+<style>
+    .question-mark:hover + .popup-content {
+        display: block;
+    }
+</style>

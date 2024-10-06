@@ -47,7 +47,7 @@
 
         <!-- Popup content on hover -->
         <div
-            class="popup-content absolute left-0 mt-2 w-72 p-3 rounded-lg bg-black border border-gray-200 opacity-0 transform transition-all duration-300 ease-in-out z-10"
+            class="popup-content hidden absolute left-0 mt-2 w-72 p-3 rounded-lg bg-black border border-gray-200 z-10"
         >
             <p>
                 A track must be played for more than 30 seconds to be included
@@ -70,6 +70,6 @@
 
 <style>
     .question-mark:hover + .popup-content {
-        opacity: 1;
+        display: block;
     }
 </style>

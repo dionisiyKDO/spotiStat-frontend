@@ -1,7 +1,16 @@
 <script lang="ts">
     import TrackList from "$lib/TrackList.svelte";
 
-    let { year } = $props();
+    let { year }: Props = $props();
+    let tempYear = $state(year);
+
+    $effect(() => {
+        tempYear = year; // Update the temporary value when the actual value changes
+    });
+
+    interface Props {
+        year: number;
+    }
 
     interface Tracks {
         added_at: any;
@@ -38,25 +47,30 @@
         }
     }
 
+    function updateYear() {
+        year = tempYear;
+    }
+
     let tracksReq = $derived(fetchSavedTracks(year));
 </script>
+
+
+<div class="flex gap-2 mt-8 mb-2">
+    <h2 class="text-3xl font-semibold mb-0 inline-block">Tracks from:</h2>
+    <input
+        class="w-24 text-center text-2xl font-semibold"
+        type="text"
+        name="year"
+        id="year"
+        bind:value={tempYear}
+        onblur={updateYear}
+    />
+</div>
 
 {#await tracksReq}
     <p class="loading">Loading...</p>
 {:then tracks}
-    <div class="m-8">
-        <div class="flex gap-2 mb-2">
-            <h2 class="py-1 text-3xl font-semibold">Tracks from:</h2>
-            <input
-                class="w-24 text-center text-2xl font-semibold"
-                type="text"
-                name="year"
-                id="year"
-                bind:value={year}
-            />
-        </div>
-        <div class="mt-4">
-            <TrackList {tracks} />
-        </div>
+    <div class="mt-4">
+        <TrackList {tracks} />
     </div>
 {/await}
