@@ -37,18 +37,39 @@
 </script>
 
 <div class="mt-4">
-    <h2 class="text-3xl font-semibold mb-2">Play history</h2>
-    <!-- TODO: Hide paragraphs to onHover question mark -->
-    <p>
-        A track must be played for more than 30 seconds to be included in play
-        history
-    </p>
-    <p>Tracks listened to while in "Private Session" will not be shown here.</p>
+    <h2 class="text-3xl font-semibold mb-2 inline-block">Play history</h2>
+    
+    <!-- Question mark with hover effect -->
+    <div class="relative inline-block group">
+        <i
+            class="question-mark fa fa-question-circle ml-2 text-gray-500 hover:text-emerald-500 transition duration-100 ease-in-out"
+        ></i>
+
+        <!-- Popup content on hover -->
+        <div
+            class="popup-content absolute left-0 mt-2 w-72 p-3 rounded-lg bg-black border border-gray-200 opacity-0 transform transition-all duration-300 ease-in-out z-10"
+        >
+            <p>
+                A track must be played for more than 30 seconds to be included
+                in play history.
+            </p>
+            <p class="mt-2">
+                Tracks listened to while in "Private Session" will not be shown
+                here.
+            </p>
+        </div>
+    </div>
 </div>
 {#await playHistoryReq}
     <p class="loading">Loading...</p>
 {:then playHistory}
-    <div class="m-4">
+    <div class="mt-4">
         <TrackList tracks={playHistory} />
     </div>
 {/await}
+
+<style>
+    .question-mark:hover + .popup-content {
+        opacity: 1;
+    }
+</style>
