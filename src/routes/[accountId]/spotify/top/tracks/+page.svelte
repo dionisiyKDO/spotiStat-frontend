@@ -3,7 +3,7 @@
 
     let timeRange = $state("medium_term");
 
-    export interface TopTrack {
+    interface TopTrack {
         added_at: any;
         album_image_url: string;
         artist: string;

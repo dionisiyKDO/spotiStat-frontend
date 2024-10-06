@@ -36,16 +36,18 @@
     let playHistoryReq = $derived(fetchPlayHistory());
 </script>
 
-{#await playHistoryReq}
-    <p class="loading">Loading...</p>
-{:then playHistory}
-    <h2 class="mb-4 text-2xl font-medium">Play history</h2>
+<div class="mt-4">
+    <h2 class="text-3xl font-semibold mb-2">Play history</h2>
     <!-- TODO: Hide paragraphs to onHover question mark -->
     <p>
         A track must be played for more than 30 seconds to be included in play
         history
     </p>
     <p>Tracks listened to while in "Private Session" will not be shown here.</p>
+</div>
+{#await playHistoryReq}
+    <p class="loading">Loading...</p>
+{:then playHistory}
     <div class="m-4">
         <TrackList tracks={playHistory} />
     </div>
