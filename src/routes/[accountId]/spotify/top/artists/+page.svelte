@@ -1,6 +1,6 @@
 <script lang="ts">
+    import image from "$lib/images/PersonPlaceholder.png";
     let timeRange = $state("medium_term");
-    // TODO : maybe some image for artists with no image
 
     interface TopArtist {
         external_urls: ExternalUrls;
@@ -43,7 +43,9 @@
                 console.log(error);
                 return null;
             }
-            const data = (await response.json()) as { top_artists: TopArtist[]; };
+            const data = (await response.json()) as {
+                top_artists: TopArtist[];
+            };
             return data.top_artists;
         } catch (err) {
             console.log(err);
@@ -54,25 +56,23 @@
     let topArtistsReq = $derived(fetchTopArtists(timeRange));
 </script>
 
+<div class="text-center">
+    <h2 class="text-3xl font-semibold mb-2">Top artists</h2>
+    <select
+        class="text-xl text-center"
+        name="time_range"
+        id="time_range"
+        bind:value={timeRange}
+    >
+        <option value="short_term">Short term (4 weeks) </option>
+        <option value="medium_term">Medium term (6 months)</option>
+        <option value="long_term">Long term (12 months) </option>
+    </select>
+</div>
+
 {#await topArtistsReq}
-    <p class="loading">Loading...</p>
+    <p class="loading">Loading list of your top artists...</p>
 {:then topArtists}
-    <div class="ml-8 flex gap-2">
-        <h2 class="text-3xl font-semibold mb-2">Top artists</h2>
-        <select
-            class="text-xl"
-            name="time_range"
-            id="time_range"
-            bind:value={timeRange}
-        >
-            <option value="short_term">Short term (4 weeks) </option>
-            <option value="medium_term">Medium term (6 months)</option>
-            <option value="long_term">Long term (12 months) </option>
-        </select>
-    </div>
-
-    <!-- TODO: Check screen sizes display off all cards -->
-
     <div
         class="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 2xl:grid-cols-5 p-4 pt-6"
     >
@@ -86,13 +86,17 @@
                                 .url});"
                         ></div>
                     {:else}
-                        <p>No image available :(</p>
-                        <!-- TODO: some mock image if artist doesn't have one -->
+                        <div
+                            class="bg-cover bg-center min-w-44 min-h-44 xl:min-w-64 xl:min-h-64"
+                            style="background-image: url({image});"
+                        ></div>
                     {/if}
                 </div>
                 <div class="p-0 mt-2 text-center">
                     {i + 1}. {artist.name}
-                    <a href={artist.external_urls.spotify}
+                    <a
+                        href={artist.external_urls.spotify}
+                        aria-label="Spotify link"
                         ><i class="fab fa-spotify"></i></a
                     >
                 </div>
