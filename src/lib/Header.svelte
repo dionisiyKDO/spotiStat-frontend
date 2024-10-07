@@ -3,7 +3,7 @@
 </script>
 
 
-<header class="p-6 pb-4 mb-2 border-b border-gray-500">
+<header class="p-6 pb-4 mb-6 border-b border-gray-500">
     <nav class="flex items-center justify-between">
         <a class="block" href="/"><strong>SpotiStat</strong></a>
         <ul class="list-none flex gap-4">

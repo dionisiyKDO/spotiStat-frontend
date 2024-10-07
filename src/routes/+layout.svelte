@@ -2,9 +2,7 @@
     import Header from "$lib/Header.svelte";
     import Footer from "$lib/Footer.svelte";
 	import "../app.css";
-	// export const ssr = false; 
-	// `export const ssr` will be ignored — move it to +layout(.server).js/ts instead. See https://kit.svelte.dev/docs/page-options for more information.
-
+	
     async function checkLoginStatus() {
         const res = await fetch("/api/auth/session");
         const data = await res.json();

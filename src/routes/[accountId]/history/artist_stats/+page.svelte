@@ -1,5 +1,10 @@
 <script lang="ts">
-    import { fetchArtistStats, fetchPlayedTracks, fetchTracks, type Tracks } from "./load";
+    import {
+        fetchArtistStats,
+        fetchPlayedTracks,
+        fetchTracks,
+        type Tracks,
+    } from "./load";
     import D3Chart from "./D3Chart.svelte";
     import TrackList from "$lib/TrackList.svelte";
 
@@ -8,9 +13,6 @@
     let searchInput = $state("");
     let filteredTracks: Tracks[] = $state([]);
     let showSuggestions = $state(false);
-
-    // 塞壬唱片-MSR
-    // Imagine Dragons
 
     function filterTracks(tracks: Tracks[]) {
         const inputLower = searchInput.toLowerCase().trim();
@@ -49,6 +51,7 @@
 
 <h1 class="text-3xl font-semibold">Artist stats</h1>
 
+<!-- Input -->
 {#await tracksReq}
     <p>Loading.....</p>
 {:then tracks}

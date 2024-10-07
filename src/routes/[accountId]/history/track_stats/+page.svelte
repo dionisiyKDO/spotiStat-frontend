@@ -9,13 +9,10 @@
     } from "./load";
     import D3Chart from "./D3Chart.svelte";
 
-    // 4DMKwE2E2iYDKY01C335Uw carry on
-    // 2UZtI2HUyLRzqBjodvcUmY rx medicate
-    // 3UhNeRObinbV3mtqPddGux pyrolisis
     let track_id = $state("3UhNeRObinbV3mtqPddGux");
-    let searchInput = $state("");
-    let filteredTracks: Tracks[] = $state([]);
+    let searchInput = $state("Battleplan Pyrolysis by 塞壬唱片-MSR");
     let showSuggestions = $state(false);
+    let filteredTracks: Tracks[] = $state([]);
 
     let trackStatsReq = $derived(fetchTrackStats(track_id));
     let trackMetaReq = $derived(fetchTrackMeta(track_id));
@@ -23,131 +20,123 @@
 
     function filterTracks(tracks: Tracks[]) {
         const inputLower = searchInput.toLowerCase().trim();
-        const searchTerms = inputLower.split(/\s+/); // Split by spaces for multi-word search
-        const maxResults = 4;
+        const searchTerms = inputLower.split(/\s+/);
 
-        // Define a helper function to calculate relevance score
-        function calculateRelevance(track: Tracks): number {
-            let score = 0;
-
-            searchTerms.forEach((term) => {
-                if (track.track_name.toLowerCase().includes(term)) score += 5; // Higher score for track name match
-                if (track.artist.toLowerCase().includes(term)) score += 3; // Artist name match
-            });
-
-            return score;
-        }
-
-        // Filter and rank tracks by relevance score
+        // Calculate relevance score
+        const calculateRelevance = (track: Tracks): number => {
+            return searchTerms.reduce((score, term) => {
+                if (track.track_name.toLowerCase().includes(term)) score += 7;
+                if (track.artist.toLowerCase().includes(term)) score += 3;
+                return score;
+            }, 0);
+        };
+        
+        // Filter and rank tracks by relevance
         filteredTracks = tracks
             .map((track) => ({
-                track, // Keep original track data
-                relevance: calculateRelevance(track), // Add relevance score
+                track,
+                relevance: calculateRelevance(track),
             }))
-            .filter((item) => item.relevance > 0) // Filter out tracks with no relevance
-            .sort((a, b) => b.relevance - a.relevance) // Sort by highest relevance first
-            .slice(0, maxResults) // Limit to the top 4 results
-            .map((item) => item.track); // Return only the tracks
+            .filter((item) => item.relevance > 0)
+            .sort((a, b) => b.relevance - a.relevance)
+            .slice(0, 4)
+            .map((item) => item.track);
+    }
+
+    // Debounced input function to reduce excessive filtering on each keystroke
+    let debounceTimeout: ReturnType<typeof setTimeout>;
+    function handleInput(tracks: Tracks[]) {
+        clearTimeout(debounceTimeout);
+        debounceTimeout = setTimeout(() => filterTracks(tracks), 300);
+    }
+
+    function selectTrack(track: Tracks) {
+        track_id = track.spotify_track_uri.replace("spotify:track:", "");
+        searchInput = `${track.track_name} by ${track.artist}`;
+        showSuggestions = false;
     }
 </script>
 
-<h1 class="text-3xl font-semibold">Track stats</h1>
+<div>
+    <!-- Search input -->
+    {#await tracksReq}
+        <p class="loading">Loading track list you listened to...</p>
+    {:then tracks}
+        <h1 class="text-3xl font-semibold mb-2 inline-block">Track stats</h1>
+        <div class="relative mb-4">
+            <input
+                class="w-9/12 border p-2"
+                type="text"
+                placeholder="Search track or artist..."
+                bind:value={searchInput}
+                onfocus={() => { showSuggestions = true}}
+                onblur={() => setTimeout(() => (showSuggestions = false), 200)}
+                oninput={() => handleInput(tracks)}
+            />
 
-{#await tracksReq}
-    <p>Loading.....</p>
-{:then tracks}
-    <div class="relative">
-        <input
-            class="w-96 border p-2"
-            type="text"
-            placeholder="Search track or artist..."
-            bind:value={searchInput}
-            onfocus={() => (showSuggestions = true)}
-            onblur={() =>
-                setTimeout(() => {
-                    showSuggestions = false;
-                }, 200)}
-            oninput={() => filterTracks(tracks)}
-        />
-
-        {#if showSuggestions && filteredTracks.length > 0}
-            <ul class="absolute bg-black border mt-1 w-96">
+            {#if showSuggestions && filteredTracks.length > 0}
+            <ul class="absolute bg-black border mt-1 w-9/12">
                 {#each filteredTracks as track}
-                    <li class="p-2 cursor-pointer hover:bg-gray-800">
-                        <button
-                            type="button"
-                            class="w-full text-left"
-                            onclick={() => {
-                                track_id = track.spotify_track_uri.replace(
-                                    "spotify:track:",
-                                    ""
-                                );
-                                showSuggestions = false;
-                                searchInput =
-                                    track.track_name + " by " + track.artist;
-                            }}
-                        >
-                            {track.track_name} by {track.artist}
-                        </button>
-                    </li>
+                <li class="p-2 cursor-pointer hover:bg-gray-800">
+                    <button
+                        type="button"
+                        class="text-left"
+                        onclick={() => selectTrack(track)}
+                    >
+                        {track.track_name} by {track.artist}
+                    </button>
+                </li>
                 {/each}
             </ul>
-        {/if}
-    </div>
-{/await}
-
-<!-- Track meta -->
-{#await trackMetaReq}
-    <p>Loading.....</p>
-{:then track_meta}
-    <div class="flex flex-row">
-        <div class="m-6 mt-2">
-            <p>Artists:</p>
-
-            {#if track_meta.artists.length === 0}
-                <p>No artists found</p>
-            {:else}
-                {#each track_meta.artists as artist, index}
-                    <p>{index + 1} {artist.name}</p>
-                {/each}
             {/if}
         </div>
+    {/await}
 
-        <div class="m-6 mt-2">
-            <p>Album name: {track_meta.album.name}</p>
-            <p>Album release date: {track_meta.album.release_date}</p>
-            <p>Track popularity: {track_meta.popularity}</p>
-        </div>
-    </div>
-{/await}
 
-<!-- Chart -->
-{#await trackStatsReq}
-    <p>Loading.....</p>
-{:then track_stats}
-    <div>
+    
+    {#await trackStatsReq}
+        <p class="loading">Loading track stats from our database...</p>
+    {:then track_stats}
+
+        <!-- Chart -->
         {#if track_stats.timeline_data.length > 0}
             <D3Chart timeline_data={track_stats.timeline_data} />
         {/if}
 
+        <!-- Stats -->
         <p>Total plays: {track_stats.total_plays}</p>
-        <p>
-            Total time played: {(track_stats.total_ms_played / 3600000).toFixed(
-                2
-            )} hours
-        </p>
-        <p>
-            First played: {new Date(
-                track_stats.first_played
-            ).toLocaleDateString()}
-        </p>
-        <p>
-            Last played: {new Date(
-                track_stats.last_played
-            ).toLocaleDateString()}
-        </p>
-    </div>
-{/await}
+        {#if (track_stats.total_ms_played / 3600000) > 3}
+            <p>Total time played: {(track_stats.total_ms_played / 3600000).toFixed(2)} hours</p>
+        {:else}
+            <p>Total time played: {(track_stats.total_ms_played / 60000).toFixed(2)} minutes</p>
+        {/if}
+        <p>First played: {new Date(track_stats.first_played).toLocaleDateString()}</p>
+        <p>Last played: {new Date(track_stats.last_played).toLocaleDateString()}</p>
 
-<style>
-</style>
+    {/await}
+
+
+    <!-- Track meta -->
+    {#await trackMetaReq}
+        <p class="loading">Loading track meta info from Spotify...</p>
+    {:then track_meta}
+        <div class="flex flex-col">
+            <div>
+                Artists:
+                {#if track_meta.artists.length === 0}
+                    <p>No artists found</p>
+                {:else}
+                    {#each track_meta.artists as artist, index}
+                        {artist.name}{index < track_meta.artists.length - 1 ? ' / ' : ''}
+                    {/each}
+                {/if}
+            </div>
+
+            <div>
+                <p>Album name: {track_meta.album.name}</p>
+                <p>Album release date: {track_meta.album.release_date}</p>
+                <p>Track popularity: {track_meta.popularity}</p>
+            </div>
+        </div>
+    {/await}
+</div>

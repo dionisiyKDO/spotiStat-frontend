@@ -1,3 +1,5 @@
+import { tick } from "svelte";
+
 export interface TrackStats {
     avg_playtime_per_play: number;
     distinct_days_played: number;
@@ -101,6 +103,8 @@ export async function fetchTracks(
             return null;
         }
 
+        // await new Promise(r => setTimeout(r, 1000));
+
         const data = (await response.json()) as { played_tracks: Tracks[] };
         return data.played_tracks;
     } catch (err) {
@@ -121,6 +125,8 @@ export async function fetchTrackStats(
             console.log(error);
             return null;
         }
+
+        // await new Promise(r => setTimeout(r, 3000));
 
         const data = (await response.json()) as TrackStats;
         data.timeline_data = fillMissingDates(data);
@@ -144,6 +150,7 @@ export async function fetchTrackMeta(
             console.log(err);
             return null;
         }
+        // await new Promise(r => setTimeout(r, 2000));
 
         return data.track_meta as TrackMeta;
     } catch (err) {

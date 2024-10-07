@@ -5,7 +5,7 @@
     let tempYear = $state(year);
 
     $effect(() => {
-        tempYear = year; // Update the temporary value when the actual value changes
+        tempYear = year;
     });
 
     interface Props {

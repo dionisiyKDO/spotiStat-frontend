@@ -41,7 +41,7 @@
     let topTracksReq = $derived(fetchTopTracks(timeRange));
 </script>
 
-<div class="mt-4">
+<div>
     <h2 class="text-3xl font-semibold mb-2">Top tracks</h2>
     <select class="w-72" name="timeRange" id="timeRange" bind:value={timeRange}>
         <option value="short_term">Short term (4 weeks) </option>

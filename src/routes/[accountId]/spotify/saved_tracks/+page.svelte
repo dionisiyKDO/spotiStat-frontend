@@ -45,7 +45,7 @@
     let savedTracksReq = $derived(fetchSavedTracks());
 </script>
 
-<div class="mt-4">
+<div>
     <h2 class="text-3xl font-semibold mb-2">Saved Tracks</h2>
 
     <div class="flex flex-row gap-4">

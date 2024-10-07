@@ -36,7 +36,7 @@
     let playHistoryReq = $derived(fetchPlayHistory());
 </script>
 
-<div class="mt-4">
+<div>
     <h2 class="text-3xl font-semibold mb-2 inline-block">Play history</h2>
     
     <!-- Question mark with hover effect -->

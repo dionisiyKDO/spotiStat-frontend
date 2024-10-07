@@ -36,6 +36,10 @@
             name: "Artist stats",
             link: `/${accountId}/history/artist_stats`,
         },
+        {
+            name: "OverView",
+            link: `/${accountId}/history/overview`,
+        },
     ];
 
     let historyFlagReq = $derived(fetchCheckHistory(accountId));
@@ -72,7 +76,7 @@
                                 Listening history not found (Import history) <!-- TODO: importing logic -->
                             </p>
                         {:else}
-                            <h2 class="text-2xl font-semibold mb-4">History links</h2>
+                            <h2 class="text-2xl font-semibold mb-1">History links</h2>
                             {#each historyLinks as { name, link }}
                                 <a class="link" href={link}>{name}</a>
                             {/each}
@@ -82,7 +86,7 @@
 
                 <!-- SpotifyAPI related block -->
                 <div>
-                    <h2 class="text-2xl font-semibold mb-4">Spotify api links</h2>
+                    <h2 class="text-2xl font-semibold mb-1">Spotify api links</h2>
                     {#each spotifyLinks as { name, link }}
                         <a class="link" href={link}>{name}</a>
                     {/each}

@@ -42,7 +42,7 @@
 </script>
 
 
-<div class="mt-4">
+<div>
     <h2 class="text-3xl font-semibold mb-2 inline-block">Tracks by year</h2>
     
     <!-- Question mark with hover effect -->
