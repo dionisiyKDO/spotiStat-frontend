@@ -1,42 +1,6 @@
 @import 'tailwindcss';
 
-@theme {
-  --color-primary: #22c55e;
-  --color-light: #37e276;
-}
-
-/*
-  The default border color has changed to `currentColor` in Tailwind CSS v4,
-  so we've added these compatibility styles to make sure everything still
-  looks the same as it did with Tailwind CSS v3.
-
-  If we ever want to remove these styles, we need to add an explicit border
-  color utility to any element that depends on these defaults.
-*/
-@layer base {
-  *,
-  ::after,
-  ::before,
-  ::backdrop,
-  ::file-selector-button {
-    border-color: var(--color-gray-200, currentColor);
-  }
-}
-
-@utility link {
-  @apply text-emerald-600 hover: text-emerald-400 px-2 py-1 m-2 rounded-lg border-2 border-emerald-600 hover:border-emerald-400 transition-all duration-200 ease-in-out box-border inline-block;
-}
-
-@utility loading {
-  @apply m-10 text-xl font-semibold text-center;
-}
-
-@utility loading-login {
-  @apply m-10 text-2xl font-semibold text-center;
-}
-
-@layer utilities {
-  :root {
+:root {
     font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
     line-height: 1.5;
     font-weight: 400;
@@ -54,67 +18,94 @@
     text-rendering: optimizeLegibility;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-  }
-
-  :root {
-    /* Background Colors */
-    --background: #1e1e1e;
-    --surface: #2a2a2a;
-    --muted-surface: #3a3a3a;
-    --input-background: #252525;
-
-    /* Text Colors */
-    --primary-text: #e0e0e0;
-    --primary-text-hover: #f0f0f0;
-    --secondary-text: #b0b0b0;
-
-    /* Primary Colors */
-    --primary: #2e2e2e;
-    --primary-hover: #474747;
-
-    /* Secondary Colors */
-    --secondary: #4a4a4a;
-    --secondary-hover: #636363;
-
-    /* Functional colors */
-    --accent: #6db68d; /* Soft, muted green */
-    --accent-hover: #7cc19e;
-    --destructive: #b85c70;
-    --destructive-hover: #d16a7f;
-
-    /* Border Colors */
-    --border: #4a4a4a;
-  }
 }
 
+:root {
+    /* Background Colors */
+    --background: #121212;
+    --surface: #1E1E1E;
+    --muted-surface: #2C2C2C;
+    --input-background: #232323;
 
+    /* Text Colors */
+    --primary-text: #E0E0E0;
+    --primary-text-hover: #FFFFFF;
+    --secondary-text: #B0B0B0;
+
+    /* Primary Colors (Spotify Green) */
+    --primary: #1ABF74;
+    /* a softened green */
+    --primary-hover: #20C27F;
+
+    /* Secondary Colors */
+    --secondary: #424242;
+    --secondary-hover: #5C5C5C;
+
+    /* Functional colors */
+    --accent: #A67C52;
+    --accent-hover: #967047;
+    --destructive: #D36C6C;
+    --destructive-hover: #E07A7A;
+
+    /* Border Colors */
+    --border: #5C5C5C;
+}
+
+@utility link {
+    @apply px-2 py-1 m-2 inline-block 
+    text-(--primary) hover:text-(--primary-hover) 
+    rounded-lg border-2 border-(--primary) hover:border-(--primary-hover) 
+    transition-all duration-200 ease-in-out box-border;
+}
+
+@utility loading {
+    @apply m-10 text-xl 
+    font-semibold text-center;
+}
+
+@utility loading-login {
+    @apply m-10 text-2xl 
+    font-semibold text-center;
+}
+
+@utility sidebar {
+    @apply w-64 p-2 h-screen 
+    bg-(--surface) 
+    fixed top-0 left-0 z-50
+    shadow-lg
+    transition-all duration-300 overflow-hidden;
+}
+
+@utility sidebar-link {
+    @apply py-0.5 px-1
+    flex items-center gap-2
+    text-(--primary-text) hover:text-(--primary-hover) 
+    transition-colors duration-200;
+}
 
 @layer components {
     a {
-        @apply text-(--accent) hover: text-(--accent-hover) transition-all duration-200 ease-in-out;
+        @apply text-(--primary) hover:text-(--primary-hover) 
+        transition-all duration-200 ease-in-out;
     }
 
     select, input {
         @apply px-4 py-1 rounded-md
     }
-}
 
-:root {
-    color-scheme: dark;
-    color: rgba(255, 255, 255, 0.95);
-    background-color: #0c0c0c;
-}
+	/* Form */
+    form input {
+        @apply w-full p-2.5 block
+        bg-(--input-background) 
+        border-(--border) border border-solid rounded-lg 
+        text-(--primary) text-sm ;
+    }
 
-body {
-    font-size: 18px;
-    margin: 0;
-    display: flex;
-    min-width: 100vw;
-    min-height: 100dvh;
-    box-sizing: border-box;
-    overflow-x: hidden;
-}
-
-#app {
-    display: contents;
+    form button {
+        @apply w-full px-5 py-2.5 
+        bg-(--primary-text) hover:bg-(--primary-text-hover) 
+        border-(--border) border border-solid rounded-lg 
+        text-(--input-background) font-bold text-center
+        transition-all duration-100 ease-in-out;
+    }
 }
