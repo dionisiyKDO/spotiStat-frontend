@@ -30,12 +30,11 @@
                 console.log(error);
                 return null;
             }
-            const data = (await response.json()) as {
-                tracks: Tracks[];
-            };
-
+            const data = (await response.json()) as Tracks[];
+            console.log(data);
+            
             // Find the maximum total_ms_played
-            const max = Math.max(...data.map((track) => track[sortby]));
+            const max = Math.max(...(data.map((track) => track[sortby])  )) ;
 
             // Add percentage key to each track
             const tracksWithPercentage = data.map((track) => ({
@@ -68,10 +67,13 @@
                             class="absolute top-0 left-0 w-full h-full opacity-50 -z-10"
                         >
                             <!-- TODO: background: linear-gradient(to right, #000000 66.6%, transparent 66.6%); -->
-                            <div
-                                class="h-full bg-emerald-900/50 absolute top-0 left-0 track-bar-fill"
-                                style="--bar-value: {track.percentage_of_max}%"
-                            ></div>
+                            {#if track.percentage_of_max}
+                                <div
+                                    class="h-full bg-emerald-900/50 absolute top-0 left-0 track-bar-fill"
+                                    style="--bar-value: {track.percentage_of_max}%"
+                                ></div>
+                            {/if}
+                            
                         </div>
                         <div
                             class="shrink-0 w-8 my-auto text-2xl font-bold text-emerald-600 text-right"
