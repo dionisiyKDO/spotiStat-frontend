@@ -1,5 +1,5 @@
 <script>
-    import { isSidebarCollapsed } from "./Sidebar";
+    import { isSidebarCollapsed, collapsedWidth, expandedWidth } from "./Sidebar";
 
     const navItems = [
         { href: "/dashboard", label: "Overview", icon: "home" },
@@ -24,19 +24,17 @@
     }
 </script>
 
-<div
-    class="{$isSidebarCollapsed
-        ? 'w-16'
-        : 'w-64'} 
-        bg-gray-800 h-screen p-4 fixed top-0 left-0 transition-all duration-300 overflow-hidden"
->
-    <div class="flex items-center justify-between mb-8">
-        {#if !$isSidebarCollapsed}
-            <h1 class="text-2xl font-bold">SpotiStat</h1>
-        {/if}
+<div class="sidebar" style="width: {$isSidebarCollapsed ? collapsedWidth : expandedWidth}">
+    <!-- Spotistat plus button to collapse -->
+    <div class="flex items-center {$isSidebarCollapsed ? "justify-center" : "justify-between"} mb-8">
+        <div class="h-8">
+            {#if !$isSidebarCollapsed}
+                <h1 class="text-2xl font-bold">SpotiStat</h1>
+            {/if}
+        </div>
         <button
             on:click={toggleCollapse}
-            class="text-gray-700 hover:text-blue-600 focus:outline-hidden"
+            class="text-(--primary-text) hover:text-blue-600 focus:outline-hidden"
             aria-label={$isSidebarCollapsed
                 ? "Expand sidebar"
                 : "Collapse sidebar"}
@@ -58,15 +56,14 @@
         </button>
     </div>
 
-    <nav>
-        <ul class="space-y-2">
+    <!-- links -->
+    <nav class="flex justify-start">
+        <ul class="space-y-2 justify-start">
             {#each navItems as item}
                 <li>
                     <a
                         href={item.href}
-                        class="flex items-center space-x-2 text-gray-700 hover:text-blue-600 transition-colors duration-200 {$isSidebarCollapsed
-                            ? 'justify-center'
-                            : ''}"
+                        class="sidebar-link h-6 text-nowrap"
                         title={$isSidebarCollapsed ? item.label : ""}
                     >
                         <span class="inline-block w-5 h-5">

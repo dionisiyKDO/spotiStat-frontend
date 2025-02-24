@@ -3,12 +3,12 @@
     import Footer from "$lib/Footer.svelte";
     import Sidebar from "$lib/Sidebar.svelte";
     import { checkLoginStatus } from "$lib/auth";
-    import { isSidebarCollapsed } from "$lib/Sidebar";
+    import { isSidebarCollapsed, collapsedWidth, expandedWidth } from "$lib/Sidebar";
 
     let { children } = $props();
     let LoginStatusReq = checkLoginStatus();
 
-    let sidebarWidth = $derived($isSidebarCollapsed ? "4rem" : "16rem");
+    let sidebarWidth = $derived($isSidebarCollapsed ? collapsedWidth : expandedWidth);
 </script>
 
 <div class="container mx-auto flex flex-col">
