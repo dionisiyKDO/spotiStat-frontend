@@ -3,20 +3,22 @@
     import Footer from "$lib/Footer.svelte";
     import Sidebar from "$lib/Sidebar.svelte";
     import { checkLoginStatus } from "$lib/auth";
-    import { isSidebarCollapsed, collapsedWidth, expandedWidth } from "$lib/Sidebar";
+    import {
+        isSidebarCollapsed,
+        collapsedWidth,
+        expandedWidth,
+    } from "$lib/Sidebar";
 
     let { children } = $props();
     let LoginStatusReq = checkLoginStatus();
 
-    let sidebarWidth = $derived($isSidebarCollapsed ? collapsedWidth : expandedWidth);
+    // let sidebarWidth = $derived($isSidebarCollapsed ? collapsedWidth : expandedWidth);
 </script>
 
 <div class="container mx-auto flex flex-col">
-    <Sidebar />
-    <div
-        class="flex-1 transition-all duration-300"
-        style="margin-left: {sidebarWidth};"
-    >
+    <!-- <Sidebar /> -->
+    <!-- <div class="flex-1 transition-all duration-300"style="margin-left: {sidebarWidth};"> -->
+    <div class="flex-1 transition-all duration-300">
         <div class="w-full flex flex-col min-h-screen">
             {#await LoginStatusReq}
                 <div class="flex items-center justify-center">
