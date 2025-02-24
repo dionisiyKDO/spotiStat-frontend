@@ -1,8 +1,10 @@
 <script lang="ts">
-    import { page } from "$app/stores";
     import { fetchUserInfo, fetchCheckHistory } from "./load";
     import TopTracks from "$lib/TopTracks.svelte";
-    let accountId = $page.params.accountId;
+
+    let { data } = $props();
+    const accountId = data.accountId;
+
 
     const spotifyLinks = [
         {

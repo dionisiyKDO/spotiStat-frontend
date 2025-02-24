@@ -1,4 +1,5 @@
 <script>
+    // TODO: merge with humbleTrackList
     let { tracks } = $props();
 
     console.log(tracks);
@@ -51,7 +52,7 @@
 
             <div class="flex flex-row">
                 <!-- Album art + play button -->
-                <a href={track.spotify_url} target="_blank">
+                <a href={track.spotify_url} target="_blank" aria-label="Spotify link">
                     <div
                         class="w-16 h-16 my-auto bg-cover bg-center rounded-md mr-2 border-2 border-black hover:border-white transition-all duration-200 ease-in-out"
                         style="background-image: url({track.album_image_url});"
