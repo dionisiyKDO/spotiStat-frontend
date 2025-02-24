@@ -1,15 +1,60 @@
 <script lang="ts">
+    import { onMount } from "svelte";
     import D3Chart from "./D3Chart.svelte";
     import SearchTrack from "./SearchTrack.svelte";
 
     let year = $state(1976);
 
-    interface TracksByYear {
+    interface TrackByYear {
         count: number;
-        release_date: string;
+        release_date: Date;
     }
 
-    async function fetchTracksByYear(): Promise<TracksByYear[] | null> {
+    onMount(async () => {
+        const data = await fetchApi<{
+            tracks_by_year: { count: number; release_date: string }[];
+        }>("/api/spotify/tracks_by_year");
+
+        if (data == null) {
+            // if fatal
+        }
+
+        const tracksByYear: TrackByYear[] = data.tracks_by_year.map((track) => {
+            return {
+                release_date: new Date(track.release_date),
+                count: track.count,
+            };
+        });
+
+        tracksByYear.sort(function (a, b) {
+            return Number(a.release_date) - Number(b.release_date);
+        }); // sort by release date
+
+        return tracksByYear;
+    });
+
+    async function fetchApi<T>(
+        route: string,
+        errorMessage: string = "Unknown error"
+    ): Promise<T | null> {
+        try {
+            const response = await fetch(route);
+            const data = await response.json();
+
+            if (!response.ok) {
+                const error = data.error || errorMessage;
+                console.log(error);
+                return null;
+            }
+
+            return data;
+        } catch (err) {
+            console.log(err);
+            return null;
+        }
+    }
+
+    async function fetchTracksByYear(): Promise<TrackByYear[] | null> {
         try {
             const response = await fetch("/api/spotify/tracks_by_year");
             if (!response.ok) {
@@ -18,18 +63,13 @@
                 console.log(error);
                 return null;
             }
-            const data = (await response.json()) as {
-                tracks_by_year: TracksByYear[];
-            };
-            const tracksByYear: TracksByYear[] = data.tracks_by_year;
+            const tracksByYear = (await response.json()).tracks_by_year.map(
+                (track) => (track.release_date = new Date(track.release_date))
+            ) as TrackByYear[];
+
             tracksByYear.sort(function (a, b) {
-                return a.release_date - b.release_date;
+                return +a.release_date - +b.release_date;
             }); // sort by release date
-            for (let i = 0; i < tracksByYear.length; i++) {
-                tracksByYear[i].release_date = new Date(
-                    tracksByYear[i].release_date
-                );
-            } // convert to date type
 
             return tracksByYear;
         } catch (err) {
@@ -41,10 +81,9 @@
     let tracksByYearReq = $derived(fetchTracksByYear());
 </script>
 
-
 <div>
     <h2 class="text-3xl font-semibold mb-2 inline-block">Tracks by year</h2>
-    
+
     <!-- Question mark with hover effect -->
     <div class="relative inline-block group">
         <i
@@ -56,7 +95,8 @@
             class="popup-content hidden absolute left-0 mt-2 w-72 p-3 rounded-lg bg-black border border-gray-200 z-10"
         >
             <p>
-                This line chart shows the number of tracks in your saves released in each year, showing your preferences by time range.
+                This line chart shows the number of tracks in your saves
+                released in each year, showing your preferences by time range.
             </p>
             <p class="mt-2 opacity-50">
                 you can click on chart for selecting a year to search
@@ -65,20 +105,13 @@
     </div>
 </div>
 
-
 {#await tracksByYearReq}
     <p class="loading">Loading...</p>
 {:then tracksByYear}
-    <D3Chart
-        year={(value) => {
-            year = value;
-        }}
-        {tracksByYear}
-    />
+    <D3Chart bind:year {tracksByYear} />
 {/await}
 
-<SearchTrack {year} />
-
+<SearchTrack bind:year />
 
 <style>
     .question-mark:hover + .popup-content {

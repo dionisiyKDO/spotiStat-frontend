@@ -7,7 +7,7 @@ export interface TotalListeningTime {
 
 export async function fetchTotalListeningTime(): Promise<TotalListeningTime | null> {
     try {
-        const response = await fetch("/api/history/total-listening-time");
+        const response = await fetch("/api/db/history/total-listening-time");
         if (!response.ok) {
             const data = await response.json();
             const error = data.error || "Failed to fetch total listening time";
@@ -31,7 +31,7 @@ export interface PlatformStats {
 
 export async function fetchPlatformStats(): Promise<PlatformStats[] | null> {
     try {
-        const response = await fetch("/api/history/platform-stats");
+        const response = await fetch("/api/db/history/platform-stats");
         if (!response.ok) {
             const data = await response.json();
             const error = data.error || "Failed to fetch platform stats";
@@ -58,7 +58,7 @@ export async function fetchMostSkippedTracks(
 ): Promise<SkippedTrack[] | null> {
     try {
         const response = await fetch(
-            `/api/history/most-skipped-tracks?limit=${limit}`
+            `/api/db/history/most-skipped-tracks?limit=${limit}`
         );
         if (!response.ok) {
             const data = await response.json();
@@ -84,7 +84,7 @@ export interface SkipStats {
 
 export async function fetchSkipStats(): Promise<SkipStats | null> {
     try {
-        const response = await fetch("/api/history/skip-stats");
+        const response = await fetch("/api/db/history/skip-stats");
         if (!response.ok) {
             const data = await response.json();
             const error = data.error || "Failed to fetch skip stats";
@@ -107,7 +107,7 @@ export interface EndReason {
 
 export async function fetchEndReasons(): Promise<EndReason[] | null> {
     try {
-        const response = await fetch("/api/history/end-reasons");
+        const response = await fetch("/api/db/history/end-reasons");
         if (!response.ok) {
             const data = await response.json();
             const error = data.error || "Failed to fetch end reasons";
@@ -129,7 +129,7 @@ export interface UniqueTracksCount {
 
 export async function fetchUniqueTracksCount(): Promise<UniqueTracksCount | null> {
     try {
-        const response = await fetch("/api/history/unique-tracks-count");
+        const response = await fetch("/api/db/history/unique-tracks-count");
         if (!response.ok) {
             const data = await response.json();
             const error = data.error || "Failed to fetch unique tracks count";
@@ -163,9 +163,9 @@ export interface ListeningSession {
 
 export async function fetchListeningSessions(
     gap: number = 30
-): Promise<ListeningSession[] | null> {
+): Promise<ListeningSession | null> {
     try {
-        const response = await fetch(`/api/history/sessions?gap=${gap}`);
+        const response = await fetch(`/api/db/history/sessions/longest?gap=${gap}`);
         if (!response.ok) {
             const data = await response.json();
             const error = data.error || "Failed to fetch listening sessions";
@@ -173,13 +173,18 @@ export async function fetchListeningSessions(
             return null;
         }
 
-        const data = (await response.json()) as ListeningSession[];
+        const data = (await response.json()) as ListeningSession;
+        data.session_start = new Date(data.session_start).toLocaleString('uk');
+        data.session_end = new Date(data.session_end).toLocaleString('uk');
         return data;
     } catch (err) {
         console.log(err);
         return null;
     }
 }
+
+
+
 
 export interface HourlyTrend {
     hour: number;
@@ -189,7 +194,7 @@ export interface HourlyTrend {
 
 export async function fetchHourlyTrends(): Promise<HourlyTrend[] | null> {
     try {
-        const response = await fetch("/api/history/hourly-trends");
+        const response = await fetch("/api/db/history/hourly-trends");
         if (!response.ok) {
             const data = await response.json();
             const error = data.error || "Failed to fetch hourly trends";
@@ -213,7 +218,7 @@ export interface WeeklyTrend {
 
 export async function fetchWeeklyTrends(): Promise<WeeklyTrend[] | null> {
     try {
-        const response = await fetch("/api/history/weekly-trends");
+        const response = await fetch("/api/db/history/weekly-trends");
         if (!response.ok) {
             const data = await response.json();
             const error = data.error || "Failed to fetch weekly trends";
@@ -237,7 +242,7 @@ export interface DailyTrend {
 
 export async function fetchDailyTrends(): Promise<DailyTrend[] | null> {
     try {
-        const response = await fetch("/api/history/daily-trends");
+        const response = await fetch("/api/db/history/daily-trends");
         if (!response.ok) {
             const data = await response.json();
             const error = data.error || "Failed to fetch daily trends";

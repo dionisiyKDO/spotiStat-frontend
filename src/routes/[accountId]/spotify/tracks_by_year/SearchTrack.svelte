@@ -1,7 +1,7 @@
 <script lang="ts">
     import TrackList from "$lib/TrackList.svelte";
 
-    let { year }: Props = $props();
+    let { year = $bindable() }: Props = $props();
     let tempYear = $state(year);
 
     $effect(() => {

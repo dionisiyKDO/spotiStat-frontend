@@ -2,7 +2,29 @@
     import * as colors from "tailwindcss/colors"
     import * as d3 from "d3";
 
-    let { year = $bindable(), tracksByYear } = $props();
+    interface Props {
+        data: any;
+        yAxisLabel: string;
+        xAxisLabel: string;
+    }
+
+    let { data, yAxisLabel, xAxisLabel }: Props = $props();
+    if (yAxisLabel === "total_ms_played") {
+        for (let i = 0; i < data.length; i++) {
+            data[i]["value"] = data[i]["total_ms_played"] / 3.6e6;
+        }
+    } else {
+        for (let i = 0; i < data.length; i++) {
+            data[i]["value"] = data[i]["play_count"];
+        }
+    }
+
+    if (xAxisLabel === "days") {
+        for (let i = 0; i < data.length; i++) {
+            data[i]["label"] = new Date( data[i]["day"]);
+        }
+    }
+    
 
     function drawChart() {
         d3.select("#chart").selectAll("*").remove();
@@ -53,11 +75,11 @@
 
         const xScale = d3.scaleTime()
             .range([0, width])
-            .domain(d3.extent(tracksByYear, d => d.release_date));
+            .domain(d3.extent(data, d => d.label));
 
         const yScale = d3.scaleLinear()
             .range([height, 0])
-            .domain([0, d3.max(tracksByYear, d => d.count)])
+            .domain([0, d3.max(data, d => d.value)])
             .nice();
 
         // add x-axis
@@ -116,13 +138,13 @@
 
         // add line chart
         svg.append("path")
-            .datum(tracksByYear)
+            .datum(data)
             .attr("fill", "none")
             .attr("stroke", chartLineStroke)
             .attr("stroke-width", chartLineStrokeWidth)
             .attr("d", d3.line()
-                .x(function(d) { return xScale(d.release_date) })
-                .y(function(d) { return yScale(d.count) })
+                .x(function(d) { return xScale(d.label) })
+                .y(function(d) { return yScale(d.value) })
                 );
 
         const tooltipLine = svg.append('line');
@@ -154,9 +176,7 @@
             const mouseY = event.clientY;
             const xDate = xScale.invert(mouseXsvg);
 
-            const closestPoint = d3.least(tracksByYear, d => Math.abs(xScale(d.release_date) - mouseXsvg));
-
-            year = closestPoint.release_date.getFullYear();
+            const closestPoint = d3.least(data, d => Math.abs(xScale(d.label) - mouseXsvg));
         }
 
         function drawTooltip(event) {
@@ -166,7 +186,7 @@
             const xDate = xScale.invert(mouseXsvg);
 
             // Find the closest data point to the mouse x position
-            const closestPoint = d3.least(tracksByYear, d => Math.abs(xScale(d.release_date) - mouseXsvg));
+            const closestPoint = d3.least(data, d => Math.abs(xScale(d.label) - mouseXsvg));
 
             // Calculate tooltip position
             const tooltipWidth = tooltip.node().offsetWidth;
@@ -190,11 +210,20 @@
                 .style("opacity", 1);
 
             // Update tooltip content
-            tooltip.html(`
-                <div>
-                    ${closestPoint.count} tracks released in ${d3.timeFormat("%Y")(closestPoint.release_date)}
-                </div>
-            `);
+            
+            if (yAxisLabel === "total_ms_played") {
+                tooltip.html(`
+                    <div>
+                        ${(closestPoint.value).toFixed(2)} Hours at ${d3.timeFormat("%Y-%m-%d")(closestPoint.label)}
+                    </div>
+                `);
+            } else {
+                tooltip.html(`
+                    <div>
+                        ${(closestPoint.value)} times at ${d3.timeFormat("%Y-%m-%d")(closestPoint.label)}
+                    </div>
+                `);
+            }
 
             // Update tooltip line
             tooltipLine
@@ -208,7 +237,7 @@
 
             // Update tooltip circles
             let circles = svg.selectAll(".tooltip-circle")
-                .data([closestPoint], d => d.release_date);
+                .data([closestPoint], d => d.label);
 
             // Remove any existing circles that are no longer needed
             circles.exit().remove();
@@ -217,8 +246,8 @@
             circles.enter()
                 .append("circle")
                 .attr("class", "tooltip-circle")
-                .attr("cx", d => xScale(d.release_date))
-                .attr("cy", d => yScale(d.count))
+                .attr("cx", d => xScale(d.label))
+                .attr("cy", d => yScale(d.value))
                 .attr("r", tooltipCircleRadius)
                 .attr("fill", tooltipCircleFill)
                 .attr("fill-opacity", tooltipCircleOpacity);
@@ -238,6 +267,7 @@
 </script>
 
 
+<p>aboba2</p>
 <div id="chart-container">
     <svg id="chart"/>
     <div id="tooltip"></div>
