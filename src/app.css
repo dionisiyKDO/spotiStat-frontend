@@ -1,8 +1,42 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import 'tailwindcss';
 
-:root {
+@theme {
+  --color-primary: #22c55e;
+  --color-light: #37e276;
+}
+
+/*
+  The default border color has changed to `currentColor` in Tailwind CSS v4,
+  so we've added these compatibility styles to make sure everything still
+  looks the same as it did with Tailwind CSS v3.
+
+  If we ever want to remove these styles, we need to add an explicit border
+  color utility to any element that depends on these defaults.
+*/
+@layer base {
+  *,
+  ::after,
+  ::before,
+  ::backdrop,
+  ::file-selector-button {
+    border-color: var(--color-gray-200, currentColor);
+  }
+}
+
+@utility link {
+  @apply text-emerald-600 hover: text-emerald-400 px-2 py-1 m-2 rounded-lg border-2 border-emerald-600 hover:border-emerald-400 transition-all duration-200 ease-in-out box-border inline-block;
+}
+
+@utility loading {
+  @apply m-10 text-xl font-semibold text-center;
+}
+
+@utility loading-login {
+  @apply m-10 text-2xl font-semibold text-center;
+}
+
+@layer utilities {
+  :root {
     font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
     line-height: 1.5;
     font-weight: 400;
@@ -20,9 +54,9 @@
     text-rendering: optimizeLegibility;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-}
+  }
 
-:root {
+  :root {
     /* Background Colors */
     --background: #1e1e1e;
     --surface: #2a2a2a;
@@ -50,6 +84,7 @@
 
     /* Border Colors */
     --border: #4a4a4a;
+  }
 }
 
 
@@ -59,20 +94,8 @@
         @apply text-(--accent) hover: text-(--accent-hover) transition-all duration-200 ease-in-out;
     }
 
-    .link {
-        @apply text-emerald-600 hover: text-emerald-400 px-2 py-1 m-2 rounded-lg border-2 border-emerald-600 hover:border-emerald-400 transition-all duration-200 ease-in-out box-border inline-block;
-    }
-
     select, input {
         @apply px-4 py-1 rounded-md
-    }
-
-    .loading {
-        @apply m-10 text-xl font-semibold text-center;
-    }
-
-    .loading-login {
-        @apply m-10 text-2xl font-semibold text-center;
     }
 }
 

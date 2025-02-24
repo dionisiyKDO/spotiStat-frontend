@@ -36,7 +36,7 @@
         {/if}
         <button
             on:click={toggleCollapse}
-            class="text-gray-700 hover:text-blue-600 focus:outline-none"
+            class="text-gray-700 hover:text-blue-600 focus:outline-hidden"
             aria-label={$isSidebarCollapsed
                 ? "Expand sidebar"
                 : "Collapse sidebar"}
