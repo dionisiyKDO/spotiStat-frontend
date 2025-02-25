@@ -25,6 +25,12 @@ interface Image {
     width: number;
 }
 
-interface Response {
-    message: string;
+export interface Track {
+    album_image_url: string;
+    artist: string;
+    play_count: number;
+    total_ms_played: number;
+    index: number;
+    track_name: string;
+    percentage_of_max: number | null;
 }

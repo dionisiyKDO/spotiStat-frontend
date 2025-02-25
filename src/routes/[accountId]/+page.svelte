@@ -1,6 +1,6 @@
 <script lang="ts">
     import TopTracks from "$lib/TopTracks.svelte";
-    import { fetchUserInfo, fetchCheckHistory } from "./load";
+    import { fetchUserInfo, fetchCheckHistory, fetchTracks } from "./load";
 
     let { data } = $props();
     const accountId = data.accountId;
@@ -49,6 +49,11 @@
     const combinedPromise = Promise.all([
         fetchUserInfo(),
         fetchCheckHistory(accountId),
+    ]);
+
+    const tracksPromise = Promise.all([
+        fetchTracks(10, "total_ms_played"),
+        fetchTracks(10, "play_count"),
     ]);
 </script>
 
@@ -105,13 +110,25 @@
         </div>
 
         <!-- Account overview block -->
-        <div class="w-full flex gap-4 flex-col lg:flex-row">
-            <div class="w-full flex flex-col gap-4 lg:w-1/2">
-                <TopTracks limit={10} sortBy="total_ms_played" />
+        {#await tracksPromise}
+            <div class="flex items-center justify-center">
+                <p class="font-bold text-2xl text-center mt-10 mb-4">
+                    Loading tracks...
+                </p>
             </div>
-            <div class="w-full flex flex-col gap-4 lg:w-1/2">
-                <TopTracks limit={10} sortBy="play_count" />
+            <!-- Skeleton loading -->
+        {:then [msPlayedTracks, playCountTracks]}
+            <div class="w-full flex gap-4 flex-col lg:flex-row">
+                <div class="w-full flex flex-col gap-4 lg:w-1/2">
+                    <TopTracks
+                        tracks={msPlayedTracks}
+                        sort_by="ms_played"
+                    />
+                </div>
+                <div class="w-full flex flex-col gap-4 lg:w-1/2">
+                    <TopTracks tracks={playCountTracks} sort_by="play_count" />
+                </div>
             </div>
-        </div>
+        {/await}
     {/await}
 </div>
