@@ -58,14 +58,8 @@
     transition-all duration-200 ease-in-out box-border;
 }
 
-@utility loading {
-    @apply m-10 text-xl 
-    font-semibold text-center;
-}
-
-@utility loading-login {
-    @apply m-10 text-2xl 
-    font-semibold text-center;
+@utility login-link {
+    @apply link;
 }
 
 @utility sidebar {

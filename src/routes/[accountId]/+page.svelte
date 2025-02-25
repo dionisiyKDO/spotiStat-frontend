@@ -1,10 +1,9 @@
 <script lang="ts">
-    import { fetchUserInfo, fetchCheckHistory } from "./load";
     import TopTracks from "$lib/TopTracks.svelte";
+    import { fetchUserInfo, fetchCheckHistory } from "./load";
 
     let { data } = $props();
     const accountId = data.accountId;
-
 
     const spotifyLinks = [
         {
@@ -44,57 +43,65 @@
         },
     ];
 
-    let historyFlagReq = $derived(fetchCheckHistory(accountId));
-    let userInfoReq = $derived(fetchUserInfo());
+    // let historyFlagReq = $derived(fetchCheckHistory(accountId));
+    // let userInfoReq = $derived(fetchUserInfo());
+
+    const combinedPromise = Promise.all([
+        fetchUserInfo(),
+        fetchCheckHistory(accountId),
+    ]);
 </script>
 
 <div>
     <!-- Profile related block -->
-    {#await userInfoReq}
-        <p class="loading">Loading Profile...</p>
-    {:then userInfo} 
+    {#await combinedPromise}
+        <div class="flex items-center justify-center">
+            <p class="font-bold text-2xl text-center mt-10 mb-4">
+                Loading Profile...
+            </p>
+        </div>
+    {:then [userInfo, historyFlag]}
         <!-- Profile head -->
         <div>
-
             <!-- avatar -->
             <div class="p-4 flex gap-4">
                 <div
                     class="rounded-full bg-cover bg-center w-20 h-20"
-                    style="background-image:url({userInfo.images[1].url});"
+                    style="background-image:url({userInfo.images[0].url});"
                 ></div>
-                <h1 class="mt-6 ml-0 text-5xl font-semibold">{userInfo.display_name}</h1>
+                <h1 class="mt-6 ml-0 text-5xl font-semibold">
+                    {userInfo.display_name}
+                </h1>
             </div>
 
             <!-- links -->
             <div class="flex gap-8">
-                
                 <!-- History related block -->
                 <div>
-                    {#await historyFlagReq}
-                        <p class="loading">Checking history existance...</p>
-                    {:then historyFlag}
-                        {#if historyFlag === null}
-                            <p style="color: darkred">
-                                Listening history not found (Import history) <!-- TODO: importing logic -->
-                            </p>
-                        {:else}
-                            <h2 class="text-2xl font-semibold mb-1">History links</h2>
-                            {#each historyLinks as { name, link }}
-                                <a class="link" href={link}>{name}</a>
-                            {/each}
-                        {/if}
-                    {/await}
+                    {#if historyFlag === null}
+                        <p class="text-red-400">
+                            Listening history not found (Import history) <!-- TODO: importing logic -->
+                        </p>
+                    {:else}
+                        <h2 class="text-2xl font-semibold mb-1">
+                            History links
+                        </h2>
+                        {#each historyLinks as { name, link }}
+                            <a class="link" href={link}>{name}</a>
+                        {/each}
+                    {/if}
                 </div>
 
                 <!-- SpotifyAPI related block -->
                 <div>
-                    <h2 class="text-2xl font-semibold mb-1">Spotify api links</h2>
+                    <h2 class="text-2xl font-semibold mb-1">
+                        Spotify api links
+                    </h2>
                     {#each spotifyLinks as { name, link }}
                         <a class="link" href={link}>{name}</a>
                     {/each}
                 </div>
             </div>
-
         </div>
 
         <!-- Account overview block -->
@@ -107,5 +114,4 @@
             </div>
         </div>
     {/await}
-
 </div>

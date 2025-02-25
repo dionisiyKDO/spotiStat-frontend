@@ -1,33 +1,4 @@
-export interface UserInfo {
-    display_name: string;
-    email: string;
-    external_urls: ExternalUrls;
-    followers: Followers;
-    href: string;
-    id: string;
-    images: Image[];
-    type: string;
-    uri: string;
-}
-
-interface ExternalUrls {
-    spotify: string;
-}
-
-interface Followers {
-    href: any;
-    total: number;
-}
-
-interface Image {
-    height: number;
-    url: string;
-    width: number;
-}
-
-interface Response {
-    message: string;
-}
+import type { UserInfo } from "./types";
 
 export async function fetchUserInfo(): Promise<UserInfo | null> {
     try {
@@ -38,8 +9,8 @@ export async function fetchUserInfo(): Promise<UserInfo | null> {
             console.log(error);
             return null;
         }
-        
-        const data = await response.json() as { user_info: UserInfo };
+
+        const data = (await response.json()) as { user_info: UserInfo };
         return data.user_info;
     } catch (err) {
         console.log(err);
