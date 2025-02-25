@@ -110,25 +110,24 @@
         </div>
 
         <!-- Account overview block -->
-        {#await tracksPromise}
-            <div class="flex items-center justify-center">
-                <p class="font-bold text-2xl text-center mt-10 mb-4">
-                    Loading tracks...
-                </p>
+        <div class="w-full flex gap-4 flex-col lg:flex-row">
+            {#await tracksPromise}
+            <div class="w-full flex flex-col gap-4 lg:w-1/2">
+                <h2 class="text-3xl font-semibold mb-4">Top time played</h2>
+                <div class="p-2 bg-(--surface) h-96 rounded-lg animate-pulse text-transparent"></div>
             </div>
-            <!-- Skeleton loading -->
-        {:then [msPlayedTracks, playCountTracks]}
-            <div class="w-full flex gap-4 flex-col lg:flex-row">
-                <div class="w-full flex flex-col gap-4 lg:w-1/2">
-                    <TopTracks
-                        tracks={msPlayedTracks}
-                        sort_by="ms_played"
-                    />
-                </div>
-                <div class="w-full flex flex-col gap-4 lg:w-1/2">
-                    <TopTracks tracks={playCountTracks} sort_by="play_count" />
-                </div>
+            <div class="w-full flex flex-col gap-4 lg:w-1/2">
+                <h2 class="text-3xl font-semibold mb-4">Top count of plays</h2>
+                <div class="p-2 bg-(--surface) h-96 rounded-lg animate-pulse text-transparent"></div>
             </div>
-        {/await}
+            {:then [msPlayedTracks, playCountTracks]}
+            <div class="w-full flex flex-col gap-4 lg:w-1/2">
+                <TopTracks tracks={msPlayedTracks} sort_by="ms_played" />
+            </div>
+            <div class="w-full flex flex-col gap-4 lg:w-1/2">
+                <TopTracks tracks={playCountTracks} sort_by="play_count" />
+            </div>
+            {/await}
+        </div>
     {/await}
 </div>

@@ -51,6 +51,31 @@
     --border: #5C5C5C;
 }
 
+/* High contrast colors for detecting hard-coded colors */
+/* :root {
+    --background: #FF0000;
+    --surface: #00FF00;
+    --muted-surface: #0000FF;
+    --input-background: #FFFF00;
+
+    --primary-text: #FF00FF;
+    --primary-text-hover: #00FFFF;
+    --secondary-text: #FFA500;
+
+    --primary: #800080;
+    --primary-hover: #FF1493;
+
+    --secondary: #8B4513;
+    --secondary-hover: #7FFF00;
+
+    --accent: #4B0082;
+    --accent-hover: #FF4500;
+    --destructive: #DC143C;
+    --destructive-hover: #ADFF2F;
+
+    --border: #6A5ACD;
+} */
+
 @utility link {
     @apply px-2 py-1 m-2 inline-block 
     text-(--primary) hover:text-(--primary-hover) 

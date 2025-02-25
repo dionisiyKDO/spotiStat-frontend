@@ -41,7 +41,7 @@
     <h1 class="text-3xl font-semibold mb-2 inline-block">{accountId} Overview</h1>
 
     <!-- Total Listening Time Section -->
-    <div class="min-h-12 grid grid-cols-2 lg:grid-cols-3 gap-6 grid-flow-row bg-neutral-900 rounded-lg p-4 w-full">
+    <div class="min-h-12 grid grid-cols-2 lg:grid-cols-3 gap-6 grid-flow-row bg-(--surface) rounded-lg p-4 w-full">
         
         {#await totalListeningTimeReq}
             <p class="loading">Loading Total Listening Time...</p>

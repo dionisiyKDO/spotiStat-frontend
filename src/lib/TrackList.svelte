@@ -73,7 +73,7 @@
                             {track.name}
                         {/if}
                     </div>
-                    <div class="text-base -mt-0.5">{track.artist}</div>
+                    <div class="text-base -mt-0.5 truncate-text">{track.artist}</div>
                 </div>
             </div>
 

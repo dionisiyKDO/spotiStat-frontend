@@ -87,12 +87,12 @@
     <!-- Question mark with hover effect -->
     <div class="relative inline-block group">
         <i
-            class="question-mark fa fa-question-circle ml-2 text-gray-500 hover:text-emerald-500 transition duration-100 ease-in-out"
+            class="question-mark fa fa-question-circle ml-2 text-(--primary-text) hover:text-(--primary-hover) transition duration-100 ease-in-out"
         ></i>
 
         <!-- Popup content on hover -->
         <div
-            class="popup-content hidden absolute left-0 mt-2 w-72 p-3 rounded-lg bg-black border border-gray-200 z-10"
+            class="popup-content hidden absolute left-0 mt-2 w-72 p-3 rounded-lg bg-(--surface) border border-(--border) z-10"
         >
             <p>
                 This line chart shows the number of tracks in your saves

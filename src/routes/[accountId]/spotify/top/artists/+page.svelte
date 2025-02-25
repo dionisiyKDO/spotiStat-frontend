@@ -81,7 +81,7 @@
                 <div>
                     {#if artist.images && artist.images.length > 0}
                         <div
-                            class="bg-cover bg-center rounded-xl border-2 border-emerald-800 min-w-44 min-h-44 xl:min-w-64 xl:min-h-64"
+                            class="bg-cover bg-center rounded-xl border-2 border-(--border) min-w-44 min-h-44 xl:min-w-64 xl:min-h-64"
                             style="background-image: url({artist.images[0]
                                 .url});"
                         ></div>
