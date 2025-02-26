@@ -96,8 +96,8 @@
             .call(
                 d3
                     .axisBottom(xScale)
-                    .ticks(d3.timeMonth.every(3))
-                    .tickFormat(d3.timeFormat("%b %Y"))
+                    .ticks(d3.timeYear.every(3))
+                    .tickFormat(d3.timeFormat("%Y"))
             )
             .call((g: any) => {
                 g.select(".domain").remove();
@@ -125,7 +125,7 @@
         // Draw x-grid lines.
         const xGrid = svg
             .selectAll("xGrid")
-            .data(xScale.ticks(d3.timeMonth.every(1)))
+            .data(xScale.ticks(d3.timeYear.every(1)))
             .join("line")
             .attr("x1", (d: any) => xScale(d))
             .attr("x2", (d: any) => xScale(d))
@@ -231,6 +231,7 @@
             .on("click", handleClick);
         // #endregion
 
+        // Handles click on chart
         function handleClick(event) {
             const [mouseXsvg, mouseYsvg] = d3.pointer(event);
             const mouseX = event.clientX;
@@ -244,6 +245,7 @@
             year = closestPoint.release_date.getFullYear();
         }
 
+		// Handles tooltip rendering and positioning on mousemove.
         function drawTooltip(event) {
             const [mouseXsvg, mouseYsvg] = d3.pointer(event);
             const mouseX = event.clientX;
@@ -255,64 +257,35 @@
                 Math.abs(xScale(d.release_date) - mouseXsvg)
             );
 
-            console.log("tracksByYear", tracksByYear);
-            console.log("mouseXsvg", mouseXsvg);
-            
-            
-            console.log("closestPoint", closestPoint);
-            
+            // Tooltip positioning
+			const tooltipWidth = tooltip.node()?.offsetWidth + 20 || 0; // 20 for browser scrollbar width
+			const tooltipHeight = tooltip.node()?.offsetHeight || 0;
+			let tooltipLeft = mouseX + 20;
+			let tooltipTop = mouseY - 40;
 
-            // Calculate tooltip position
-            const tooltipWidth = tooltip.node().offsetWidth;
-            const tooltipHeight = tooltip.node().offsetHeight;
+			// Ensure the tooltip stays within viewport bounds
+			if (tooltipLeft + tooltipWidth > window.innerWidth) tooltipLeft = mouseX - tooltipWidth - 10;
+			if (tooltipTop + tooltipHeight > window.innerHeight) tooltipTop = mouseY - tooltipHeight - 10;
 
-            // Modified: Account for page scroll
-            let tooltipLeft = mouseX + 15 + window.scrollX;
-            let tooltipTop = mouseY - 30 + window.scrollY;
-
-            // Adjust tooltip position if it goes out of viewport
-            if (
-                tooltipLeft + tooltipWidth + 15 >=
-                window.innerWidth + window.scrollX
-            ) {
-                tooltipLeft = mouseX - tooltipWidth - 10 + window.scrollX;
-            }
-            if (
-                tooltipTop + tooltipHeight >=
-                window.innerHeight + window.scrollY
-            ) {
-                tooltipTop = mouseY - tooltipHeight - 10 + window.scrollY;
-            }
-
-            tooltip
-                .style("left", `${tooltipLeft}px`)
-                .style("top", `${tooltipTop}px`)
-                .style("opacity", 1);
+			// Show the tooltip
+			tooltip.style('left', `${tooltipLeft}px`).style('top', `${tooltipTop}px`).style('opacity', 1);
 
             // Update tooltip content
-            tooltip.html(`
-                <div>
-                    ${closestPoint.count} tracks released in ${d3.timeFormat("%Y")(closestPoint.release_date)}
-                </div>
-            `);
+            const tooltipContent = `<div>${closestPoint.count} tracks released in ${d3.timeFormat("%Y")(closestPoint.release_date)}</div>`;
+			tooltip.html(tooltipContent);
 
             // Update tooltip line
-            tooltipLine
-                .attr("x1", mouseXsvg)
-                .attr("x2", mouseXsvg)
-                .attr("y1", 0)
-                .attr("y2", height)
-                .attr("stroke", tooltipLineStroke)
-                .attr("stroke-width", tooltipLineStrokeWidth)
-                .attr("stroke-opacity", tooltipLineStrokeOpacity);
+			tooltipLine
+				.attr('x1', mouseXsvg)
+				.attr('x2', mouseXsvg)
+				.attr('y1', 0)
+				.attr('y2', height)
+				.attr('stroke-width', 1)
+				.attr('opacity', 0.2);
 
             // Update tooltip circles
-            let circles = svg
-                .selectAll(".tooltip-circle")
-                .data([closestPoint], (d) => d.release_date);
-
-            // Remove any existing circles that are no longer needed
-            circles.exit().remove();
+            let circles = svg.selectAll(".tooltip-circle").data([closestPoint], (d) => d.release_date);
+            circles.exit().remove(); // Remove any existing circles that are no longer needed
 
             // Add new circles
             circles
@@ -327,10 +300,11 @@
         }
 
         function removeTooltip() {
-            tooltip.style("opacity", 0);
-            tooltipLine.attr("stroke-width", 0);
-            svg.selectAll(".tooltip-circle").remove();
+			tooltip.style('opacity', 0); // Hide tooltip
+			tooltipLine.attr('opacity', 0); // Hide tooltip line
+			svg.selectAll('.tooltip-circle').remove(); // Remove circles
         }
+		// #endregion
     }
 </script>
 
