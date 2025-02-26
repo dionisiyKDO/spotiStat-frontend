@@ -63,10 +63,13 @@
                 console.log(error);
                 return null;
             }
-            const tracksByYear = (await response.json()).tracks_by_year.map(
-                (track) => (track.release_date = new Date(track.release_date))
-            ) as TrackByYear[];
 
+            const data = await response.json();
+            const tracksByYear = data.tracks_by_year.map((track) => {
+                track.release_date = new Date(track.release_date); // Update the release_date
+                return track; // Return the full track object
+            }) as TrackByYear[];
+            
             tracksByYear.sort(function (a, b) {
                 return +a.release_date - +b.release_date;
             }); // sort by release date
