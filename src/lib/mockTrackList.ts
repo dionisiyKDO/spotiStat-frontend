@@ -73,6 +73,7 @@ export const mockDbTracks: Track[] = [
         spotify_url: "https://open.spotify.com/album/1B1qJKZsd3JYOcPjJqnMPc",
         total_ms_played: 35258906,
         track_name: "Battleplan Pyrolysis",
+        percentage_of_max: 100,
     },
     {
         album_image_url:
@@ -83,6 +84,7 @@ export const mockDbTracks: Track[] = [
         spotify_url: "https://open.spotify.com/album/4fSovBNtliN1OY3CXNDS16",
         total_ms_played: 34812423,
         track_name: "War of Change",
+        percentage_of_max: 90,
     },
     {
         album_image_url:
@@ -93,6 +95,7 @@ export const mockDbTracks: Track[] = [
         spotify_url: "https://open.spotify.com/album/7C8nskYbHG7N0LDrNVvt7x",
         total_ms_played: 22659974,
         track_name: "THE BADDEST",
+        percentage_of_max: 80,
     },
     {
         album_image_url:
@@ -103,6 +106,7 @@ export const mockDbTracks: Track[] = [
         spotify_url: "https://open.spotify.com/album/4o469Mz5jMw0vkjm3vHyrX",
         total_ms_played: 32825690,
         track_name: "Speed of Light",
+        percentage_of_max: 50,
     },
     {
         album_image_url:
@@ -113,6 +117,7 @@ export const mockDbTracks: Track[] = [
         spotify_url: "https://open.spotify.com/album/23yd1cYlPgl643vE8bb0WD",
         total_ms_played: 28058179,
         track_name: "MORE",
+        percentage_of_max: 50,
     },
     {
         album_image_url:
@@ -123,6 +128,7 @@ export const mockDbTracks: Track[] = [
         spotify_url: "https://open.spotify.com/album/3MBuWCEWssM1Yc7JmvuYB7",
         total_ms_played: 25234070,
         track_name: "weapon",
+        percentage_of_max: 50,
     },
     {
         album_image_url:
@@ -133,6 +139,7 @@ export const mockDbTracks: Track[] = [
         spotify_url: "https://open.spotify.com/album/3ztW1pVjZEtRFJusUmsN9j",
         total_ms_played: 31239055,
         track_name: "Radiant",
+        percentage_of_max: 50,
     },
     {
         album_image_url:
@@ -143,6 +150,7 @@ export const mockDbTracks: Track[] = [
         spotify_url: "https://open.spotify.com/album/4sruD6fFajEm7CWetpxQd9",
         total_ms_played: 29306753,
         track_name: "Death of Me",
+        percentage_of_max: 50,
     },
     {
         album_image_url:
@@ -153,6 +161,7 @@ export const mockDbTracks: Track[] = [
         spotify_url: "https://open.spotify.com/album/4mPWTksMsByAvomErPtJwK",
         total_ms_played: 22536034,
         track_name: "Wolf in Sheep's Clothing",
+        percentage_of_max: 50,
     },
     {
         album_image_url:
@@ -163,10 +172,11 @@ export const mockDbTracks: Track[] = [
         spotify_url: "https://open.spotify.com/album/26IdRjba8f8DNa7c0FwfQb",
         total_ms_played: 23586686,
         track_name: "DRUM GO DUM",
+        percentage_of_max: 50,
     },
 ];
 
-export const fetchMockDbTracks = () => {
+export async function fetchMockDbTracks(): Promise<Track[] | null> {
     return new Promise((resolve, reject) => {
         setTimeout(() => {
             resolve(mockDbTracks);
@@ -175,10 +185,10 @@ export const fetchMockDbTracks = () => {
     });
 };
 
-export const fetchMockSavedTracks = () => {
+export async function fetchMockSavedTracks(): Promise<SavedTrack[] | null> {
     return new Promise((resolve, reject) => {
         setTimeout(() => {
-            resolve(mockDbTracks);
+            resolve(mockSavedTracks);
             // reject(new Error("Failed to fetch track list")); // to simulate an error - reject the promise
         }, 1000); // 1 second delay
     });

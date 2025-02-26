@@ -124,10 +124,12 @@
                 <div class="p-2 bg-(--surface) h-96 rounded-lg animate-pulse text-transparent"></div>
             </div>
             {:then [msPlayedTracks, playCountTracks]}
-            <div class="w-full flex flex-col gap-4 lg:w-1/2">
+            <div class="w-full flex flex-col lg:w-1/2">
+                <h2 class="text-3xl font-semibold mb-4">Top time played</h2>
                 <TopTracks data={msPlayedTracks} sort_by="ms_played" />
             </div>
-            <div class="w-full flex flex-col gap-4 lg:w-1/2">
+            <div class="w-full flex flex-col lg:w-1/2">
+                <h2 class="text-3xl font-semibold mb-4">Top count of plays</h2>
                 <TopTracks data={playCountTracks} sort_by="play_count" />
             </div>
             {/await}

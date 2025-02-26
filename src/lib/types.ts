@@ -25,16 +25,31 @@ interface Image {
     width: number;
 }
 
-export interface Track {
-    album_image_url: string
-    artist: string
-    index: number
-    play_count: number
-    spotify_url: string
-    total_ms_played: number
-    track_name: string
+// ------------------
+
+export interface TrackByYear {
+    count: number;
+    release_date: Date;
 }
 
+// ------------------
+
+// DB Track: db/history/top-tracks
+export interface Track {
+    index: number
+    album_image_url: string
+    track_name: string
+    artist: string
+    spotify_url: string
+    play_count: number
+    total_ms_played: number
+
+    percentage_of_max?: number | null
+}
+
+// ------------------
+
+// Spotify Saved Track api
 export interface SavedTrack {
     added_at: any;
     album_image_url: string;
@@ -45,9 +60,4 @@ export interface SavedTrack {
     popularity: number;
     release_date: string;
     spotify_url: string;
-}
-
-export interface TrackByYear {
-    count: number;
-    release_date: Date;
 }
