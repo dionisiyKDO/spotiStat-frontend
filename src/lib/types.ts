@@ -34,3 +34,20 @@ export interface Track {
     track_name: string;
     percentage_of_max: number | null;
 }
+
+export interface SavedTrack {
+    added_at: any;
+    album_image_url: string;
+    artist: string;
+    duration_ms: number;
+    name: string;
+    played_at: any;
+    popularity: number;
+    release_date: string;
+    spotify_url: string;
+}
+
+export interface TrackByYear {
+    count: number;
+    release_date: Date;
+}

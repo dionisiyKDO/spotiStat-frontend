@@ -1,55 +1,9 @@
 <script lang="ts">
     import TrackList from "$lib/TrackList.svelte";
+    import { fetchSavedTracks } from "./load";
 
-    let { year = $bindable() }: Props = $props();
+    let { year = $bindable() }: { year: number; } = $props();
     let tempYear = $state(year);
-
-    $effect(() => {
-        tempYear = year;
-    });
-
-    interface Props {
-        year: number;
-    }
-
-    interface Tracks {
-        added_at: any;
-        album_image_url: string;
-        artist: string;
-        duration_ms: number;
-        name: string;
-        played_at: any;
-        popularity: number;
-        release_date: string;
-        spotify_url: string;
-    }
-
-    async function fetchSavedTracks(year: number): Promise<Tracks[] | null> {
-        try {
-            const response = await fetch(
-                `/api/spotify/saved_tracks/filter?year=${year}`
-            );
-
-            if (!response.ok) {
-                const data = await response.json();
-                const error = data.error || "Failed to fetch saved tracks";
-                console.log(error);
-                return null;
-            }
-
-            const data = (await response.json()) as {
-                results: Tracks[];
-            };
-            return data.results;
-        } catch (err) {
-            console.log(err);
-            return null;
-        }
-    }
-
-    function updateYear() {
-        year = tempYear;
-    }
 
     let tracksReq = $derived(fetchSavedTracks(year));
 </script>
@@ -63,7 +17,7 @@
         name="year"
         id="year"
         bind:value={tempYear}
-        onblur={updateYear}
+        onblur={() => year = tempYear}
     />
 </div>
 
