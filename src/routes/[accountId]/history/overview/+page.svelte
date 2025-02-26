@@ -1,5 +1,5 @@
 <script lang="ts">
-    import HumbleTracksList from "$lib/HumbleTracksList.svelte";
+    import TrackListPage from "$lib/TrackListPage.svelte";
     import D3BarChart from "./D3BarChart.svelte";
     import D3TimelineChart from "./D3TimelineChart.svelte";
     import {
@@ -120,7 +120,7 @@
         <p class="loading">Loading Most Skipped Tracks...</p>
     {:then mstData}
         <h2 class="text-2xl font-semibold mb-1 mx-auto">Most Skipped Tracks</h2>
-        <HumbleTracksList Tracks={mstData} />
+        <TrackListPage Tracks={mstData} />
     {/await}
 
     <!-- TODO: Think what to do -->

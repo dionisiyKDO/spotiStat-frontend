@@ -1,5 +1,5 @@
 <script>
-    // TODO: merge with humbleTrackList
+    // TODO: merge with TrackListPage
     let { tracks } = $props();
 
     console.log(tracks);
