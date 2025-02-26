@@ -5,6 +5,8 @@ export interface ArtistStats {
     first_played: string;
     last_played: string;
     timeline_data: TimelineData[];
+    total_plays: number | null;
+    total_ms_played: number | null;
 }
 
 interface TimelineData {
@@ -13,7 +15,7 @@ interface TimelineData {
     total_ms_played: number;
 }
 
-export interface Tracks {
+export interface Track {
     album_image_url: string;
     artist: string;
     play_count: number;
@@ -27,7 +29,7 @@ export interface Tracks {
 export async function fetchTracks(
     limit_count: number = 10,
     limit_play: number = 1000
-): Promise<Tracks[] | null> {
+): Promise<Track[] | null> {
     try {
         const response = await fetch(
             `/api/db/history/played-tracks?limit_count=${limit_count}&limit_play=${limit_play}&group_by=artist`
@@ -40,7 +42,7 @@ export async function fetchTracks(
             return null;
         }
 
-        const data = (await response.json()) as { played_tracks: Tracks[] };
+        const data = (await response.json()) as { played_tracks: Track[] };
         return data.played_tracks;
     } catch (err) {
         console.log(err);
@@ -73,7 +75,7 @@ export async function fetchPlayedTracks(
     limit: number,
     date: string,
     artist: string
-): Promise<Tracks[] | null> {
+): Promise<Track[] | null> {
     try {
         const sortby = "total_ms_played";
         const response = await fetch(
@@ -86,14 +88,14 @@ export async function fetchPlayedTracks(
             return null;
         }
         const data = (await response.json()) as {
-            tracks: Tracks[];
+            tracks: Track[];
         };
 
         // Find the maximum total_ms_played
-        const max = Math.max(...data.map((track) => track[sortby]));
+        const max = Math.max(...data.map((track: Track) => track[sortby]));
 
         // Add percentage key to each track
-        const tracksWithPercentage = data.map((track) => ({
+        const tracksWithPercentage = data.map((track: Track) => ({
             ...track, // Spread the existing properties
             percentage_of_max: (track[sortby] / max) * 100,
         }));

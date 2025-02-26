@@ -1,5 +1,5 @@
 <script lang="ts">
-    import TrackList from "$lib/TrackList.svelte";
+    // import TrackList from "$lib/TrackList.svelte";
 
     interface PlayHistory {
         added_at: any;
@@ -60,7 +60,7 @@
     <p class="loading">Loading...</p>
 {:then playHistory}
     <div class="mt-4">
-        <TrackList tracks={playHistory} />
+        <!-- <TrackList tracks={playHistory} /> -->
     </div>
 {/await}
 

@@ -1,6 +1,7 @@
 <script lang="ts">
-    import TopTracks from "$lib/TopTracks.svelte";
+    import TopTracks from "$lib/CardTrackList.svelte";
     import { fetchUserInfo, fetchCheckHistory, fetchTracks } from "./load";
+    import { fetchMockDbTracks } from "$lib/mockTrackList";
 
     let { data } = $props();
     const accountId = data.accountId;
@@ -31,15 +32,15 @@
     const historyLinks = [
         {
             name: "Track stats",
-            link: `/${accountId}/history/track_stats`,
+            link: `/${accountId}/tracks`,
         },
         {
             name: "Artist stats",
-            link: `/${accountId}/history/artist_stats`,
+            link: `/${accountId}/artists`,
         },
         {
             name: "OverView",
-            link: `/${accountId}/history/overview`,
+            link: `/${accountId}/trends`,
         },
     ];
 
@@ -52,8 +53,10 @@
     ]);
 
     const tracksPromise = Promise.all([
-        fetchTracks(10, "total_ms_played"),
-        fetchTracks(10, "play_count"),
+        // fetchTracks(10, "total_ms_played"),
+        // fetchTracks(10, "play_count"),
+        fetchMockDbTracks(),
+        fetchMockDbTracks(),
     ]);
 </script>
 
@@ -122,10 +125,10 @@
             </div>
             {:then [msPlayedTracks, playCountTracks]}
             <div class="w-full flex flex-col gap-4 lg:w-1/2">
-                <TopTracks tracks={msPlayedTracks} sort_by="ms_played" />
+                <TopTracks data={msPlayedTracks} sort_by="ms_played" />
             </div>
             <div class="w-full flex flex-col gap-4 lg:w-1/2">
-                <TopTracks tracks={playCountTracks} sort_by="play_count" />
+                <TopTracks data={playCountTracks} sort_by="play_count" />
             </div>
             {/await}
         </div>

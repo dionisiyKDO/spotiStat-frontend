@@ -1,19 +1,14 @@
 <script lang="ts">
     import type { Track } from "$lib/types";
-    interface Props {
-        tracks: Track[];
-        sort_by: string;
-    }
 
-    let { tracks, sort_by }: Props = $props();
-
+    let { data, sort_by }: { data: Track[]; sort_by: string;} = $props();
 </script>
 
 <div class="mt-6">
     <h2 class="text-3xl font-semibold mb-4">Top count of plays</h2>
-    {#if tracks.length > 0}
+    {#if data.length > 0}
         <ul class="flex flex-col gap-2">
-            {#each tracks as track}
+            {#each data as track}
                 <li
                     class="relative p-1.5 pl-2 flex flex-row rounded-lg border-2 border-emerald-800 hover:border-emerald-400 transition-all duration-200 ease-in-out"
                 >
@@ -66,7 +61,7 @@
             {/each}
         </ul>
     {:else}
-        <p>No tracks found</p>
+        <p>No data found</p>
     {/if}
 </div>
 

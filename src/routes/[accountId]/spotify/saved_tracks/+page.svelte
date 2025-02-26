@@ -1,5 +1,5 @@
 <script lang="ts">
-    import TrackList from "$lib/TrackList.svelte";
+    // import TrackList from "$lib/TrackList.svelte";
 
     let sortBy = $state("index");
     let order = $state("asc");
@@ -73,6 +73,6 @@
     <p class="loading">Loading...</p>
 {:then savedTracks}
     <div class="mt-4">
-        <TrackList tracks={savedTracks} />
+        <!-- <TrackList tracks={savedTracks} /> -->
     </div>
 {/await}

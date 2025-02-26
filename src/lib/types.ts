@@ -26,13 +26,13 @@ interface Image {
 }
 
 export interface Track {
-    album_image_url: string;
-    artist: string;
-    play_count: number;
-    total_ms_played: number;
-    index: number;
-    track_name: string;
-    percentage_of_max: number | null;
+    album_image_url: string
+    artist: string
+    index: number
+    play_count: number
+    spotify_url: string
+    total_ms_played: number
+    track_name: string
 }
 
 export interface SavedTrack {

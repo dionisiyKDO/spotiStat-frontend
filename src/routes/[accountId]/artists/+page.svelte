@@ -3,24 +3,24 @@
         fetchArtistStats,
         fetchPlayedTracks,
         fetchTracks,
-        type Tracks,
+        type Track,
     } from "./load";
     import D3Chart from "./D3Chart.svelte";
-    import TrackList from "$lib/TrackList.svelte";
+    // import TrackList from "$lib/TrackList.svelte";
 
     let artist = $state("塞壬唱片-MSR");
     let selectedDate = $state("1976-01-01");
     let searchInput = $state("");
-    let filteredTracks: Tracks[] = $state([]);
+    let filteredTracks: Track[] = $state([]);
     let showSuggestions = $state(false);
 
-    function filterTracks(tracks: Tracks[]) {
+    function filterTracks(tracks: Track[]) {
         const inputLower = searchInput.toLowerCase().trim();
         const searchTerms = inputLower.split(/\s+/); // Split by spaces for multi-word search
         const maxResults = 4;
 
         // Define a helper function to calculate relevance score
-        function calculateRelevance(track: Tracks): number {
+        function calculateRelevance(track: Track): number {
             let score = 0;
 
             searchTerms.forEach((term) => {
@@ -138,7 +138,7 @@
                 </h2>
             </div>
             <div class="mt-4">
-                <TrackList {tracks} />
+                <!-- <TrackList {tracks} /> -->
             </div>
         {/if}
     </div>

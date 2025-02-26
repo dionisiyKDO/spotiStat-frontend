@@ -1,5 +1,5 @@
 <script lang="ts">
-    import TrackList from "$lib/TrackList.svelte";
+    // import TrackList from "$lib/TrackList.svelte";
 
     let timeRange = $state("medium_term");
 
@@ -54,6 +54,6 @@
     <p class="loading">Loading...</p>
 {:then topTracks}
     <div class="mt-4">
-        <TrackList tracks={topTracks} />
+        <!-- <TrackList tracks={topTracks} /> -->
     </div>
 {/await}
