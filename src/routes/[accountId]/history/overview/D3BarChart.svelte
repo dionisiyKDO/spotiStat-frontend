@@ -1,6 +1,7 @@
 <script lang="ts">
-    import * as colors from "tailwindcss/colors";
     import * as d3 from "d3";
+
+    let chartsvg;
 
     interface Props {
         data: any;
@@ -30,12 +31,9 @@
         }
     }
     console.log(xAxisLabel, data);
-    
 
     function drawChart() {
-        console.log('aboba123');
-        
-        d3.select("#chart").selectAll("*").remove();
+        d3.select(chartsvg).selectAll("*").remove();
 
         // styles for the chart
         // #region
@@ -46,24 +44,30 @@
         const chartStroke = "#7b8495";
         const chartStrokeWidth = 1;
         const chartStrokeOpacity = 0.33;
-        const chartBar = colors.emerald[500];
-        const chartBarHover = colors.emerald[600];
-        const chartLineStroke = colors.emerald[600];
+        // const chartBar = colors.emerald[500];
+        // const chartBarHover = colors.emerald[600];
+        // const chartLineStroke = colors.emerald[600];
+        const chartBar = "#7b8495";
+        const chartBarHover = "#7b8495";
+        const chartLineStroke = "#7b8495";
         const chartLineStrokeWidth = 1.5;
         const chartLineStrokeOpacity = 0.66;
 
         const tooltipFontSize = "18px";
         const tooltipColor = "#c2c7d0";
         const tooltipBG = "#0c0c0c";
-        const tooltipBorderColor = colors.emerald[500];
+        // const tooltipBorderColor = colors.emerald[500];
+        const tooltipBorderColor = "#7b8495";
         const tooltipBorderWidth = "2px";
-        const tooltipBorder = tooltipBorderWidth + " solid " + tooltipBorderColor;
-        
+        const tooltipBorder =
+            tooltipBorderWidth + " solid " + tooltipBorderColor;
+
         const tooltipBorderRadius = "6px";
         const tooltipPadding = "5px";
         const tooltipBoxShadow = "0 0 10px rgba(0, 0, 0, 0.1)";
 
-        const tooltipCircleFill = colors.emerald[500];
+        // const tooltipCircleFill = colors.emerald[500];
+        const tooltipCircleFill = "#7b8495";
         const tooltipCircleRadius = 3;
         const tooltipCircleOpacity = 1;
 
@@ -86,7 +90,7 @@
         // Create the SVG elements
         // #region
         const svg = d3
-            .select("#chart")
+            .select(chartsvg)
             .attr(
                 "viewBox",
                 `0 0 ${width + margin.left + margin.right} ${height + margin.top + margin.bottom}`
@@ -98,7 +102,7 @@
             .scaleBand()
             .range([0, width])
             .domain(data.map((d) => d.label));
-            // .padding(0.2);
+        // .padding(0.2);
 
         const yScale = d3
             .scaleLinear()
@@ -238,12 +242,10 @@
     $effect(() => {
         drawChart();
     });
-
-    let cahrtsvg;
 </script>
 
 <p>aboba1</p>
 <div id="chart-container">
-    <svg id="chart" bind:this={cahrtsvg}/>
+    <svg id="chart" bind:this={chartsvg} />
     <div id="tooltip"></div>
 </div>

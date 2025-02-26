@@ -1,6 +1,5 @@
 <script>
     import * as d3 from "d3";
-    import * as colors from "tailwindcss/colors"
 
     let { timeline_data } = $props();
     
@@ -15,19 +14,22 @@
         const chartStroke = '#7b8495';
         const chartStrokeWidth = 1;
         const chartStrokeOpacity = 0.33;
-        const chartLineStroke = colors.emerald[600];
+        // const chartLineStroke = colors.emerald[600];
+        const chartLineStroke = '#7b8495';
         const chartLineStrokeWidth = 1.5;
         const chartLineStrokeOpacity = 0.66;
 
         const tooltipFontSize = '18px';
         const tooltipColor = '#c2c7d0';
         const tooltipBG = '#0c0c0c';
-        const tooltipBorder = colors.emerald[500];
+        // const tooltipBorder = colors.emerald[500];
+        const tooltipBorder = '#7b8495';
         const tooltipBorderRadius = '3px';
         const tooltipPadding = '5px';
         const tooltipBoxShadow = '0 0 10px rgba(0, 0, 0, 0.1)';
 
-        const tooltipCircleFill = colors.emerald[500];
+        // const tooltipCircleFill = colors.emerald[500];
+        const tooltipCircleFill = '#7b8495';
         const tooltipCircleRadius = 3;
         const tooltipCircleOpacity = 1;
 
