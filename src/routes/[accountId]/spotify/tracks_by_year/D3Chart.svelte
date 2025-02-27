@@ -1,5 +1,28 @@
 <script lang="ts">
     import * as d3 from "d3";
+    import {
+        chartFontSize,
+        chartColor,
+        chartStroke,
+        chartStrokeWidth,
+        chartStrokeOpacity,
+        chartLineStroke,
+        chartLineStrokeWidth,
+        chartLineStrokeOpacity,
+        tooltipFontSize,
+        tooltipColor,
+        tooltipBG,
+        tooltipBorder,
+        tooltipBorderRadius,
+        tooltipPadding,
+        tooltipBoxShadow,
+        tooltipCircleFill,
+        tooltipCircleRadius,
+        tooltipCircleOpacity,
+        tooltipLineStroke,
+        tooltipLineStrokeWidth,
+        tooltipLineStrokeOpacity,
+    } from "$lib/chartStyles";
 
     let chartsvg: SVGSVGElement;
     let chartContainer: HTMLElement;
@@ -12,34 +35,6 @@
 
     function drawChart() {
         d3.select(chartsvg).selectAll("*").remove();
-
-        // TODO: export styles to other ts file
-        // #region styles for the chart
-        const chartFontSize = "14px";
-        const chartColor = "#c2c7d0";
-        const chartStroke = "#7b8495";
-        const chartStrokeWidth = 1;
-        const chartStrokeOpacity = 0.33;
-        const chartLineStroke = "#7b8495";
-        const chartLineStrokeWidth = 1.5;
-        const chartLineStrokeOpacity = 0.66;
-
-        const tooltipFontSize = "18px";
-        const tooltipColor = "#c2c7d0";
-        const tooltipBG = "#0c0c0c";
-        const tooltipBorder = "#7b8495";
-        const tooltipBorderRadius = "3px";
-        const tooltipPadding = "5px";
-        const tooltipBoxShadow = "0 0 10px rgba(0, 0, 0, 0.1)";
-
-        const tooltipCircleFill = "#7b8495";
-        const tooltipCircleRadius = 3;
-        const tooltipCircleOpacity = 1;
-
-        const tooltipLineStroke = chartStroke;
-        const tooltipLineStrokeWidth = 1;
-        const tooltipLineStrokeOpacity = 0.66;
-        // #endregion
 
         // #region Create the chart variables
         const container = d3.select(chartContainer);
@@ -102,7 +97,7 @@
         //     .attr("height", height)
         //     .attr("stroke", chartStroke)
         //     .attr("fill", "none");
-        
+
         // #endregion
 
         // #region Draw the bars
@@ -136,11 +131,11 @@
             .attr("height", height)
             .attr("stroke", chartStroke)
             .attr("fill", "none");
-        
+
         // #endregion
 
         // #region Axes, Grid, Bounds
-        
+
         // Draw the x-axis
         let xAxis = svg
             .append("g")
@@ -217,26 +212,25 @@
             .style("font-family", "sans-serif")
             .text("Count");
 
-
         // #endregion
 
-		// #region Draw Tooltip
+        // #region Draw Tooltip
 
-		// Set up the tooltip line to indicate the cursor's x-position
+        // Set up the tooltip line to indicate the cursor's x-position
         const tooltipLine = svg
-			.append('line')
-			.attr('stroke', '#fff')
-			.attr('stroke-width', 1)
-			.attr('opacity', 0);
-        
-		// Set up the tooltip container
-		const tooltip = d3
-			.select('#tooltip')
-			.style('opacity', 0)
-			.style('position', 'fixed')
-			.style('white-space', 'nowrap')
-			.style('z-index', '10')
-			.style('pointer-events', 'none')
+            .append("line")
+            .attr("stroke", "#fff")
+            .attr("stroke-width", 1)
+            .attr("opacity", 0);
+
+        // Set up the tooltip container
+        const tooltip = d3
+            .select("#tooltip")
+            .style("opacity", 0)
+            .style("position", "fixed")
+            .style("white-space", "nowrap")
+            .style("z-index", "10")
+            .style("pointer-events", "none")
             .style("background-color", tooltipBG)
             .style("border", tooltipBorder)
             .style("font-size", tooltipFontSize)
@@ -245,7 +239,7 @@
             .style("border-radius", tooltipBorderRadius)
             .style("box-shadow", tooltipBoxShadow);
 
-		// Add an invisible rectangle to listen for mouse events
+        // Add an invisible rectangle to listen for mouse events
         const listeningRect = svg
             .append("rect")
             .attr("width", width)
@@ -265,7 +259,7 @@
             year = closestPoint.release_date.getFullYear();
         }
 
-		// Handles tooltip rendering and positioning on mousemove.
+        // Handles tooltip rendering and positioning on mousemove.
         function drawTooltip(event) {
             const [mouseXsvg, mouseYsvg] = d3.pointer(event);
             const mouseX = event.clientX;
@@ -277,29 +271,34 @@
             );
 
             // Tooltip positioning
-			const tooltipWidth = tooltip.node()?.offsetWidth + 20 || 0; // 20 for browser scrollbar width
-			const tooltipHeight = tooltip.node()?.offsetHeight || 0;
-			let tooltipLeft = mouseX + 20;
-			let tooltipTop = mouseY - 40;
+            const tooltipWidth = tooltip.node()?.offsetWidth + 20 || 0; // 20 for browser scrollbar width
+            const tooltipHeight = tooltip.node()?.offsetHeight || 0;
+            let tooltipLeft = mouseX + 20;
+            let tooltipTop = mouseY - 40;
 
-			// Ensure the tooltip stays within viewport bounds
-			if (tooltipLeft + tooltipWidth > window.innerWidth) tooltipLeft = mouseX - tooltipWidth - 10;
-			if (tooltipTop + tooltipHeight > window.innerHeight) tooltipTop = mouseY - tooltipHeight - 10;
+            // Ensure the tooltip stays within viewport bounds
+            if (tooltipLeft + tooltipWidth > window.innerWidth)
+                tooltipLeft = mouseX - tooltipWidth - 10;
+            if (tooltipTop + tooltipHeight > window.innerHeight)
+                tooltipTop = mouseY - tooltipHeight - 10;
 
-			// Show the tooltip
-			tooltip.style('left', `${tooltipLeft}px`).style('top', `${tooltipTop}px`).style('opacity', 1);
+            // Show the tooltip
+            tooltip
+                .style("left", `${tooltipLeft}px`)
+                .style("top", `${tooltipTop}px`)
+                .style("opacity", 1);
 
             // Update tooltip content
             const tooltipContent = `<div>${closestPoint.count} tracks released in ${d3.timeFormat("%Y")(closestPoint.release_date)}</div>`;
-			tooltip.html(tooltipContent);
+            tooltip.html(tooltipContent);
 
             // Update tooltip line
-			tooltipLine
-				.attr('x1', mouseXsvg)
-				.attr('x2', mouseXsvg)
-				.attr('y1', 0)
-				.attr('y2', height)
-				.attr('opacity', 0.2);
+            tooltipLine
+                .attr("x1", mouseXsvg)
+                .attr("x2", mouseXsvg)
+                .attr("y1", 0)
+                .attr("y2", height)
+                .attr("opacity", 0.2);
 
             // Update tooltip circles for line chart
             // let circles = svg.selectAll(".tooltip-circle").data([closestPoint], (d) => d.release_date);
@@ -321,12 +320,12 @@
         }
 
         function removeTooltip() {
-			tooltip.style('opacity', 0); // Hide tooltip
-			tooltipLine.attr('opacity', 0); // Hide tooltip line
-			svg.selectAll('.tooltip-circle').remove(); // Remove circles
+            tooltip.style("opacity", 0); // Hide tooltip
+            tooltipLine.attr("opacity", 0); // Hide tooltip line
+            svg.selectAll(".tooltip-circle").remove(); // Remove circles
             svg.selectAll(".bar").attr("fill", chartLineStroke);
         }
-		// #endregion
+        // #endregion
     }
 </script>
 

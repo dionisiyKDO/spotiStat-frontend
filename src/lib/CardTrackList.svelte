@@ -12,7 +12,7 @@
             <li class="relative p-1.5 pl-2 flex flex-row rounded-lg border-2 border-(--primary) hover:border-(--primary-hover) transition-all duration-200 ease-in-out">
                 <!-- Background "progress bar" -->
                 <div class="absolute top-0 left-0 w-full h-full opacity-50 -z-10">
-                    {#if track.percentage_of_max} <!-- TODO: background: linear-gradient(to right, #000000 66.6%, transparent 66.6%); -->
+                    {#if track.percentage_of_max}
                         <div
                             class="h-full bg-emerald-900/50 absolute top-0 left-0 track-bar-fill"
                             style="width: {track.percentage_of_max}%"

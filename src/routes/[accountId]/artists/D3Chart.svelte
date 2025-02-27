@@ -1,43 +1,34 @@
 <script>
     import * as d3 from "d3";
+    import {
+        chartFontSize,
+        chartColor,
+        chartStroke,
+        chartStrokeWidth,
+        chartStrokeOpacity,
+        chartLineStroke,
+        chartLineStrokeWidth,
+        chartLineStrokeOpacity,
+        tooltipFontSize,
+        tooltipColor,
+        tooltipBG,
+        tooltipBorder,
+        tooltipBorderRadius,
+        tooltipPadding,
+        tooltipBoxShadow,
+        tooltipCircleFill,
+        tooltipCircleRadius,
+        tooltipCircleOpacity,
+        tooltipLineStroke,
+        tooltipLineStrokeWidth,
+        tooltipLineStrokeOpacity,
+    } from "$lib/chartStyles";
     // TODO: add zoom to all charts
 
     let { timeline_data, selectedDate } = $props();
 
     async function drawChart() {
         d3.select("#chart").selectAll("*").remove();
-
-        // Create the styles for the chart
-        // #region
-        const chartFontSize = '14px';
-        const chartColor = '#c2c7d0';
-        const chartBG = '#777';
-        const chartStroke = '#7b8495';
-        const chartStrokeWidth = 1;
-        const chartStrokeOpacity = 0.33;
-        // const chartLineStroke = colors.emerald[600];
-        const chartLineStroke = '#7b8495';
-        const chartLineStrokeWidth = 1.5;
-        const chartLineStrokeOpacity = 0.66;
-
-        const tooltipFontSize = '18px';
-        const tooltipColor = '#c2c7d0';
-        const tooltipBG = '#0c0c0c';
-        // const tooltipBorder = colors.emerald[500];
-        const tooltipBorder = '#7b8495';
-        const tooltipBorderRadius = '3px';
-        const tooltipPadding = '5px';
-        const tooltipBoxShadow = '0 0 10px rgba(0, 0, 0, 0.1)';
-
-        // const tooltipCircleFill = colors.emerald[500];
-        const tooltipCircleFill = '#7b8495';
-        const tooltipCircleRadius = 3;
-        const tooltipCircleOpacity = 1;
-
-        const tooltipLineStroke = chartStroke;
-        const tooltipLineStrokeWidth = 1;
-        const tooltipLineStrokeOpacity = 0.66;
-        // #endregion
         
         // Create the chart variables
         // #region
