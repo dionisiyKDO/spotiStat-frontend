@@ -29,14 +29,10 @@
         },
     ];
 
-    const userReq = fetchUserInfo();
 
     function numberWithCommas(x) {
         return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
     }
-
-    let mostSkippedTracksReq = fetchMostSkippedTracks();
-    let endReasonsReq = fetchEndReasons();
 
     const summaryPromise = Promise.all([
         fetchTotalListeningTime(),
@@ -52,6 +48,8 @@
         fetchPlatformStats(),
         fetchSkipStats(),
     ]);
+    // let mostSkippedTracksReq = fetchMostSkippedTracks();
+    // let endReasonsReq = fetchEndReasons();
 </script>
 
 <div>
@@ -85,7 +83,7 @@
             <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                 <div class="bg-(--surface) shadow rounded-xl p-4">
                     <h2 class="text-sm text-(--secondary-text)">Total Listening Time</h2>
-                    <div class="flex gap-3 text-2xl">
+                    <div class="flex gap-2 text-2xl">
                         <p class="font-semibold mt-1">{numberWithCommas(tltData.total_listening_days.toFixed(0))}d</p>
                         <p class="mt-1"> or </p> 
                         <p class="font-semibold mt-1">{numberWithCommas(tltData.total_listening_hours.toFixed(0))}h</p>
@@ -170,11 +168,11 @@
         <!-- Future Expansion -->
         <section class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div class="bg-(--surface) shadow rounded-xl p-4">
-                <h3 class="text-lg font-semibold mb-2">Listening Sessions</h3>
+                <h2 class="text-sm text-(--secondary-text) mb-1">Listening Sessions</h2>
                 <div class="h-36 rounded">[Session Data Placeholder]</div>
             </div>
             <div class="bg-(--surface) shadow rounded-xl p-4">
-                <h3 class="text-lg font-semibold mb-2">Genre Distribution</h3>
+                <h2 class="text-sm text-(--secondary-text) mb-1">Genre Distribution</h2>
                 <div class="h-36 rounded">[Pie or Bar Placeholder]</div>
             </div>
         </section>

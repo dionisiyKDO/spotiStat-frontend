@@ -25,75 +25,67 @@
         tooltipLineStrokeOpacity,
     } from "$lib/chartStyles";
 
-    let chartsvg;
+	let chartsvg: SVGSVGElement;
 
-    interface Props {
-        data: any;
-        yAxisLabel: string;
-        xAxisLabel: string;
-    }
+    interface DataPoint {
+        label?: string;
+		total_ms_played?: number;
+		play_count?: number;
+		hour?: string;
+		day_of_week?: string;
+	}
+
+	interface Props {
+		data: any;
+		// data: DataPoint[];
+		yAxisLabel: string;
+		xAxisLabel: string;
+	}
 
     let { data, yAxisLabel, xAxisLabel }: Props = $props();
-    if (yAxisLabel === "total_ms_played") {
-        for (let i = 0; i < data.length; i++) {
-            data[i]["value"] = data[i]["total_ms_played"] / 3.6e6;
-        }
-    } else {
-        for (let i = 0; i < data.length; i++) {
-            data[i]["value"] = data[i]["play_count"];
-        }
-    }
 
-    if (xAxisLabel === "hour") {
-        for (let i = 0; i < data.length; i++) {
-            data[i]["label"] = data[i]["hour"];
-        }
-    }
-    if (xAxisLabel === "day_of_week") {
-        for (let i = 0; i < data.length; i++) {
-            data[i]["label"] = data[i]["day_of_week"];
-        }
-    }
-    console.log(xAxisLabel, data);
+    const processedData = data.map((d) => ({
+		...d,
+		value: yAxisLabel === 'total_ms_played'
+			? (d.total_ms_played ?? 0) / 3.6e6
+			: d.play_count ?? 0,
+		label: xAxisLabel === 'hour'
+			? d.hour ?? ''
+			: xAxisLabel === 'day_of_week'
+			? d.day_of_week ?? ''
+			: ''
+	}));
 
     function drawChart() {
-        d3.select(chartsvg).selectAll("*").remove();
+		d3.select(chartsvg).selectAll('*').remove();
 
         // Create the chart variables
         // #region
         const container = d3.select("#chart-container");
         const margin = { top: 20, right: 20, bottom: 30, left: 50 };
-        const width =
-            container.node().getBoundingClientRect().width -
-            margin.left -
-            margin.right;
+        const width = container.node().getBoundingClientRect().width - margin.left - margin.right;
         const height = 350 - margin.top - margin.bottom;
         // #endregion
 
         // Create the SVG elements
         // #region
         const svg = d3
-            .select(chartsvg)
-            .attr(
-                "viewBox",
-                `0 0 ${width + margin.left + margin.right} ${height + margin.top + margin.bottom}`
-            )
-            .append("g")
-            .attr("transform", `translate(${margin.left},${margin.top})`);
+			.select(chartsvg)
+			.attr('viewBox', `0 0 ${width + margin.left + margin.right} ${height + margin.top + margin.bottom}`)
+			.append('g')
+			.attr('transform', `translate(${margin.left},${margin.top})`);
 
-        const xScale = d3
-            .scaleBand()
-            .range([0, width])
-            .domain(data.map((d) => d.label));
-        // .padding(0.2);
+        const xScale = d3.scaleBand()
+			.range([0, width])
+			.domain(processedData.map(d => d.label))
+			.padding(0.1);
 
-        const yScale = d3
-            .scaleLinear()
-            .range([height, 0])
-            .domain([0, d3.max(data, (d) => d.value)])
-            .nice();
+		const yScale = d3.scaleLinear()
+			.range([height, 0])
+			.domain([0, d3.max(processedData, d => d.value)!])
+			.nice();
 
-        // add x-axis
+		// Axes
         const xAxis = svg
             .append("g")
             .attr("class", "x-axis")
@@ -104,10 +96,8 @@
             .call((g) => g.select(".domain").remove())
             .selectAll(".tick line")
             .style("color", chartStroke)
-            // .style("stroke-opacity", chartStrokeOpacity);
             .style("stroke-opacity", 0);
 
-        // add y-axis
         const yAxis = svg
             .append("g")
             .attr("class", "y-axis")
@@ -117,7 +107,6 @@
             .call((g) => g.select(".domain").remove())
             .selectAll(".tick line")
             .style("color", chartStroke)
-            // .style("stroke-opacity", chartStrokeOpacity);
             .style("stroke-opacity", 0);
 
         // add y-grid
@@ -143,7 +132,7 @@
 
         // add bars
         svg.selectAll(".bar")
-            .data(data)
+            .data(processedData)
             .enter()
             .append("rect")
             .attr("class", "bar")
@@ -151,83 +140,53 @@
             .attr("y", (d) => yScale(d.value))
             .attr("width", xScale.bandwidth())
             .attr("height", (d) => height - yScale(d.value))
-            .attr("fill", chartBar);
-
-        // Tooltip setup
-        const tooltip = d3
-            .select("#tooltip")
-            .style("opacity", 0)
-            .style("position", "absolute")
-            .style("z-index", "10")
-            .style("pointer-events", "none")
-            .style("background-color", tooltipBG)
-            .style("border", tooltipBorder)
-            .style("font-size", tooltipFontSize)
-            .style("color", tooltipColor)
-            .style("padding", tooltipPadding)
-            .style("border-radius", tooltipBorderRadius)
-            .style("box-shadow", tooltipBoxShadow);
-
-        // Interaction listeners for the bars
-        svg.selectAll(".bar")
-            .on("mousemove", drawTooltip)
-            .on("mouseout", removeTooltip);
+            .attr("fill", chartBar)
+            .on('mousemove', drawTooltip)
+			.on('mouseout', () => d3.select('#tooltip').style('opacity', 0));
 
         function drawTooltip(event, d) {
-            const [mouseX, mouseY] = [event.clientX, event.clientY];
+            const tooltip = d3.select('#tooltip');
             const tooltipWidth = tooltip.node().offsetWidth;
             const tooltipHeight = tooltip.node().offsetHeight;
 
-            // Position the tooltip based on mouse position and viewport boundaries
-            let tooltipLeft = mouseX + 15 + window.scrollX;
-            let tooltipTop = mouseY - 30 + window.scrollY;
+            let left = event.clientX + 15 + window.scrollX;
+            let top = event.clientY - 30 + window.scrollY;
 
-            if (
-                tooltipLeft + tooltipWidth + 15 >=
-                window.innerWidth + window.scrollX
-            ) {
-                tooltipLeft = mouseX - tooltipWidth - 10 + window.scrollX;
-            }
-            if (
-                tooltipTop + tooltipHeight >=
-                window.innerHeight + window.scrollY
-            ) {
-                tooltipTop = mouseY - tooltipHeight - 10 + window.scrollY;
-            }
+            if (left + tooltipWidth + 15 >= window.innerWidth + window.scrollX)
+                left = event.clientX - tooltipWidth - 10 + window.scrollX;
+            
+            if (top + tooltipHeight >= window.innerHeight + window.scrollY)
+                top = event.clientY - tooltipHeight - 10 + window.scrollY;
+            
 
             tooltip
-                .style("left", `${tooltipLeft}px`)
-                .style("top", `${tooltipTop}px`)
-                .style("opacity", 1);
-
-            // Update tooltip content
-            if (yAxisLabel === "total_ms_played") {
-                tooltip.html(`
-                    <div>
-                        At ${d.label} </br>
-                        ${d.value.toFixed(2)} Hours
-                    </div>
-                `);
-            } else {
-                tooltip.html(`
-                    <div>
-                        ${d.value} Times
-                    </div>
-                `);
-            }
-        }
-
-        function removeTooltip() {
-            tooltip.style("opacity", 0);
+                .style("left", `${left}px`)
+                .style("top", `${top}px`)
+                .style("opacity", 1)
+                .html(
+                    yAxisLabel === 'total_ms_played'
+                        ? `At ${d.label} <br>${d.value.toFixed(2)} Hours`
+                        : `${d.value} Times`
+                );
         }
     }
 
-    $effect(() => {
-        drawChart();
-    });
+    $effect(drawChart);
 </script>
 
 <div id="chart-container">
     <svg id="chart" bind:this={chartsvg} />
-    <div id="tooltip"></div>
+    <div id="tooltip" style="
+		position: absolute;
+		z-index: 10;
+		pointer-events: none;
+		background-color: {tooltipBG};
+		border: {tooltipBorder};
+		font-size: {tooltipFontSize};
+		color: {tooltipColor};
+		padding: {tooltipPadding};
+		border-radius: {tooltipBorderRadius};
+		box-shadow: {tooltipBoxShadow};
+		opacity: 0;
+	"></div>
 </div>
