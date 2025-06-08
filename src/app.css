@@ -22,20 +22,17 @@
 
 :root {
     /* Background Colors */
-    --background: #121212;
-    --surface: #1E1E1E;
-    --muted-surface: #2C2C2C;
-    --input-background: #232323;
+    --background: #272628;
+    --surface: #212022;
 
     /* Text Colors */
-    --primary-text: #E0E0E0;
-    --primary-text-hover: #FFFFFF;
-    --secondary-text: #B0B0B0;
+    --primary-text: #ededed;
+    --primary-text-hover: #d1d1d1;
+    --secondary-text: #9b9b9b;
 
-    /* Primary Colors (Spotify Green) */
-    --primary: #1ABF74;
-    /* a softened green */
-    --primary-hover: #20C27F;
+    /* Primary Colors */
+    --primary: #ededed;
+    --primary-hover: #d1d1d1;
 
     /* Secondary Colors */
     --secondary: #424242;
@@ -50,6 +47,7 @@
     /* Border Colors */
     --border: #5C5C5C;
 }
+
 
 /* High contrast colors for detecting hard-coded colors */
 /* :root {

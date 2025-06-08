@@ -58,7 +58,7 @@
         const container = d3.select("#chart-container");
         const margin = {top: 20, right: 20, bottom: 30, left: 40};
         const width  = container.node().getBoundingClientRect().width - margin.left - margin.right;
-        const height = 400 - margin.top - margin.bottom;
+        const height = 350 - margin.top - margin.bottom;
         // #endregion
 
         // Create the SVG elements
@@ -262,7 +262,6 @@
 </script>
 
 
-<p>aboba2</p>
 <div id="chart-container">
     <svg id="chart" bind:this={chartsvg}/>
     <div id="tooltip"></div>

@@ -1,4 +1,5 @@
 node_modules
+src/archive.css
 
 # Output
 .output

@@ -1,33 +1,22 @@
 <script lang="ts">
-    import TopTracks from "$lib/CardTrackList.svelte";
-    import { fetchUserInfo, fetchCheckHistory, fetchTracks } from "./load";
-    import { fetchMockDbTracks } from "$lib/mockTrackList";
+    import D3BarChart from "$lib/overview/D3BarChart.svelte";
+    import D3TimelineChart from "$lib/overview/D3TimelineChart.svelte";
+    import { fetchUserInfo } from "$lib/auth";
+    import {
+        fetchTotalListeningTime,
+        fetchPlatformStats,
+        fetchMostSkippedTracks,
+        fetchSkipStats,
+        fetchEndReasons,
+        fetchUniqueTracksCount,
+        fetchListeningSessions,
+        fetchDailyTrends,
+        fetchHourlyTrends,
+        fetchWeeklyTrends,
+        type ListeningSession,
+    } from "./load";
 
-    let { data } = $props();
-    const accountId = data.accountId;
-
-    const spotifyLinks = [
-        {
-            name: "Recently played",
-            link: `/${accountId}/spotify/recently_played`,
-        },
-        {
-            name: "Saved tracks",
-            link: `/${accountId}/spotify/saved_tracks`,
-        },
-        {
-            name: "Top tracks",
-            link: `/${accountId}/spotify/top/tracks`,
-        },
-        {
-            name: "Top artists",
-            link: `/${accountId}/spotify/top/artists`,
-        },
-        {
-            name: "Tracks by year",
-            link: `/${accountId}/spotify/tracks_by_year`,
-        },
-    ];
+    let { accountId } = $props();
 
     const historyLinks = [
         {
@@ -38,101 +27,171 @@
             name: "Artist stats",
             link: `/${accountId}/artists`,
         },
-        {
-            name: "OverView",
-            link: `/${accountId}/trends`,
-        },
     ];
 
-    // let historyFlagReq = $derived(fetchCheckHistory(accountId));
-    // let userInfoReq = $derived(fetchUserInfo());
+    const userReq = fetchUserInfo();
 
-    const combinedPromise = Promise.all([
-        fetchUserInfo(),
-        fetchCheckHistory(accountId),
-    ]);
+    function numberWithCommas(x) {
+        return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    }
 
-    const tracksPromise = Promise.all([
-        // fetchTracks(10, "total_ms_played"),
-        // fetchTracks(10, "play_count"),
-        fetchMockDbTracks(),
-        fetchMockDbTracks(),
-    ]);
+    let totalListeningTimeReq = fetchTotalListeningTime();
+    let platformStatsReq = fetchPlatformStats();
+    let skipStatsReq = fetchSkipStats();
+    let uniqueTracksCountReq = fetchUniqueTracksCount();
+    let longestListeningSessionsReq = fetchListeningSessions();
+    let mostSkippedTracksReq = fetchMostSkippedTracks();
+    let endReasonsReq = fetchEndReasons();
+    let hourlyTrendsReq = fetchHourlyTrends();
+    let weeklyTrendsReq = fetchWeeklyTrends();
+    let dailyTrendsReq = fetchDailyTrends();
 </script>
 
 <div>
-    <!-- Profile related block -->
-    {#await combinedPromise}
+    {#await userReq}
         <div class="flex items-center justify-center">
             <p class="font-bold text-2xl text-center mt-10 mb-4">
                 Loading Profile...
             </p>
         </div>
-    {:then [userInfo, historyFlag]}
-        <!-- Profile head -->
-        <div>
-            <!-- avatar -->
-            <div class="p-4 flex gap-4">
-                <div
-                    class="rounded-full bg-cover bg-center w-20 h-20"
-                    style="background-image:url({userInfo.images[0].url});"
-                ></div>
-                <h1 class="mt-6 ml-0 text-5xl font-semibold">
-                    {userInfo.display_name}
-                </h1>
-            </div>
-
-            <!-- links -->
-            <div class="flex gap-8">
-                <!-- History related block -->
-                <div>
-                    {#if historyFlag === null}
-                        <p class="text-red-400">
-                            Listening history not found (Import history) <!-- TODO: importing logic -->
-                        </p>
-                    {:else}
-                        <h2 class="text-2xl font-semibold mb-1">
-                            History links
-                        </h2>
-                        {#each historyLinks as { name, link }}
-                            <a class="link" href={link}>{name}</a>
-                        {/each}
-                    {/if}
-                </div>
-
-                <!-- SpotifyAPI related block -->
-                <div>
-                    <h2 class="text-2xl font-semibold mb-1">
-                        Spotify api links
-                    </h2>
-                    {#each spotifyLinks as { name, link }}
-                        <a class="link" href={link}>{name}</a>
-                    {/each}
-                </div>
-            </div>
+    {:then userInfo}
+        <div class="flex"> <!-- links -->
+            {#each historyLinks as { name, link }}
+                <a class="link" href={link}>{name}</a>
+            {/each}
         </div>
-
-        <!-- Account overview block -->
-        <div class="w-full flex gap-4 flex-col lg:flex-row">
-            {#await tracksPromise}
-            <div class="w-full flex flex-col gap-4 lg:w-1/2">
-                <h2 class="text-3xl font-semibold mb-4">Top time played</h2>
-                <div class="p-2 bg-(--surface) h-96 rounded-lg animate-pulse text-transparent"></div>
-            </div>
-            <div class="w-full flex flex-col gap-4 lg:w-1/2">
-                <h2 class="text-3xl font-semibold mb-4">Top count of plays</h2>
-                <div class="p-2 bg-(--surface) h-96 rounded-lg animate-pulse text-transparent"></div>
-            </div>
-            {:then [msPlayedTracks, playCountTracks]}
-            <div class="w-full flex flex-col lg:w-1/2">
-                <h2 class="text-3xl font-semibold mb-4">Top time played</h2>
-                <TopTracks data={msPlayedTracks} sort_by="ms_played" />
-            </div>
-            <div class="w-full flex flex-col lg:w-1/2">
-                <h2 class="text-3xl font-semibold mb-4">Top count of plays</h2>
-                <TopTracks data={playCountTracks} sort_by="play_count" />
-            </div>
-            {/await}
-        </div>
+        <hr class="mt-4">
     {/await}
+
+    <div class="flex flex-col gap-10">
+        <h1 class="text-3xl font-semibold mb-2 inline-block">{accountId} Overview</h1>
+
+        <!-- Total Listening Time Section -->
+        <div class="min-h-12 grid grid-cols-2 lg:grid-cols-3 gap-6 grid-flow-row bg-(--surface) rounded-lg p-4 w-full">
+            
+            {#await totalListeningTimeReq}
+                <p class="loading">Loading Total Listening Time...</p>
+            {:then tltData}
+                <div class="flex flex-col w-full text-center">
+                    <h2 class="text-2xl font-semibold mb-1">Total listening time</h2>
+                    <ul class="mx-auto">
+                        <li>{numberWithCommas(tltData.total_listening_days.toFixed(2))} Days</li>
+                        <li>{numberWithCommas(tltData.total_listening_hours.toFixed(2))} Hours</li>
+                        <li>{numberWithCommas(tltData.total_listening_minutes.toFixed(2))} Minutes</li>
+                    </ul>
+                </div>
+            {/await}
+
+            {#await platformStatsReq}
+                <p class="loading">Loading Total Platform stats...</p>
+            {:then psData}
+                <div class="flex flex-col w-full text-center">
+                    <h2 class="text-2xl font-semibold mb-1">Listening on each Platforms</h2>
+                    <ul class="mx-auto">
+                        {#each psData.sort((a, b) => b.total_ms_played - a.total_ms_played) as { platform, play_count, total_ms_played }}
+                            {#if play_count > 0}
+                                <li>{numberWithCommas((total_ms_played / 3600000).toFixed(2))} Hours on {platform}</li>
+                            {/if}
+                        {/each}
+                    </ul>
+                </div>
+            {/await}
+
+            
+
+            {#await skipStatsReq}
+                <p class="loading">Loading Skip Stats...</p>
+            {:then skipStats}
+                <div class="flex flex-col w-full text-center">
+                    <h2 class="text-2xl font-semibold mb-1">Skip Stats</h2>
+                    <ul class="mx-auto">
+                        <li>Total Plays: {numberWithCommas(skipStats.total_plays.toString())}</li>
+                        <li>Skipped Tracks: {numberWithCommas(skipStats.skipped_tracks.toString())}</li>
+                        <li>Skip Rate: {(skipStats.skip_rate * 100).toFixed(2)}%</li>
+                    </ul>
+                </div>
+            {/await}
+
+            
+
+            {#await uniqueTracksCountReq}
+                <p class="loading">Loading Unique Tracks Count...</p>
+            {:then uniqueTracks}
+                <div class="flex flex-col w-full text-center">
+                    <h2 class="text-2xl font-semibold mb-1">Unique Tracks Count</h2>
+                    <ul class="mx-auto">
+                        <li>Unique Tracks: {uniqueTracks.unique_tracks_count}</li>
+                    </ul>
+                </div>
+            {/await}
+
+            {#await longestListeningSessionsReq}
+                <p class="loading">Loading Listening Sessions...</p>
+            {:then longestSession}
+                <div class="flex flex-col w-full text-center">
+                    <h2 class="text-2xl font-semibold mb-1">Longest listening Session</h2>
+                    <ul class="mx-auto">
+                        <li>Session start: {longestSession.session_start} </li>
+                        <li>Session end: {longestSession.session_end}</li>
+                        <li>Total Hours played: {(longestSession.total_ms_played / 3600000).toFixed(2)} hours</li>
+                        <li>Total tracks: {longestSession.total_tracks}</li>
+                    </ul>
+                </div>
+            {/await}
+
+        </div>
+
+
+        {#await mostSkippedTracksReq}
+            <p class="loading">Loading Most Skipped Tracks...</p>
+        {:then mstData}
+            <h2 class="text-2xl font-semibold mb-1 mx-auto">Most Skipped Tracks</h2>
+            <!-- <TrackListPage Tracks={mstData} /> -->
+        {/await}
+
+        <!-- TODO: Think what to do -->
+        {#await endReasonsReq}
+            <p class="loading">Loading End Reasons...</p>
+        {:then endReasons}
+            <div class="flex flex-col w-full text-center">
+                <h2 class="text-2xl font-semibold mb-1">End Reasons</h2>
+                <ul class="mx-auto">
+                    {#each endReasons as { reason_end, count }}
+                        <li>{reason_end}: {count} times</li>
+                    {/each}
+                </ul>
+            </div>
+        {/await}
+        
+
+        <!-- TODO: graphs -->
+        <!-- Hourly Trends -->
+        <h2 class="text-2xl font-semibold mb-1">Hourly Trends</h2>
+        {#await hourlyTrendsReq}
+            <p class="loading">Loading Hourly Trends...</p>
+        {:then hourlyTrends}
+            <D3BarChart data={hourlyTrends} yAxisLabel={'total_ms_played'} xAxisLabel={'hour'} />
+        {/await}
+
+        <!-- Weekly Trends -->
+        <h2 class="text-2xl font-semibold mb-1">Weekly Trends</h2>
+        {#await weeklyTrendsReq}
+            <p class="loading">Loading Weekly Trends...</p>
+        {:then weeklyTrends}
+            <D3BarChart data={weeklyTrends} yAxisLabel={'total_ms_played'} xAxisLabel={'day_of_week'} />
+        {/await}
+
+        <!-- Daily Trends -->
+        <h2 class="text-2xl font-semibold mb-1">Daily Trends</h2>
+        {#await dailyTrendsReq}
+            <p class="loading">Loading Daily Trends...</p>
+        {:then dailyTrends}
+            <D3TimelineChart data={dailyTrends} yAxisLabel={'total_ms_played'} xAxisLabel={'days'} />
+        {/await}
+
+    </div>
+
 </div>
+
+
+
