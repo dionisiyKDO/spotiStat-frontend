@@ -63,7 +63,7 @@
         // #region
         const container = d3.select("#chart-container");
         const margin = { top: 20, right: 20, bottom: 30, left: 50 };
-        const width = container.node().getBoundingClientRect().width - margin.left - margin.right;
+        const width  = container.node().getBoundingClientRect().width - margin.left - margin.right;
         const height = 350 - margin.top - margin.bottom;
         // #endregion
 

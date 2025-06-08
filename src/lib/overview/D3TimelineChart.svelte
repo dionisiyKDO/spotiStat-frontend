@@ -24,7 +24,7 @@
         tooltipLineStrokeOpacity,
     } from "$lib/chartStyles";
     
-    let chartsvg
+    let chartsvg: SVGSVGElement;
 
     interface Props {
         data: any;
@@ -33,77 +33,75 @@
     }
 
     let { data, yAxisLabel, xAxisLabel }: Props = $props();
-    if (yAxisLabel === "total_ms_played") {
-        for (let i = 0; i < data.length; i++) {
-            data[i]["value"] = data[i]["total_ms_played"] / 3.6e6;
-        }
-    } else {
-        for (let i = 0; i < data.length; i++) {
-            data[i]["value"] = data[i]["play_count"];
-        }
-    }
 
-    if (xAxisLabel === "days") {
-        for (let i = 0; i < data.length; i++) {
-            data[i]["label"] = new Date( data[i]["day"]);
-        }
-    }
+    const processedData = data.map((d) => ({
+        ...d,
+        value: yAxisLabel === "total_ms_played"
+            ? d.total_ms_played / 3.6e6
+            : d.play_count,
+        label: xAxisLabel === "days" ? new Date(d.day) : d[xAxisLabel]
+    }));
+
     
-
     function drawChart() {
         d3.select(chartsvg).selectAll("*").remove();
 
         // Create the chart variables
         // #region
         const container = d3.select("#chart-container");
-        const margin = {top: 20, right: 20, bottom: 30, left: 40};
+        const margin = { top: 20, right: 20, bottom: 30, left: 50 };
         const width  = container.node().getBoundingClientRect().width - margin.left - margin.right;
         const height = 350 - margin.top - margin.bottom;
         // #endregion
 
         // Create the SVG elements
         // #region
-        const svg = d3.select(chartsvg)
-            .attr("viewBox", `0 0 ${width + margin.left + margin.right} ${height + margin.top + margin.bottom}`)
-            .append("g")
-            .attr("transform", `translate(${margin.left},${margin.top})`);
+        const svg = d3
+			.select(chartsvg)
+			.attr('viewBox', `0 0 ${width + margin.left + margin.right} ${height + margin.top + margin.bottom}`)
+			.append('g')
+			.attr('transform', `translate(${margin.left},${margin.top})`);
 
         const xScale = d3.scaleTime()
             .range([0, width])
-            .domain(d3.extent(data, d => d.label));
+            .domain(d3.extent(processedData, d => d.label));
 
         const yScale = d3.scaleLinear()
             .range([height, 0])
-            .domain([0, d3.max(data, d => d.value)])
+            .domain([0, d3.max(processedData, d => d.value)])
             .nice();
 
         // add x-axis
-        svg.append("g")
+        const xAxis = svg
+            .append("g")
             .attr("class", "x-axis")
             .attr("transform", `translate(0,${height})`)
             .style("font-size", chartFontSize)
             .style("color", chartColor)
             .call(d3.axisBottom(xScale))
-            .call(g => g.select(".domain").remove())
+            .call((g) => g.select(".domain").remove())
             .selectAll(".tick line")
-                .style("stroke-opacity", 0);
-
+            .style("color", chartStroke)
+            .style("stroke-opacity", 0);
+        
         // add y-axis
-        const yAxis = svg.append("g")
+        const yAxis = svg
+            .append("g")
             .attr("class", "y-axis")
             .style("font-size", chartFontSize)
             .style("color", chartColor)
             .call(d3.axisLeft(yScale))
-            .call(g => g.select(".domain").remove())
+            .call((g) => g.select(".domain").remove())
             .selectAll(".tick line")
-                .style("stroke-opacity", 0);
+            .style("color", chartStroke)
+            .style("stroke-opacity", 0);
 
         // add x-grid
         svg.selectAll("xGrid")
             .data(xScale.ticks())
             .join("line")
-            .attr("x1", d => xScale(d))
-            .attr("x2", d => xScale(d))
+            .attr("x1", (d) => xScale(d))
+            .attr("x2", (d) => xScale(d))
             .attr("y1", 0)
             .attr("y2", height)
             .attr("stroke", chartStroke)
@@ -116,8 +114,8 @@
             .join("line")
             .attr("x1", 0)
             .attr("x2", width)
-            .attr("y1", d => yScale(d))
-            .attr("y2", d => yScale(d))
+            .attr("y1", (d) => yScale(d))
+            .attr("y2", (d) => yScale(d))
             .attr("stroke", chartStroke)
             .attr("stroke-width", chartStrokeWidth)
             .attr("stroke-opacity", chartStrokeOpacity);
@@ -133,92 +131,58 @@
 
         // add line chart
         svg.append("path")
-            .datum(data)
+            .datum(processedData)
             .attr("fill", "none")
             .attr("stroke", chartLineStroke)
             .attr("stroke-width", chartLineStrokeWidth)
             .attr("d", d3.line()
-                .x(function(d) { return xScale(d.label) })
-                .y(function(d) { return yScale(d.value) })
-                );
+                .x((d) => xScale(d.label))
+                .y((d) => yScale(d.value)));
 
+        const tooltip = d3.select('#tooltip');
         const tooltipLine = svg.append('line');
-        const tooltip = d3.select('#tooltip').style('opacity', 0)
-            .style('position', 'absolute')
-            .style('z-index', '10')
-            .style('pointer-events', 'none')
-            .style("background-color", tooltipBG)
-            .style("border", tooltipBorder)
-            .style("font-size", tooltipFontSize)
-            .style("color", tooltipColor)
-            .style("padding", tooltipPadding)
-            .style("border-radius", tooltipBorderRadius)
-            .style('box-shadow', tooltipBoxShadow);
-
 
         const listeningRect = svg.append('rect')
             .attr('width', width)
             .attr('height', height)
             .attr('opacity', 0)
             .on('mousemove', drawTooltip)
-            .on('mouseout', removeTooltip)
-            .on('click', handleClick);
+            .on('mouseout', () => {
+                tooltip.style.opacity = "0";
+                tooltipLine.attr("stroke-width", 0);
+                svg.selectAll(".tooltip-circle").remove();
+            });
         // #endregion
 
-        function handleClick(event) {
-            const [mouseXsvg, mouseYsvg] = d3.pointer(event);
-            const mouseX = event.clientX;
-            const mouseY = event.clientY;
-            const xDate = xScale.invert(mouseXsvg);
-
-            const closestPoint = d3.least(data, d => Math.abs(xScale(d.label) - mouseXsvg));
-        }
 
         function drawTooltip(event) {
-            const [mouseXsvg, mouseYsvg] = d3.pointer(event);
-            const mouseX = event.clientX;
-            const mouseY = event.clientY;
-            const xDate = xScale.invert(mouseXsvg);
-
-            // Find the closest data point to the mouse x position
-            const closestPoint = d3.least(data, d => Math.abs(xScale(d.label) - mouseXsvg));
-
-            // Calculate tooltip position
+            const tooltip = d3.select('#tooltip');
             const tooltipWidth = tooltip.node().offsetWidth;
             const tooltipHeight = tooltip.node().offsetHeight;
+            const [mouseXsvg, mouseYsvg] = d3.pointer(event);
+            
+            // Find the closest data point to the mouse x position
+            const closestPoint = d3.least(processedData, d => Math.abs(xScale(d.label) - mouseXsvg));            
 
-            // Modified: Account for page scroll
-            let tooltipLeft = mouseX + 15 + window.scrollX;
-            let tooltipTop = mouseY - 30 + window.scrollY;
+            // Update tooltip box
+            let left = event.clientX + 15 + window.scrollX;
+            let top = event.clientY - 30 + window.scrollY;
 
-            // Adjust tooltip position if it goes out of viewport
-            if (tooltipLeft + tooltipWidth + 15 >= window.innerWidth + window.scrollX) {
-                tooltipLeft = mouseX - tooltipWidth - 10 + window.scrollX;
-            }
-            if (tooltipTop + tooltipHeight >= window.innerHeight + window.scrollY) {
-                tooltipTop = mouseY - tooltipHeight - 10 + window.scrollY;
-            }
+            if (left + tooltipWidth + 15 >= window.innerWidth + window.scrollX)
+                left = event.clientX - tooltipWidth - 10 + window.scrollX;
+            
+            if (top + tooltipHeight >= window.innerHeight + window.scrollY)
+                top = event.clientY - tooltipHeight - 10 + window.scrollY;
 
             tooltip
-                .style("left", `${tooltipLeft}px`)
-                .style("top", `${tooltipTop}px`)
-                .style("opacity", 1);
-
-            // Update tooltip content
-            
-            if (yAxisLabel === "total_ms_played") {
-                tooltip.html(`
-                    <div>
-                        ${(closestPoint.value).toFixed(2)} Hours at ${d3.timeFormat("%Y-%m-%d")(closestPoint.label)}
-                    </div>
-                `);
-            } else {
-                tooltip.html(`
-                    <div>
-                        ${(closestPoint.value)} times at ${d3.timeFormat("%Y-%m-%d")(closestPoint.label)}
-                    </div>
-                `);
-            }
+                .style("left", `${left}px`)
+                .style("top", `${top}px`)
+                .style("opacity", 1)
+                .html(
+                    yAxisLabel === 'total_ms_played'
+                        ? `${(closestPoint.value).toFixed(2)} Hours at ${d3.timeFormat("%Y-%m-%d")(closestPoint.label)}`
+                        : `${(closestPoint.value)} times at ${d3.timeFormat("%Y-%m-%d")(closestPoint.label)}`
+                );
 
             // Update tooltip line
             tooltipLine
@@ -247,22 +211,25 @@
                 .attr("fill", tooltipCircleFill)
                 .attr("fill-opacity", tooltipCircleOpacity);
         }
-
-
-        function removeTooltip() {
-            tooltip.style("opacity", 0);
-            tooltipLine.attr("stroke-width", 0);
-            svg.selectAll(".tooltip-circle").remove();
-        }
     }
 
-    $effect(() => {
-        drawChart();
-    });
+    $effect(drawChart);
 </script>
 
 
 <div id="chart-container">
     <svg id="chart" bind:this={chartsvg}/>
-    <div id="tooltip"></div>
+    <div id="tooltip" style="
+		position: absolute;
+		z-index: 10;
+		pointer-events: none;
+		background-color: {tooltipBG};
+		border: {tooltipBorder};
+		font-size: {tooltipFontSize};
+		color: {tooltipColor};
+		padding: {tooltipPadding};
+		border-radius: {tooltipBorderRadius};
+		box-shadow: {tooltipBoxShadow};
+		opacity: 0;
+	"></div>
 </div>
