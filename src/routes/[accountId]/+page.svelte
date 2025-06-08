@@ -1,6 +1,6 @@
 <script lang="ts">
-    import D3BarChart from "$lib/overview/D3BarChart.svelte";
-    import D3TimelineChart from "$lib/overview/D3TimelineChart.svelte";
+    import D3BarChart from "$lib/dashboard/BarChart.svelte";
+    import D3TimelineChart from "$lib/dashboard/TimelineChart.svelte";
     import { fetchUserInfo } from "$lib/auth";
     import {
         fetchTotalListeningTime,
