@@ -25,6 +25,8 @@
     } from "$lib/chartStyles";
 
     let { timeline_data } = $props();
+    console.log(timeline_data);
+    
     
     async function drawChart() {
         d3.select("#chart").selectAll("*").remove();
