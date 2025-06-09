@@ -53,6 +53,19 @@
 
 <!-- 
 
+TODO: handle no data
+TODO: normal logging in
+TODO: Track stats - input more pleasant, keys navigation in dropdown
+TODO: Track stats - chart x axis and overall
+TODO: navbar trackstats and artists stats
+TODO: in track and artist stats selecting the artist and track more thoughtfull make
+    maybe suggest the most popular tracks and artists as images?
+TODO: maybe track pictures request
+TODO: 
+TODO: 
+TODO: 
+
+
 src/routes/
 ├── +layout.svelte                  // Global shell: nav bar, theme, etc.
 ├── +page.svelte                    // Landing page: brief description + login / register / upload

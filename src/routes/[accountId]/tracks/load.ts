@@ -8,7 +8,6 @@ export interface TrackStats {
     most_frequent_play_count: number;
     most_frequent_play_hour: number;
     timeline_data: TimelineData[];
-    total_days_played: number;
     total_ms_played: number;
     total_plays: number;
     track_id: string;
