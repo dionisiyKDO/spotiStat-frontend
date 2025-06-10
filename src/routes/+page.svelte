@@ -5,46 +5,46 @@
 
     // const combinedPromise = Promise.all([
     //     fetchUserInfo(),
-    //     fetchCheckHistory(accountId),
+    //     fetchCheckHistory(username),
     // ]);
 
     // let { data } = $props();
-    // const accountId = data.accountId;
+    // const username = data.username;
     // const spotifyLinks = [
     //     {
     //         name: "Recently played",
-    //         link: `/${accountId}/spotify/recently_played`,
+    //         link: `/${username}/spotify/recently_played`,
     //     },
     //     {
     //         name: "Saved tracks",
-    //         link: `/${accountId}/spotify/saved_tracks`,
+    //         link: `/${username}/spotify/saved_tracks`,
     //     },
     //     {
     //         name: "Top tracks",
-    //         link: `/${accountId}/spotify/top/tracks`,
+    //         link: `/${username}/spotify/top/tracks`,
     //     },
     //     {
     //         name: "Top artists",
-    //         link: `/${accountId}/spotify/top/artists`,
+    //         link: `/${username}/spotify/top/artists`,
     //     },
     //     {
     //         name: "Tracks by year",
-    //         link: `/${accountId}/spotify/tracks_by_year`,
+    //         link: `/${username}/spotify/tracks_by_year`,
     //     },
     // ];
 
     // const historyLinks = [
     //     {
     //         name: "Track stats",
-    //         link: `/${accountId}/tracks`,
+    //         link: `/${username}/tracks`,
     //     },
     //     {
     //         name: "Artist stats",
-    //         link: `/${accountId}/artists`,
+    //         link: `/${username}/artists`,
     //     },
     //     {
     //         name: "OverView",
-    //         link: `/${accountId}/trends`,
+    //         link: `/${username}/trends`,
     //     },
     // ];
 
@@ -61,8 +61,8 @@ TODO: navbar trackstats and artists stats
 TODO: in track and artist stats selecting the artist and track more thoughtfull make
     maybe suggest the most popular tracks and artists as images?
 TODO: maybe track pictures request
-TODO: 
-TODO: 
+TODO: artist - fetch artists, not tracks
+TODO: make skeletons for all components
 TODO: 
 
 

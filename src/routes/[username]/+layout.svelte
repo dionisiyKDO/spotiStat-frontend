@@ -19,7 +19,7 @@
         </div>
     {:else}
         <div class="min-h-screen flex flex-col">
-            <Header loggedIn={data.logged_in} accountId={data.account_id} />
+            <Header loggedIn={data.logged_in} username={data.username} />
 
             <main class="flex-1 container mx-auto p-4">
                 {@render children()}

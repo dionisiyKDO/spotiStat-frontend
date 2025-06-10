@@ -1,6 +1,6 @@
 <script>
     import { fetchUserInfo } from "./auth";
-    let { loggedIn, accountId } = $props();
+    let { loggedIn, username } = $props();
 
     const userReq = fetchUserInfo();
 </script>
@@ -23,7 +23,7 @@
 
         <ul class="list-none flex gap-4">
             {#if loggedIn === true}
-                <li><a href="/{accountId}">Profile</a></li>
+                <li><a href="/{username}">Profile</a></li>
                 <li><a href="/api/auth/logout">Logout</a></li>
             {:else if loggedIn === false}
                 <li><a href="/api/auth/login">Login with Spotify</a></li>

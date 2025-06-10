@@ -16,16 +16,16 @@
         type ListeningSession,
     } from "./load";
 
-    let { accountId } = $props();
+    let { username } = $props();
 
     const historyLinks = [
         {
             name: "Track stats",
-            link: `/${accountId}/tracks`,
+            link: `/${username}/tracks`,
         },
         {
             name: "Artist stats",
-            link: `/${accountId}/artists`,
+            link: `/${username}/artists`,
         },
     ];
 
