@@ -1,5 +1,11 @@
 <script>
+    import { goto } from "$app/navigation";
+
+    let route = $state("");
+
+
     // TODO: write redirect logic to land/ or dashboard/
+    // TODO: upload history, in args put username
 
 
 
@@ -47,8 +53,17 @@
     //         link: `/${username}/trends`,
     //     },
     // ];
-
+    function stalk(){
+        goto(`/${route}`)
+    }
 </script>
+
+<p>
+    Write whoms you want to stalk:
+</p>
+<input bind:value={route}>
+<button onclick={stalk}>Let's Stalk</button>
+
 
 
 <!-- 
