@@ -1,19 +1,16 @@
 <script lang="ts">
 	import type { PageProps } from './$types';
-    import D3BarChart from "$lib/dashboard/BarChart.svelte";
-    import D3TimelineChart from "$lib/dashboard/TimelineChart.svelte";
+    import BarChart from "$lib/dashboard/BarChart.svelte";
+    import TimelineChart from "$lib/dashboard/TimelineChart.svelte";
     import {
         fetchTotalListeningTime,
         fetchPlatformStats,
-        fetchMostSkippedTracks,
         fetchSkipStats,
-        fetchEndReasons,
         fetchUniqueTracksCount,
         fetchLongestListeningSession,
         fetchDailyTrends,
         fetchHourlyTrends,
         fetchWeeklyTrends,
-        type ListeningSession,
     } from "./load";
 
     let { data }: PageProps = $props();
@@ -153,15 +150,15 @@
                 <div class="bg-(--surface) shadow rounded-xl p-4 flex flex-col col-span-2">
                 <!-- <div class="bg-(--surface) shadow rounded-xl p-4 flex flex-col"> -->
                     <h3 class="text-lg font-semibold mb-2">Timeline of Activity</h3>
-                    <D3TimelineChart data={dailyTrends} yAxisLabel={'total_ms_played'} xAxisLabel={'days'} />
+                    <TimelineChart data={dailyTrends} yAxisLabel={'total_ms_played'} xAxisLabel={'days'} />
                 </div>
                 <div class="bg-(--surface) shadow rounded-xl p-4">
                     <h3 class="text-lg font-semibold mb-2">Hourly Listening Pattern</h3>
-                    <D3BarChart data={hourlyTrends} yAxisLabel={'total_ms_played'} xAxisLabel={'hour'} />
+                    <BarChart data={hourlyTrends} yAxisLabel={'total_ms_played'} xAxisLabel={'hour'} />
                 </div>
                 <div class="bg-(--surface) shadow rounded-xl p-4">
                     <h3 class="text-lg font-semibold mb-2">Day-of-Week Listening</h3>
-                    <D3BarChart data={weeklyTrends} yAxisLabel={'total_ms_played'} xAxisLabel={'day_of_week'} />
+                    <BarChart data={weeklyTrends} yAxisLabel={'total_ms_played'} xAxisLabel={'day_of_week'} />
                 </div>
             </section>
         {/await}
