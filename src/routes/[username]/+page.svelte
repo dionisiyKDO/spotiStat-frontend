@@ -1,7 +1,7 @@
 <script lang="ts">
+	import type { PageProps } from './$types';
     import D3BarChart from "$lib/dashboard/BarChart.svelte";
     import D3TimelineChart from "$lib/dashboard/TimelineChart.svelte";
-    import { fetchUserInfo } from "$lib/auth";
     import {
         fetchTotalListeningTime,
         fetchPlatformStats,
@@ -16,7 +16,8 @@
         type ListeningSession,
     } from "./load";
 
-    let { username } = $props();
+    let { data }: PageProps = $props();
+    const username = data.username
 
     const historyLinks = [
         {
@@ -33,23 +34,43 @@
     function numberWithCommas(x) {
         return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
     }
-
+    
     const summaryPromise = Promise.all([
-        fetchTotalListeningTime(),
-        fetchUniqueTracksCount(),
-        fetchListeningSessions(),
+        fetchTotalListeningTime(username),
+        fetchUniqueTracksCount(username),
+        fetchListeningSessions(username),
     ]);
     const trendsPromise = Promise.all([
-        fetchHourlyTrends(),
-        fetchWeeklyTrends(),
-        fetchDailyTrends(),
+        fetchHourlyTrends(username),
+        fetchWeeklyTrends(username),
+        fetchDailyTrends(username),
     ]);
     const behaviorPromise = Promise.all([
-        fetchPlatformStats(),
-        fetchSkipStats(),
+        fetchPlatformStats(username),
+        fetchSkipStats(username),
     ]);
-    // let mostSkippedTracksReq = fetchMostSkippedTracks();
-    // let endReasonsReq = fetchEndReasons();
+    // let mostSkippedTracksReq = fetchMostSkippedTracks(username);
+    // let endReasonsReq = fetchEndReasons(username);
+
+    async function reqUploadHistory() {
+    try {
+        const response = await fetch(`/api/db/upload_history?username=${username}`);
+        if (!response.ok) {
+            const data = await response.json();
+            const error = data.error || "Failed to fetch total listening time";
+            console.log(error);
+            return null;
+        }
+
+        const data = (await response.json());
+        console.log(data);
+        
+        return data;
+    } catch (err) {
+        console.log(err);
+        return null;
+    }
+}
 </script>
 
 <div>
@@ -57,6 +78,10 @@
         <!-- Dashboard Header -->
         <header class="flex mb-0 justify-between items-center">
             <h1 class="text-3xl font-bold">Listening Dashboard</h1>
+            
+            <button class="link cursor-pointer" onclick={reqUploadHistory} >
+                Upload History
+            </button>
             
             <!-- Links -->
             <div class="flex"> 
