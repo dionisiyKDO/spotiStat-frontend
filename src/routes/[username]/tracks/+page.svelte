@@ -168,13 +168,14 @@
 				<p class="text-xl font-semibold text-(--primary-text) mt-1">{formatDate(trackStats.first_played)}</p>
 			</div>
 			
-			<div class="bg-(--surface) shadow-sm rounded-xl p-4">
+            <!-- Useless info -->
+			<!-- <div class="bg-(--surface) shadow-sm rounded-xl p-4">
 				<h2 class="text-sm text-(--secondary-text) mb-1 font-medium">Last Recorded Play</h2>
 				<p class="text-xl font-semibold text-(--primary-text) mt-1">{formatDate(trackStats.last_played)}</p>
-			</div>
+			</div> -->
 
 			<!-- Optional Add-ons -->
-			<div class="bg-(--surface) shadow-sm rounded-xl p-4">
+			<!-- <div class="bg-(--surface) shadow-sm rounded-xl p-4">
 				<h2 class="text-sm text-(--secondary-text) mb-1 font-medium">Longest Streak</h2>
 				<p class="text-xl font-semibold text-(--primary-text) mt-1">7 days in a row</p>
 			</div>
@@ -182,7 +183,7 @@
 			<div class="bg-(--surface) shadow-sm rounded-xl p-4">
 				<h2 class="text-sm text-(--secondary-text) mb-1 font-medium">Listening Pattern</h2>
 				<p class="text-xl font-semibold text-(--primary-text) mt-1">Instant favorite</p>
-			</div>
+			</div> -->
 		</section>
 
 		<!-- Timeline Chart -->

@@ -9,7 +9,7 @@
         fetchSkipStats,
         fetchEndReasons,
         fetchUniqueTracksCount,
-        fetchListeningSessions,
+        fetchLongestListeningSession,
         fetchDailyTrends,
         fetchHourlyTrends,
         fetchWeeklyTrends,
@@ -38,7 +38,7 @@
     const summaryPromise = Promise.all([
         fetchTotalListeningTime(username),
         fetchUniqueTracksCount(username),
-        fetchListeningSessions(username),
+        fetchLongestListeningSession(username),
     ]);
     const trendsPromise = Promise.all([
         fetchHourlyTrends(username),
@@ -123,6 +123,8 @@
                     <h2 class="text-sm text-(--secondary-text)">Unique Tracks</h2>
                     <p class="text-2xl font-semibold mt-1">{numberWithCommas(uniqData.unique_tracks_count)}</p>
                 </div>
+
+                <!-- TODO: Make tio artist and top tracks list 5 elemts instead of one name -->
                 <div class="bg-(--surface) shadow rounded-xl p-4">
                     <h2 class="text-sm text-(--secondary-text)">Top Artist</h2>
                     <p class="text-2xl font-semibold mt-1">[Porter Robinson]</p>
@@ -146,7 +148,13 @@
         {:then [hourlyTrends, weeklyTrends, dailyTrends]}
             
             <section class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <div class="space-y-6">
+
+                <!-- Weird behavior with col-span-2 -->
+                <div class="bg-(--surface) shadow rounded-xl p-4 flex flex-col col-span-2">
+                <!-- <div class="bg-(--surface) shadow rounded-xl p-4 flex flex-col"> -->
+                    <h3 class="text-lg font-semibold mb-2">Timeline of Activity</h3>
+                    <D3TimelineChart data={dailyTrends} yAxisLabel={'total_ms_played'} xAxisLabel={'days'} />
+                </div>
                 <div class="bg-(--surface) shadow rounded-xl p-4">
                     <h3 class="text-lg font-semibold mb-2">Hourly Listening Pattern</h3>
                     <D3BarChart data={hourlyTrends} yAxisLabel={'total_ms_played'} xAxisLabel={'hour'} />
@@ -154,11 +162,6 @@
                 <div class="bg-(--surface) shadow rounded-xl p-4">
                     <h3 class="text-lg font-semibold mb-2">Day-of-Week Listening</h3>
                     <D3BarChart data={weeklyTrends} yAxisLabel={'total_ms_played'} xAxisLabel={'day_of_week'} />
-                </div>
-                </div>
-                <div class="bg-(--surface) shadow rounded-xl p-4 flex flex-col">
-                    <h3 class="text-lg font-semibold mb-2">Timeline of Activity</h3>
-                    <D3TimelineChart data={dailyTrends} yAxisLabel={'total_ms_played'} xAxisLabel={'days'} />
                 </div>
             </section>
         {/await}
@@ -191,7 +194,7 @@
         {/await}
 
         <!-- Future Expansion -->
-        <section class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <!-- <section class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div class="bg-(--surface) shadow rounded-xl p-4">
                 <h2 class="text-sm text-(--secondary-text) mb-1">Listening Sessions</h2>
                 <div class="h-36 rounded">[Session Data Placeholder]</div>
@@ -200,7 +203,7 @@
                 <h2 class="text-sm text-(--secondary-text) mb-1">Genre Distribution</h2>
                 <div class="h-36 rounded">[Pie or Bar Placeholder]</div>
             </div>
-        </section>
+        </section> -->
     </div>
 
 

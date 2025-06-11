@@ -102,34 +102,10 @@
 }
 
 @utility input {
-    @apply text-center w-96 max-w-full border border-(--border) 
+    @apply w-96 max-w-full border border-(--border) 
     p-2 rounded-md bg-(--surface) text-(--primary-text) 
 }
 
 
 @layer components {
-    a {
-        @apply text-(--primary) hover:text-(--primary-hover) 
-        transition-all duration-200 ease-in-out;
-    }
-
-    select, input {
-        @apply px-4 py-1 rounded-md
-    }
-
-	/* Form */
-    form input {
-        @apply w-full p-2.5 block
-        bg-(--input-background) 
-        border-(--border) border border-solid rounded-lg 
-        text-(--primary) text-sm ;
-    }
-
-    form button {
-        @apply w-full px-5 py-2.5 
-        bg-(--primary-text) hover:bg-(--primary-text-hover) 
-        border-(--border) border border-solid rounded-lg 
-        text-(--input-background) font-bold text-center
-        transition-all duration-100 ease-in-out;
-    }
 }

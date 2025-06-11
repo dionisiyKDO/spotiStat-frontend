@@ -11,7 +11,7 @@
 <div class="min-h-screen min-w-screen flex items-center justify-center">
     <div class="flex flex-col items-center">
            
-        <input placeholder="Write whoms you want to stalk" class="input" bind:value={route}>
+        <input placeholder="Write whoms you want to stalk" class="input text-center" bind:value={route}>
         <button class="link w-26" onclick={stalk}>Let's Stalk</button>
     
    </div>    

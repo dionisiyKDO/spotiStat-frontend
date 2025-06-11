@@ -5,7 +5,7 @@ export interface TotalListeningTime {
     total_listening_ms: number;
 }
 
-export async function fetchTotalListeningTime(username): Promise<TotalListeningTime | null> {
+export async function fetchTotalListeningTime(username: string): Promise<TotalListeningTime | null> {
     try {
         const response = await fetch(`/api/db/history/total-listening-time?username=${username}`);
         if (!response.ok) {
@@ -15,10 +15,10 @@ export async function fetchTotalListeningTime(username): Promise<TotalListeningT
             return null;
         }
 
-        const data = (await response.json()) as TotalListeningTime;
+        const data: TotalListeningTime = await response.json();
         return data;
     } catch (err) {
-        console.log(err);
+        console.error("Network or parsing error in fetchTotalListeningTime():", err);
         return null;
     }
 }
@@ -29,7 +29,7 @@ export interface PlatformStats {
     total_ms_played: number;
 }
 
-export async function fetchPlatformStats(username): Promise<PlatformStats[] | null> {
+export async function fetchPlatformStats(username: string): Promise<PlatformStats[] | null> {
     try {
         const response = await fetch(`/api/db/history/platform-stats?username=${username}`);
         if (!response.ok) {
@@ -39,23 +39,22 @@ export async function fetchPlatformStats(username): Promise<PlatformStats[] | nu
             return null;
         }
 
-        const data = (await response.json()) as PlatformStats[];
+        const data: PlatformStats[] = await response.json();
         return data;
     } catch (err) {
-        console.log(err);
+        console.error("Network or parsing error in fetchPlatformStats():", err);
         return null;
     }
 }
 
 export interface SkippedTrack {
+    index: number;
     track_name: string;
     artist: string;
     skip_count: number;
 }
 
-export async function fetchMostSkippedTracks(
-    limit: number = 10, username
-): Promise<SkippedTrack[] | null> {
+export async function fetchMostSkippedTracks(username: string, limit: number = 10): Promise<SkippedTrack[] | null> {
     try {
         const response = await fetch(`/api/db/history/most-skipped-tracks?username=${username}&limit=${limit}`);
         if (!response.ok) {
@@ -65,10 +64,10 @@ export async function fetchMostSkippedTracks(
             return null;
         }
 
-        const data = (await response.json()) as SkippedTrack[];
+        const data: SkippedTrack[] = await response.json();
         return data;
     } catch (err) {
-        console.log(err);
+        console.error("Network or parsing error in fetchMostSkippedTracks():", err);
         return null;
     }
 }
@@ -80,7 +79,7 @@ export interface SkipStats {
     skip_percentage: number;
 }
 
-export async function fetchSkipStats(username): Promise<SkipStats | null> {
+export async function fetchSkipStats(username: string): Promise<SkipStats | null> {
     try {
         const response = await fetch(`/api/db/history/skip-stats?username=${username}`);
         if (!response.ok) {
@@ -90,10 +89,10 @@ export async function fetchSkipStats(username): Promise<SkipStats | null> {
             return null;
         }
 
-        const data = (await response.json()) as SkipStats;
+        const data: SkipStats = await response.json();
         return data;
     } catch (err) {
-        console.log(err);
+        console.error("Network or parsing error in fetchSkipStats():", err);
         return null;
     }
 }
@@ -103,7 +102,7 @@ export interface EndReason {
     count: number;
 }
 
-export async function fetchEndReasons(username): Promise<EndReason[] | null> {
+export async function fetchEndReasons(username: string): Promise<EndReason[] | null> {
     try {
         const response = await fetch(`/api/db/history/end-reasons?username=${username}`);
         if (!response.ok) {
@@ -113,10 +112,10 @@ export async function fetchEndReasons(username): Promise<EndReason[] | null> {
             return null;
         }
 
-        const data = (await response.json()) as EndReason[];
+        const data: EndReason[] = await response.json();
         return data;
     } catch (err) {
-        console.log(err);
+        console.error("Network or parsing error in fetchEndReasons():", err);
         return null;
     }
 }
@@ -125,7 +124,7 @@ export interface UniqueTracksCount {
     unique_tracks_count: number;
 }
 
-export async function fetchUniqueTracksCount(username): Promise<UniqueTracksCount | null> {
+export async function fetchUniqueTracksCount(username: string): Promise<UniqueTracksCount | null> {
     try {
         const response = await fetch(`/api/db/history/unique-tracks-count?username=${username}`);
         if (!response.ok) {
@@ -135,14 +134,15 @@ export async function fetchUniqueTracksCount(username): Promise<UniqueTracksCoun
             return null;
         }
 
-        const data = (await response.json()) as UniqueTracksCount;
+        const data: UniqueTracksCount = await response.json();
         return data;
     } catch (err) {
-        console.log(err);
+        console.error("Network or parsing error in fetchUniqueTracksCount():", err);
         return null;
     }
 }
 
+// TODO: In theory it could be interesting to show what tracks were played in longest session, so yeah, think where to show it
 export interface TrackSession {
     track_name: string;
     track_artist: string;
@@ -159,9 +159,7 @@ export interface ListeningSession {
     tracks: TrackSession[];
 }
 
-export async function fetchListeningSessions(
-    username, gap: number = 30
-): Promise<ListeningSession | null> {
+export async function fetchLongestListeningSession(username: string, gap: number = 30): Promise<ListeningSession | null> {
     try {
         const response = await fetch(`/api/db/history/sessions/longest?username=${username}&gap=${gap}`);
         if (!response.ok) {
@@ -171,26 +169,23 @@ export async function fetchListeningSessions(
             return null;
         }
 
-        const data = (await response.json()) as ListeningSession;
+        const data: ListeningSession = await response.json();
         data.session_start = new Date(data.session_start).toLocaleString('uk');
         data.session_end = new Date(data.session_end).toLocaleString('uk');
         return data;
     } catch (err) {
-        console.log(err);
+        console.error("Network or parsing error in fetchLongestListeningSession():", err);
         return null;
     }
 }
 
-
-
-
-export interface HourlyTrend {
+export interface HourTrend {
     hour: number;
     play_count: number;
     total_ms_played: number;
 }
 
-export async function fetchHourlyTrends(username): Promise<HourlyTrend[] | null> {
+export async function fetchHourlyTrends(username: string): Promise<HourTrend[] | null> {
     try {
         const response = await fetch(`/api/db/history/hourly-trends?username=${username}`);
         if (!response.ok) {
@@ -200,10 +195,10 @@ export async function fetchHourlyTrends(username): Promise<HourlyTrend[] | null>
             return null;
         }
 
-        const data = (await response.json()) as HourlyTrend[];
+        const data: HourTrend[] = await response.json();
         return data;
     } catch (err) {
-        console.log(err);
+        console.error("Network or parsing error in fetchHourlyTrends():", err);
         return null;
     }
 }
@@ -214,7 +209,7 @@ export interface WeeklyTrend {
     total_ms_played: number;
 }
 
-export async function fetchWeeklyTrends(username): Promise<WeeklyTrend[] | null> {
+export async function fetchWeeklyTrends(username: string): Promise<WeeklyTrend[] | null> {
     try {
         const response = await fetch(`/api/db/history/weekly-trends?username=${username}`);
         if (!response.ok) {
@@ -224,10 +219,10 @@ export async function fetchWeeklyTrends(username): Promise<WeeklyTrend[] | null>
             return null;
         }
 
-        const data = (await response.json()) as WeeklyTrend[];
+        const data: WeeklyTrend[] = await response.json();
         return data;
     } catch (err) {
-        console.log(err);
+        console.error("Network or parsing error in fetchWeeklyTrends():", err);
         return null;
     }
 }
@@ -238,7 +233,7 @@ export interface DailyTrend {
     total_ms_played: number;
 }
 
-export async function fetchDailyTrends(username): Promise<DailyTrend[] | null> {
+export async function fetchDailyTrends(username: string): Promise<DailyTrend[] | null> {
     try {
         const response = await fetch(`/api/db/history/daily-trends?username=${username}`);
         if (!response.ok) {
@@ -248,10 +243,10 @@ export async function fetchDailyTrends(username): Promise<DailyTrend[] | null> {
             return null;
         }
 
-        const data = (await response.json()) as DailyTrend[];
+        const data: DailyTrend[] = await response.json();
         return data;
     } catch (err) {
-        console.log(err);
+        console.error("Network or parsing error in fetchDailyTrends():", err);
         return null;
     }
 }
