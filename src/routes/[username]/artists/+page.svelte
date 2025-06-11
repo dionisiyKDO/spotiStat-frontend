@@ -109,7 +109,7 @@
 			
 			<div class="relative mb-4">
 				<input
-					class="w-96 max-w-full border border-(--border) p-2 rounded-md bg-(--surface) text-(--primary-text) focus:outline-none focus:border-(--primary-text) focus:ring-1 focus:ring-(--primary-text) focus:ring-opacity-20"
+					class="input"
 					type="text"
 					placeholder="Search artist..."
 					bind:value={searchInput}

@@ -101,6 +101,12 @@
     transition-colors duration-200;
 }
 
+@utility input {
+    @apply text-center w-96 max-w-full border border-(--border) 
+    p-2 rounded-md bg-(--surface) text-(--primary-text) 
+}
+
+
 @layer components {
     a {
         @apply text-(--primary) hover:text-(--primary-hover) 
