@@ -23,6 +23,8 @@
     }
 
     let { data, yAxisLabel, xAxisLabel }: Props = $props();
+    $inspect(data, yAxisLabel, xAxisLabel)
+
 
     let chartContainer: HTMLDivElement;
     let chartSvg: SVGSVGElement;
@@ -38,8 +40,12 @@
                 : d.play_count ?? 0,
             label: xAxisLabel === "hour"
                 ? d.hour ?? ""
-                : xAxisLabel === "day_of_week"
-                ? d.day_of_week ?? ""
+                : xAxisLabel === "weekday"
+                ? d.weekday ?? ""
+                : xAxisLabel === "year"
+                ? d.year ?? ""
+                : xAxisLabel === "month"
+                ? d.month ?? ""
                 : d[xAxisLabel] ?? ""
         }))
     );

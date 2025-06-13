@@ -55,7 +55,12 @@
             value: yAxisLabel === "total_ms_played" 
                 ? d.total_ms_played / 3.6e6 
                 : d.play_count,
-            label: xAxisLabel === "days" ? new Date(d.day) : d[xAxisLabel]
+
+            label: xAxisLabel === "date"
+                ? new Date(d.date) ?? ""
+                : xAxisLabel === "month"
+                ? new Date(d.month) ?? ""
+                : d[xAxisLabel] ?? ""
         }))
     );
 
@@ -428,9 +433,31 @@
                 .attr("fill-opacity", tooltipCircleOpacity);
 
             // Position and show tooltip
-            const tooltipContent = yAxisLabel === 'total_ms_played'
-                ? `${d.value.toFixed(2)} Hours<br/>${d3.timeFormat("%Y-%m-%d")(d.label)}`
-                : `${Math.round(d.value)} plays<br/>${d3.timeFormat("%Y-%m-%d")(d.label)}`;
+            const tooltipContent =
+                yAxisLabel === "total_ms_played"
+                    ? `${d.value.toFixed(2)} Hours<br/>${
+                        xAxisLabel === "date"
+                        ? d3.timeFormat("%Y-%m-%d")(new Date(d.date))
+                        : xAxisLabel === "month"
+                        ? d3.timeFormat("%Y-%m")(new Date(d.month))
+                        : xAxisLabel === "year"
+                        ? d3.timeFormat("%Y")(new Date(d.year))
+                        : xAxisLabel === "weekday"
+                        ? d3.timeFormat("%A")(new Date(d.weekday))
+                        : d[xAxisLabel] ?? ""
+                    }`
+                    : `${Math.round(d.value)} plays<br/>${
+                        xAxisLabel === "date"
+                        ? d3.timeFormat("%Y-%m-%d")(new Date(d.date))
+                        : xAxisLabel === "month"
+                        ? d3.timeFormat("%Y-%m")(new Date(d.month))
+                        : xAxisLabel === "year"
+                        ? d3.timeFormat("%Y")(new Date(d.year))
+                        : xAxisLabel === "weekday"
+                        ? d3.timeFormat("%A")(new Date(d.weekday))
+                        : d[xAxisLabel] ?? ""
+                    }`;
+
 
             tooltip
                 .style("opacity", 1)
