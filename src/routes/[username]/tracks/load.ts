@@ -45,6 +45,7 @@ interface TimelineData {
     date: string | Date;
     play_count: number;
     total_ms_played: number;
+    total_minutes_played?: number;
 }
 
 interface Album {
@@ -88,7 +89,7 @@ interface ExternalIds {
 
 export async function fetchTracks(
     username,
-    limit_count: number = 10,
+    limit_count: number = 5,
     limit_play: number = 1000
 ): Promise<Tracks[] | null> {
     try {
@@ -156,6 +157,26 @@ export async function fetchTrackMeta(
         return null;
     }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 /**
  * Fills in missing dates in timeline data with zero values.
