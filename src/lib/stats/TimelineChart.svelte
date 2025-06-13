@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
     import * as d3 from "d3";
     import {
         chartFontSize,
@@ -24,13 +24,15 @@
         tooltipLineStrokeOpacity,
     } from "$lib/chartStyles";
 
-    let { timeline_data } = $props();
-    console.log(timeline_data);
-    
-    
+    interface Props {
+        timeline_data: any[];
+    }
+
+    let { timeline_data }: Props = $props();
+
     async function drawChart() {
         d3.select("#chart").selectAll("*").remove();
-
+        
         // Create the chart variables
         // #region
         const container = d3.select("#chart-container");
@@ -49,11 +51,10 @@
         const xScale = d3.scaleTime()
             .range([0, width])
             .domain(d3.extent(timeline_data, d => d.date));
-        
+
         const yScale = d3.scaleLinear()
             .range([height, 0])
-            .domain([0, d3.max(timeline_data, d => d.total_minutes_played)])
-            .nice();
+            .domain([0, d3.max(timeline_data, d => d.total_minutes_played)]).nice();
 
         // add x-axis
         svg.append("g")
@@ -231,6 +232,6 @@
 
 
 <div id="chart-container">
-    <svg id="chart"/>
+    <svg id="chart"></svg>
     <div id="tooltip"></div>
 </div>

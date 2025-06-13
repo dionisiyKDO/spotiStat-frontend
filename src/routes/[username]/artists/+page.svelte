@@ -1,11 +1,13 @@
 <script lang="ts">
 	import type { PageProps } from './$types';
-	import D3Chart from "$lib/artist/TimelineChart.svelte";
+	import D3Chart from "$lib/stats/TimelineChart.svelte";
 	import {
 		fetchArtistStats,
 		fetchTracks,
 		type Track,
 	} from "./load";
+
+	// TODO: add stats for each track for artist i've selected
 
 	// Props
 	let { data }: PageProps = $props();
@@ -13,7 +15,7 @@
 
 	// State
 	let artist = $state("塞壬唱片-MSR");
-	let searchInput = $state("");
+	let searchInput = $state("塞壬唱片-MSR");
 	let filteredTracks: Track[] = $state([]);
 	let showSuggestions = $state(false);
 
@@ -170,13 +172,7 @@
 			<section class="mt-10">
 				<div class="bg-(--surface) shadow-sm rounded-xl p-4">
 					<h2 class="text-sm text-(--secondary-text) mb-1 ml-4 font-medium">Minutes of artist played per day</h2>
-					<D3Chart
-						selectedDate={(value) => {
-							// Handle date selection if needed
-							console.log('Selected date:', value);
-						}}
-						timeline_data={artistStats.timeline_data}
-					/>
+					<D3Chart timeline_data={artistStats.timeline_data} />
 				</div>
 			</section>
 		{/if}

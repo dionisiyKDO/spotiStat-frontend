@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { PageProps } from './$types';
-	import D3Chart from "$lib/track/TimelineChart.svelte";
+	import D3Chart from "$lib/stats/TimelineChart.svelte";
 	import {
 		fetchTrackStats,
 		fetchTracks,

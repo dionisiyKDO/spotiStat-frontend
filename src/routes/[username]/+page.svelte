@@ -124,7 +124,7 @@
                 <!-- TODO: Make tio artist and top tracks list 5 elemts instead of one name -->
                 <div class="bg-(--surface) shadow rounded-xl p-4">
                     <h2 class="text-sm text-(--secondary-text)">Top Artist</h2>
-                    <p class="text-2xl font-semibold mt-1">[Porter Robinson]</p>
+                    <p class="text-2xl font-semibold mt-1">[Porter]</p>
                 </div>
                 <div class="bg-(--surface) shadow rounded-xl p-4">
                     <h2 class="text-sm text-(--secondary-text)">Longest Session</h2>
