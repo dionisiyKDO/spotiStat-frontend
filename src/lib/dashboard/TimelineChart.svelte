@@ -481,7 +481,7 @@
         tooltip = d3.select("body")
             .append("div")
             .attr("class", "chart-tooltip")
-            .style("position", "absolute")
+            .style("position", "fixed")
             .style("z-index", "1000")
             .style("pointer-events", "none")
             .style("background-color", tooltipBG)
