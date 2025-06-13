@@ -101,6 +101,7 @@ export interface TopTrack {
   play_count: number
   spotify_track_uri: string
   total_ms_played: number
+  total_hours: number
   track_name: string
 }
 

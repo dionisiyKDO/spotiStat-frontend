@@ -23,8 +23,6 @@
     }
 
     let { data, yAxisLabel, xAxisLabel }: Props = $props();
-    $inspect(data, yAxisLabel, xAxisLabel)
-
 
     let chartContainer: HTMLDivElement;
     let chartSvg: SVGSVGElement;

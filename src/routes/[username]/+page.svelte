@@ -48,6 +48,8 @@
         tltData: data.total_listening_time, 
         uniqData: data.unique_tracks_count, 
         sessData: data.longest_session,
+    }));
+    const topPromise        = StatsReq.then(data => ({
         topTracks: data.top_tracks,
         topArtists: data.top_artists,
     }));
@@ -86,7 +88,7 @@
         <!-- Summary Cards -->
         {#await summaryPromise}
             <p class="loading">Loading Total Listening Time...</p>
-        {:then {tltData, uniqData, sessData, topTracks, topArtists}}
+        {:then {tltData, uniqData, sessData}}
             <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                 <div class="bg-(--surface) shadow rounded-xl p-4">
                     <h2 class="text-sm text-(--secondary-text)">Total Listening Time</h2>
@@ -100,22 +102,52 @@
                     <h2 class="text-sm text-(--secondary-text)">Unique Tracks</h2>
                     <p class="text-2xl font-semibold mt-1">{numberWithCommas(uniqData.unique_tracks_count)}</p>
                 </div>
-
-                <!-- TODO: Make top artist and top tracks list 5 elemts instead of one name -->
-                <div class="bg-(--surface) shadow rounded-xl p-4">
-                    <h2 class="text-sm text-(--secondary-text)">Top Artist</h2>
-                    <p class="text-2xl font-semibold mt-1">[Porter]</p>
-                </div>
                 <div class="bg-(--surface) shadow rounded-xl p-4">
                     <h2 class="text-sm text-(--secondary-text)">Longest Session</h2>
                     <p class="text-2xl font-semibold mt-1">{(sessData.total_ms_played / 3600000).toFixed(2)}h</p>
-                    <!-- <ul class="mx-auto">
-                        <li>Session start: {longestSession.session_start} </li>
-                        <li>Session end: {longestSession.session_end}</li>
-                        <li>Total Hours played: {(longestSession.total_ms_played / 3600000).toFixed(2)} hours</li>
-                        <li>Total tracks: {longestSession.total_tracks}</li>
-                    </ul> -->
                 </div>
+            </section>
+        {/await}
+
+
+        <!-- Top tracks and artists Cards -->
+        {#await topPromise}
+            <p class="loading">Loading Total Listening Time...</p>
+        {:then {topTracks, topArtists}}
+            <section class="grid grid-cols-1 sm:grid-cols-1 lg:grid-cols-2 gap-6">
+
+                <!-- Top Artists Card -->
+                <div class="bg-(--surface) shadow rounded-xl p-5 flex flex-col gap-3">
+                    <h2 class="text-sm text-(--secondary-text)">Top Artists</h2>
+                    <ul class="space-y-2 text-sm">
+                        {#each topArtists.slice(0, 10) as { artist, play_count, total_hours, total_ms_played }, i}
+                            <li class="flex justify-between items-center">
+                                <span class="text-(--primary-text)">
+                                    <span class="font-bold text-(--accent-text)">{i + 1}.</span> {artist}
+                                </span>
+                                <span class="font-semibold text-right tabular-nums">{total_hours.toFixed(2)}h</span>
+                            </li>
+                        {/each}
+                    </ul>
+                </div>
+
+                <!-- Top Tracks Card -->
+                <div class="bg-(--surface) shadow rounded-xl p-5 flex flex-col gap-3">
+                    <h2 class="text-sm text-(--secondary-text)">Top Tracks</h2>
+                    <ul class="space-y-2 text-sm">
+                        {#each topTracks.slice(0, 10) as { artist, track_name, total_hours }, i}
+                            <li class="flex justify-between items-center">
+                                <span 
+                                    class="text-(--primary-text) max-w-[85%] truncate"
+                                    title={`${track_name} by ${artist}`}>
+                                    <span class="font-bold text-(--accent-text)">{i + 1}.</span> {track_name} <span class="text-(--secondary-text)">by</span> {artist}
+                                </span>
+                                <span class="font-semibold text-right tabular-nums">{total_hours.toFixed(2)}h</span>
+                            </li>
+                        {/each}
+                    </ul>
+                </div>
+
             </section>
         {/await}
 
