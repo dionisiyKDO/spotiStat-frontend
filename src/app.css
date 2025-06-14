@@ -21,31 +21,23 @@
 }
 
 :root {
-    /* Background Colors */
     --background: #272628;
     --surface: #212022;
     --surface-hover: #272427;
 
-    /* Text Colors */
     --primary-text: #ededed;
     --primary-text-hover: #d1d1d1;
     --secondary-text: #9b9b9b;
 
-    /* Primary Colors */
     --primary: #ededed;
     --primary-hover: #d1d1d1;
 
-    /* Secondary Colors */
     --secondary: #424242;
     --secondary-hover: #5C5C5C;
 
-    /* Functional colors */
-    --accent: #A67C52;
-    --accent-hover: #967047;
     --destructive: #D36C6C;
     --destructive-hover: #E07A7A;
 
-    /* Border Colors */
     --border: #5C5C5C;
 }
 
@@ -75,37 +67,7 @@
     --border: #6A5ACD;
 } */
 
-@utility link {
-    @apply px-2 py-1 m-2 inline-block 
-    text-(--primary) hover:text-(--primary-hover) 
-    rounded-lg border-2 border-(--primary) hover:border-(--primary-hover) 
-    transition-all duration-200 ease-in-out box-border;
-}
-
-@utility login-link {
-    @apply link;
-}
-
-@utility sidebar {
-    @apply w-64 p-2 h-screen 
-    bg-(--surface) 
-    fixed top-0 left-0 z-50
-    shadow-lg
-    transition-all duration-300 overflow-hidden;
-}
-
-@utility sidebar-link {
-    @apply py-0.5 px-1
-    flex items-center gap-2
-    text-(--primary-text) hover:text-(--primary-hover) 
-    transition-colors duration-200;
-}
-
 @utility input {
     @apply w-96 max-w-full border border-(--border) 
     p-2 rounded-md bg-(--surface) text-(--primary-text) 
-}
-
-
-@layer components {
 }

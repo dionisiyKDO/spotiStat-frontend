@@ -3,20 +3,24 @@
 
     let route = $state("");
 
-    function stalk(){
-        goto(`/${route}`)
+    function stalk() {
+        goto(`/${route}`);
     }
 </script>
 
 <div class="min-h-screen min-w-screen flex items-center justify-center">
     <div class="flex flex-col items-center">
-           
-        <input placeholder="Write whoms you want to stalk" class="input text-center" bind:value={route}>
-        <button class="link w-26" onclick={stalk}>Let's Stalk</button>
-    
-   </div>    
+        <input
+            placeholder="Write whoms you want to stalk"
+            class="input text-center"
+            bind:value={route}
+        />
+        <button
+            class="px-2 py-1 m-2 inline-block text-(--primary) hover:text-(--primary-hover) rounded-lg border-2 border-(--primary) hover:border-(--primary-hover) transition-all duration-200 ease-in-out box-border w-26"
+            onclick={stalk}>Let's Stalk</button
+        >
+    </div>
 </div>
-
 
 <!-- 
 
@@ -33,6 +37,7 @@ TODO: make skeletons for all components
 TODO: write redirect logic to land/ or dashboard/
 TODO: upload history, in args put username 
 TODO: Genre Distribution to dashboard
+TODO: Maybe most skipped artists
 
 
 src/routes/
