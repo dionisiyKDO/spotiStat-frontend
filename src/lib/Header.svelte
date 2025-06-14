@@ -1,38 +1,73 @@
-<script>
-    import { checkLoginStatus } from "./auth";
+<script lang="ts">
+    interface Props {
+        username: string;
+    }
+    interface Meta {
+        stats_exist: boolean
+        last_calculated: string
+    }
 
-    const userReq = checkLoginStatus();
-    userReq.then((d)=>{
-        console.log(d);
-    })
+    let { username }: Props = $props();
+
+    const historyLinks = [
+        {
+            name: "Profile",
+            link: `/${username}`,
+        },
+        {
+            name: "Track stats",
+            link: `/${username}/tracks`,
+        },
+        {
+            name: "Artist stats",
+            link: `/${username}/artists`,
+        },
+    ];
+
+    export async function fetchStatsStatus(username: string): Promise<Meta | null> {
+        try {
+            const response = await fetch(`/api/db/stats/${username}/status`);
+            if (!response.ok) {
+                const data = await response.json();
+                const error = data.error || "Failed to fetch stats";
+                console.log(error);
+                return null;
+            }
+
+            const data: Meta = await response.json();
+            console.log(data);
+            return data;
+        } catch (err) {
+            console.error("Network or parsing error in fetchAllStats():", err);
+            return null;
+        }
+    }
+
+    const metaReq = fetchStatsStatus(username);
+
 </script>
 
 
 <!-- <header class="p-6 pb-4 mb-6 border-b border-gray-500"> -->
-<header class="p-4 mb-2 border-b border-gray-500">
+<header class="px-4 py-2 mb-2 border-b border-gray-500">
     <nav class="flex items-center justify-between">
-        {#await userReq then userInfo}
-            <div class="flex gap-4">
-                <h1 class="text-2xl"><a class="block" href="/"><strong>SpotiStat</strong></a></h1>
-                {#if userInfo.logged_in === true}
-                    <strong class="text-2xl">|</strong>
-                    <div class="flex gap-2">
-                        <h1 class="mt-0 ml-0 text-2xl font-semibold">
-                            {userInfo.username}
-                        </h1>
-                    </div>
-                {/if}
-                
-            </div>
+        <div class="flex flex-col">
+            <h1 class="text-3xl font-bold">Listening Dashboard</h1>
+            
+            {#await metaReq}
+                <p class="loading">Loading Total Listening Time...</p>
+            {:then {stats_exist, last_calculated}}
+                <h2 class="text-sm text-(--secondary-text)">Calculated at: {new Date(last_calculated).toLocaleString()}</h2>
+            {/await}
+        </div>
 
-            <ul class="list-none flex gap-4">
-                {#if userInfo.logged_in === true}
-                    <li><a href="/{userInfo.username}">Profile</a></li>
-                    <li><a href="/api/auth/logout">Logout</a></li>
-                {:else if userInfo.logged_in === false}
-                    <li><a href="/login">Login with Spotify</a></li>
-                {/if}
-            </ul>
-        {/await}
+
+        <!-- Links -->
+        <div class="flex"> 
+            {#each historyLinks as { name, link }}
+                <a class="text-base text-(--secondary-text) hover:text-(--primary-text-hover) px-3 py-1 transition duration-150"
+                 href={link}>{name}</a>
+            {/each}
+        </div>
     </nav>
 </header>
