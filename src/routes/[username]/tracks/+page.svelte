@@ -4,7 +4,8 @@
 	import {
 		fetchTrackStats,
 		fetchTracks,
-		type Tracks,
+		type TopTrack,
+		type TrackStats,
 	} from "./load";
 
 	// Props  
@@ -14,78 +15,30 @@
 	// State
 	let track_id = $state("29fFAKTm2Bvw9KwyxGtYgV");
 	let searchInput = $state("Tsubasa by ナナホシ(CV:若山詩音)");
-	let filteredTracks: Tracks[] = $state([]);
 	let showSuggestions = $state(false);
-
-	// Constants
-	const MAX_SEARCH_RESULTS = 4;
-	const TRACK_MATCH_SCORE = 7;
-	const ARTIST_MATCH_SCORE = 3;
-	const SUGGESTION_HIDE_DELAY = 200;
-	const DEBOUNCE_DELAY = 300;
 
 	// Computed values
 	let trackStatsReq = $derived(fetchTrackStats(username, track_id));
 	let tracksReq = $derived(fetchTracks(username));
 
-	// Search functionality
-	function calculateRelevance(track: Tracks, searchTerms: string[]): number {
-		let score = 0;
-		const trackNameLower = track.track_name.toLowerCase();
-		const artistLower = track.artist.toLowerCase();
+	// Get top 4 tracks or filter based on search input
+	function getDisplayTracks(tracks: TopTrack[]): TopTrack[] {
+		const input = searchInput.toLowerCase().trim();
 		
-		searchTerms.forEach((term) => {
-			if (trackNameLower.includes(term)) {
-				score += TRACK_MATCH_SCORE;
-			}
-			if (artistLower.includes(term)) {
-				score += ARTIST_MATCH_SCORE;
-			}
-		});
-		
-		return score;
-	}
-
-	function filterTracks(tracks: Tracks[]): void {
-		const inputLower = searchInput.toLowerCase().trim();
-		
-		if (!inputLower) {
-			filteredTracks = [];
-			return;
+		if (!input) {
+			return tracks.slice(0, 4);
 		}
-
-		const searchTerms = inputLower.split(/\s+/);
-
-		filteredTracks = tracks
-			.map((track) => ({
-				track,
-				relevance: calculateRelevance(track, searchTerms),
-			}))
-			.filter((item) => item.relevance > 0)
-			.sort((a, b) => b.relevance - a.relevance)
-			.slice(0, MAX_SEARCH_RESULTS)
-			.map((item) => item.track);
+		
+		return tracks
+			.filter(track => 
+				track.track_name.toLowerCase().includes(input) || 
+				track.artist.toLowerCase().includes(input)
+			)
+			.slice(0, 4);
 	}
 
 	// Event handlers
-	let debounceTimeout: ReturnType<typeof setTimeout>;
-
-	function handleSearchFocus(): void {
-		showSuggestions = true;
-	}
-
-	function handleSearchBlur(): void {
-		setTimeout(() => {
-			showSuggestions = false;
-		}, SUGGESTION_HIDE_DELAY);
-	}
-
-	function handleSearchInput(tracks: Tracks[]): void {
-		clearTimeout(debounceTimeout);
-		debounceTimeout = setTimeout(() => filterTracks(tracks), DEBOUNCE_DELAY);
-	}
-
-	function selectTrack(track: Tracks): void {
+	function selectTrack(track: TopTrack): void {
 		track_id = track.spotify_track_uri.replace("spotify:track:", "");
 		searchInput = `${track.track_name} by ${track.artist}`;
 		showSuggestions = false;
@@ -122,25 +75,35 @@
 					type="text"
 					placeholder="Search track or artist..."
 					bind:value={searchInput}
-					onfocus={handleSearchFocus}
-					onblur={handleSearchBlur}
-					oninput={() => handleSearchInput(tracks)}
+					onfocus={() => showSuggestions = true}
+					onblur={() => setTimeout(() => showSuggestions = false, 200)}
 				/>
 
-				{#if showSuggestions && filteredTracks.length > 0}
-					<ul class="absolute top-full left-0 right-0 bg-(--surface) border border-(--border) rounded-md mt-1 max-h-48 overflow-y-auto z-10 shadow-lg">
-						{#each filteredTracks as track (track.spotify_track_uri)}
-							<li class="border-b border-(--border) last:border-b-0">
-								<button
-									type="button"
-									class="w-full text-left p-2 bg-transparent border-none text-(--primary-text) cursor-pointer hover:bg-(--surface-hover) transition-colors duration-200"
-									onclick={() => selectTrack(track)}
-								>
-									{track.track_name} by {track.artist}
-								</button>
-							</li>
-						{/each}
-					</ul>
+				{#if showSuggestions}
+					{@const displayTracks = getDisplayTracks(tracks)}
+					{#if displayTracks.length > 0}
+						<ul class="absolute top-full left-0 right-0 bg-(--surface) border border-(--border) rounded-md mt-1 max-h-56 overflow-y-auto z-10 shadow-lg">
+							{#each displayTracks as track (track.spotify_track_uri)}
+								<li class="border-b border-(--border) last:border-b-0">
+									<button
+										type="button"
+										class="w-full text-left p-1 px-3 bg-transparent border-none text-(--primary-text) cursor-pointer hover:bg-(--surface-hover) transition-colors duration-200"
+										onclick={() => selectTrack(track)}
+									>
+										<div class="flex justify-between items-center">
+											<div>
+												<div class="font-medium">{track.track_name}</div>
+												<div class="text-sm text-(--secondary-text)">{track.artist}</div>
+											</div>
+											<div class="text-sm text-(--secondary-text)">
+												{track.total_hours.toFixed(1)}h
+											</div>
+										</div>
+									</button>
+								</li>
+							{/each}
+						</ul>
+					{/if}
 				{/if}
 			</div>
 		</header>
@@ -167,26 +130,10 @@
 				<h2 class="text-sm text-(--secondary-text) mb-1 font-medium">First Play</h2>
 				<p class="text-xl font-semibold text-(--primary-text) mt-1">{formatDate(trackStats.first_played)}</p>
 			</div>
-			
-            <!-- Useless info -->
-			<!-- <div class="bg-(--surface) shadow-sm rounded-xl p-4">
-				<h2 class="text-sm text-(--secondary-text) mb-1 font-medium">Last Recorded Play</h2>
-				<p class="text-xl font-semibold text-(--primary-text) mt-1">{formatDate(trackStats.last_played)}</p>
-			</div> -->
-
-			<!-- Optional Add-ons -->
-			<!-- <div class="bg-(--surface) shadow-sm rounded-xl p-4">
-				<h2 class="text-sm text-(--secondary-text) mb-1 font-medium">Longest Streak</h2>
-				<p class="text-xl font-semibold text-(--primary-text) mt-1">7 days in a row</p>
-			</div>
-			
-			<div class="bg-(--surface) shadow-sm rounded-xl p-4">
-				<h2 class="text-sm text-(--secondary-text) mb-1 font-medium">Listening Pattern</h2>
-				<p class="text-xl font-semibold text-(--primary-text) mt-1">Instant favorite</p>
-			</div> -->
 		</section>
 
 		<!-- Timeline Chart -->
+		 <!-- todo: change to minutes -->
 		{#if trackStats.timeline_data?.length > 0}
 			<section class="mt-10">
 				<div class="bg-(--surface) shadow-sm rounded-xl p-4">

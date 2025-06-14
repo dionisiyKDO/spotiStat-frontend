@@ -38,6 +38,13 @@ TODO: write redirect logic to land/ or dashboard/
 TODO: upload history, in args put username 
 TODO: Genre Distribution to dashboard
 TODO: Maybe most skipped artists
+TODO: shuffle stats
+TODO: 
+TODO: 
+TODO: 
+TODO: 
+TODO: 
+TODO: 
 
 
 src/routes/
