@@ -16,6 +16,7 @@
 	let track_id = $state("29fFAKTm2Bvw9KwyxGtYgV");
 	let searchInput = $state("Tsubasa by ナナホシ(CV:若山詩音)");
 	let showSuggestions = $state(false);
+	let selectedIndex = $state(-1); // -1 means no selection
 
 	// Computed values
 	let trackStatsReq = $derived(fetchTrackStats(username, track_id));
@@ -40,19 +41,53 @@
 	// Event handlers
 	function selectTrack(track: TopTrack): void {
 		showSuggestions = false;
+		selectedIndex = -1;
 		track_id = track.spotify_track_uri.replace("spotify:track:", "");
 		searchInput = `${track.track_name} by ${track.artist}`;
 	}
 
+	function handleKeyDown(event: KeyboardEvent, tracks: TopTrack[]): void {
+		showSuggestions = true;
+		// if (!showSuggestions) return;
+		
+		const displayTracks = getDisplayTracks(tracks);
+		
+		switch (event.key) {
+			case 'ArrowDown':
+				event.preventDefault();
+				selectedIndex = selectedIndex < displayTracks.length - 1 ? selectedIndex + 1 : 0;
+				break;
+			case 'ArrowUp':
+				event.preventDefault();
+				selectedIndex = selectedIndex > 0 ? selectedIndex - 1 : displayTracks.length - 1;
+				break;
+			case 'Enter':
+				event.preventDefault();
+				if (selectedIndex >= 0 && selectedIndex < displayTracks.length) {
+					selectTrack(displayTracks[selectedIndex]);
+				}
+				break;
+			case 'Escape':
+				showSuggestions = false;
+				selectedIndex = -1;
+				break;
+			default:
+				selectedIndex = -1;
+		}
+	}
+
+	function handleFocus(): void {
+		showSuggestions = true;
+		selectedIndex = -1;
+	}
+
+	function handleBlur(): void {
+		showSuggestions = false;
+		selectedIndex = -1;
+	}
+
 	// Utility functions
 	function formatDuration(milliseconds: number): string {
-		// const hours = milliseconds / 3600000;
-		// const minutes = milliseconds / 60000;
-		
-		// return hours > 3 
-		// 	? `${hours.toFixed(2)} hours`
-		// 	: `${minutes.toFixed(2)} minutes`;
-
 		const totalSeconds = Math.floor(milliseconds / 1000);
 		const minutes = Math.floor(totalSeconds / 60);
 		const seconds = totalSeconds % 60;
@@ -90,19 +125,20 @@
 					type="text"
 					placeholder="Search track or artist..."
 					bind:value={searchInput}
-					onfocus={() => showSuggestions = true}
-					onblur={() => setTimeout(() => showSuggestions = false, 200)}
+					onfocus={handleFocus}
+					onblur={handleBlur}
+					onkeydown={(e) => handleKeyDown(e, tracks)}
 				/>
 
 				{#if showSuggestions}
 					{@const displayTracks = getDisplayTracks(tracks)}
 					{#if displayTracks.length > 0}
 						<ul class="absolute top-full left-0 right-0 bg-(--surface) border border-(--border) rounded-md mt-1 max-h-56 overflow-y-auto z-10 shadow-lg">
-							{#each displayTracks as track (track.spotify_track_uri)}
+							{#each displayTracks as track, i (track.spotify_track_uri)}
 								<li class="border-b border-(--border) last:border-b-0">
 									<button
 										type="button"
-										class="w-full text-left p-1 px-3 bg-transparent border-none text-(--primary-text) cursor-pointer hover:bg-(--surface-hover) transition-colors duration-200"
+										class={`w-full text-left p-1 px-3 border-none text-(--primary-text) cursor-pointer transition-colors duration-200 ${selectedIndex === i ? 'bg-(--surface-hover)' : 'bg-transparent'}`}
 										onclick={() => selectTrack(track)}
 									>
 										<div class="flex justify-between items-center">
