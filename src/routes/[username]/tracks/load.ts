@@ -161,7 +161,7 @@ function fillMissingDates(
 /**
  * Simple approach: Fill all dates between first and last play with zeros where needed
  */
-function fillAllDates(data: ArtistStats, dataMap: Map<string, any>): TimelineData[] {
+function fillAllDates(data: TrackStats, dataMap: Map<string, any>): TimelineData[] {
     const result: TimelineData[] = [];
     const startDate = new Date(data.first_played);
     const endDate = new Date(data.last_played);

@@ -39,23 +39,38 @@
 
 	// Event handlers
 	function selectTrack(track: TopTrack): void {
+		showSuggestions = false;
 		track_id = track.spotify_track_uri.replace("spotify:track:", "");
 		searchInput = `${track.track_name} by ${track.artist}`;
-		showSuggestions = false;
 	}
 
 	// Utility functions
 	function formatDuration(milliseconds: number): string {
-		const hours = milliseconds / 3600000;
-		const minutes = milliseconds / 60000;
+		// const hours = milliseconds / 3600000;
+		// const minutes = milliseconds / 60000;
 		
-		return hours > 3 
-			? `${hours.toFixed(2)} hours`
-			: `${minutes.toFixed(2)} minutes`;
+		// return hours > 3 
+		// 	? `${hours.toFixed(2)} hours`
+		// 	: `${minutes.toFixed(2)} minutes`;
+
+		const totalSeconds = Math.floor(milliseconds / 1000);
+		const minutes = Math.floor(totalSeconds / 60);
+		const seconds = totalSeconds % 60;
+
+		if (milliseconds >= 3600000) {
+			// Rare case: longer than 1 hour
+			const hours = milliseconds / 3600000;
+			return `${hours.toFixed(2)} hours`;
+		} else {
+			// Default for 1–5 min (and most songs)
+			return seconds === 0
+				? `${minutes}m`
+				: `${minutes}m${seconds}s`;
+		}
 	}
 
 	function formatDate(dateString: string): string {
-		return new Date(dateString).toLocaleDateString();
+		return new Date(dateString).toLocaleString();
 	}
 </script>
 
@@ -115,29 +130,50 @@
 			<p class="text-(--primary-text)">Loading track statistics...</p>
 		</div>
 	{:then trackStats}
-		<section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-10">
-			<div class="bg-(--surface) shadow-sm rounded-xl p-4">
-				<h2 class="text-sm text-(--secondary-text) mb-1 font-medium">Total Plays</h2>
-				<p class="text-xl font-semibold text-(--primary-text) mt-1">{trackStats.total_plays.toLocaleString()}</p>
+		<section class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-6 gap-6 mb-10">
+	
+			<!-- Total Plays -->
+			<div class="col-span-1 md:col-span-2 bg-(--surface) shadow rounded-xl p-4">
+				<h2 class="text-sm text-(--secondary-text)">Total Plays</h2>
+				<p class="text-2xl font-semibold mt-1">{trackStats.total_plays.toLocaleString()}</p>
 			</div>
-			
-			<div class="bg-(--surface) shadow-sm rounded-xl p-4">
-				<h2 class="text-sm text-(--secondary-text) mb-1 font-medium">Total Time Played</h2>
-				<p class="text-xl font-semibold text-(--primary-text) mt-1">{formatDuration(trackStats.total_ms_played)}</p>
+
+			<!-- Total Time Played -->
+			<div class="col-span-1 md:col-span-2 bg-(--surface) shadow rounded-xl p-4">
+				<h2 class="text-sm text-(--secondary-text)">Total Time Played</h2>
+				<p class="text-2xl font-semibold mt-1">{formatDuration(trackStats.total_ms_played)}</p>
 			</div>
-			
-			<div class="bg-(--surface) shadow-sm rounded-xl p-4">
-				<h2 class="text-sm text-(--secondary-text) mb-1 font-medium">First Play</h2>
-				<p class="text-xl font-semibold text-(--primary-text) mt-1">{formatDate(trackStats.first_played)}</p>
+
+			<!-- Distinct Days Played -->
+			<div class="col-span-1 md:col-span-2 bg-(--surface) shadow rounded-xl p-4">
+				<h2 class="text-sm text-(--secondary-text)">Distinct Days Played</h2>
+				<p class="text-xl font-semibold mt-1">{trackStats.distinct_days_played}</p>
+			</div>
+
+			<!-- First Play -->
+			<div class="col-span-1 md:col-span-3 bg-(--surface) shadow rounded-xl p-4">
+				<h2 class="text-sm text-(--secondary-text)">First Play</h2>
+				<p class="text-xl font-semibold mt-1">{formatDate(trackStats.first_played)}</p>
+			</div>
+
+			<!-- Average playtime per play -->
+			<div class="col-span-1 sm:col-span-2 md:col-span-3 bg-(--surface) shadow rounded-xl p-4">
+				<h2 class="text-sm text-(--secondary-text)">Average playtime per play</h2>
+				<div class="flex flex-wrap gap-2 text-2xl">
+					<p class="font-semibold">{formatDuration(trackStats.avg_playtime_per_play)}</p>
+					<p>out of</p>
+					<p class="font-semibold">{formatDuration(trackStats.song_length)}</p>
+				</div>
 			</div>
 		</section>
+
 
 		<!-- Timeline Chart -->
 		 <!-- todo: change to minutes -->
 		{#if trackStats.timeline_data?.length > 0}
 			<section class="mt-10">
-				<div class="bg-(--surface) shadow-sm rounded-xl p-4">
-					<h2 class="text-sm text-(--secondary-text) mb-1 ml-4 font-medium">Minutes of track played per day</h2>
+				<div class="bg-(--surface) shadow rounded-xl p-4">
+					<h2 class="text-sm text-(--secondary-text) mb-1 ml-4">Minutes of track played per day</h2>
 					<D3Chart timeline_data={trackStats.timeline_data} />
 				</div>
 			</section>
