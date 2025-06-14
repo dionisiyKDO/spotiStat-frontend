@@ -82,18 +82,27 @@
         endreasonsData: data.end_reasons, 
         skipedTracksStats: data.most_skipped_tracks,
     }));
+    const metaPromise               = StatsReq.then(data => ({
+        calcDate: data.calculated_at, 
+        username: data.username,
+    }));
 </script>
 
 <div>
     <div class="space-y-8">
         <!-- Dashboard Header -->
         <header class="flex mb-0 justify-between items-center">
-            <h1 class="text-3xl font-bold">Listening Dashboard</h1>
-            
-            <button class="link cursor-pointer" onclick={reqUploadHistory} >
-                Upload History
-            </button>
-            
+            <div class="flex flex-col">
+                <h1 class="text-3xl font-bold">Listening Dashboard</h1>
+                
+                {#await metaPromise}
+                    <p class="loading">Loading Total Listening Time...</p>
+                {:then {calcDate, username}}
+                    <h2 class="text-sm text-(--secondary-text)">Calculated at: {new Date(calcDate).toLocaleString()}</h2>
+                {/await}
+            </div>
+
+
             <!-- Links -->
             <div class="flex"> 
                 {#each historyLinks as { name, link }}
@@ -281,31 +290,6 @@
             </section>
         {/await}
     </div>
-
-
-    <!-- <hr class="mt-4"> -->
-
-    <!-- {#await mostSkippedTracksReq}
-        <p class="loading">Loading Most Skipped Tracks...</p>
-    {:then mstData}
-        <h2 class="text-2xl font-semibold mb-1 mx-auto">Most Skipped Tracks</h2>
-        <TrackListPage Tracks={mstData} />
-    {/await} -->
-
-    <!-- TODO: Think what to do -->
-    <!-- {#await endReasonsReq}
-        <p class="loading">Loading End Reasons...</p>
-    {:then endReasons}
-        <div class="flex flex-col w-full text-center">
-            <h2 class="text-2xl font-semibold mb-1">End Reasons</h2>
-            <ul class="mx-auto">
-                {#each endReasons as { reason_end, count }}
-                    <li>{reason_end}: {count} times</li>
-                {/each}
-            </ul>
-        </div>
-    {/await} -->
-        
 </div>
 
 
