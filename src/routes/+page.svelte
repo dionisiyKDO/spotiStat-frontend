@@ -32,6 +32,7 @@ TODO: artist - fetch artists, not tracks
 TODO: make skeletons for all components
 TODO: write redirect logic to land/ or dashboard/
 TODO: upload history, in args put username 
+TODO: Genre Distribution to dashboard
 
 
 src/routes/

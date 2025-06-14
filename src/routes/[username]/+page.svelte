@@ -41,29 +41,47 @@
     function numberWithCommas(x) {
         return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
     }
+    const reasonLabels: Record<string, string> = {
+        trackdone: "Finished naturally",
+        endplay: "Manually paused",
+        fwdbtn: "Skipped (Forward)",
+        backbtn: "Skipped (Back)",
+        logout: "User logged out",
+        remote: "Remote control",
+        trackerror: "Track error",
+        "unexpected-exit": "Unexpected exit",
+        "unexpected-exit-while-paused": "Unexpected exit (paused)",
+        unknown: "Unknown reason"
+    };
     
     let StatsReq = fetchAllStats(username);
 
-    const summaryPromise    = StatsReq.then(data => ({
+    const summaryPromise            = StatsReq.then(data => ({
         tltData: data.total_listening_time, 
         uniqData: data.unique_tracks_count, 
         sessData: data.longest_session,
     }));
-    const topPromise        = StatsReq.then(data => ({
+    const topPromise                = StatsReq.then(data => ({
         topTracks: data.top_tracks,
         topArtists: data.top_artists,
     }));
-    const trendsPromise     = StatsReq.then(data => ({
+    const listeningHistoryPromise   = StatsReq.then(data => ({
+        dailyTrends: data.listening_by_date,
+    }));
+    const trendsPromise             = StatsReq.then(data => ({
         hourlyTrends: data.listening_by_hour, 
         weeklyTrends: data.listening_by_weekday, 
         monthsTrends: data.listening_by_month, 
         yearlyTrends: data.listening_by_year, 
-        dailyTrends: data.listening_by_date,
     }));
-    const behaviorPromise   = StatsReq.then(data => ({
+    const behaviorPromise           = StatsReq.then(data => ({
         platfData: data.platform_stats, 
         skipStats: data.skip_stats,
-        }));
+    }));
+    const skipPromise               = StatsReq.then(data => ({
+        endreasonsData: data.end_reasons, 
+        skipedTracksStats: data.most_skipped_tracks,
+    }));
 </script>
 
 <div>
@@ -84,6 +102,7 @@
             </div>
         </header>
         <hr class="mt-4">
+
 
         <!-- Summary Cards -->
         {#await summaryPromise}
@@ -151,19 +170,25 @@
             </section>
         {/await}
 
-        <!-- Trends Area -->
-        {#await trendsPromise}
-            <p class="loading">Loading Hourly Trends...</p>
-        {:then {hourlyTrends, weeklyTrends, dailyTrends, yearlyTrends, monthsTrends}}
-            
-            <section class="grid grid-cols-1 lg:grid-cols-2 gap-6">
 
-                <!-- Weird behavior with col-span-2 -->
+        <!-- Trends Area -->
+        {#await listeningHistoryPromise}
+            <p class="loading">Loading Hourly Trends...</p>
+        {:then {dailyTrends}}
+            <section class="gap-6">
                 <div class="bg-(--surface) shadow rounded-xl p-4 flex flex-col col-span-2">
-                <!-- <div class="bg-(--surface) shadow rounded-xl p-4 flex flex-col"> -->
                     <h3 class="text-lg font-semibold mb-2">Timeline of Activity</h3>
                     <TimelineChart data={dailyTrends} yAxisLabel={'total_ms_played'} xAxisLabel={'date'} />
                 </div>
+            </section>
+        {/await}
+
+
+        <!-- Trends Area -->
+        {#await trendsPromise}
+            <p class="loading">Loading Hourly Trends...</p>
+        {:then {hourlyTrends, weeklyTrends, yearlyTrends, monthsTrends}}
+            <section class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <div class="bg-(--surface) shadow rounded-xl p-4">
                     <h3 class="text-lg font-semibold mb-2">Hourly Listening Pattern</h3>
                     <BarChart data={hourlyTrends} yAxisLabel={'total_ms_played'} xAxisLabel={'hour'} />
@@ -182,6 +207,7 @@
                 </div>
             </section>
         {/await}
+
 
         <!-- Behavior Insights -->
         {#await behaviorPromise}
@@ -210,17 +236,50 @@
             </section>
         {/await}
 
-        <!-- Future Expansion -->
-        <!-- <section class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div class="bg-(--surface) shadow rounded-xl p-4">
-                <h2 class="text-sm text-(--secondary-text) mb-1">Listening Sessions</h2>
-                <div class="h-36 rounded">[Session Data Placeholder]</div>
-            </div>
-            <div class="bg-(--surface) shadow rounded-xl p-4">
-                <h2 class="text-sm text-(--secondary-text) mb-1">Genre Distribution</h2>
-                <div class="h-36 rounded">[Pie or Bar Placeholder]</div>
-            </div>
-        </section> -->
+
+        <!-- Most skipped tracks -->
+        {#await skipPromise}
+            <p class="loading">Loading Total Listening Time...</p>
+        {:then {endreasonsData, skipedTracksStats}}
+            <section class="grid grid-cols-1 sm:grid-cols-1 lg:grid-cols-2 gap-6">
+
+                <!-- Most skipped tracks Card -->
+                <div class="bg-(--surface) shadow rounded-xl p-5 flex flex-col gap-3">
+                    <h2 class="text-sm text-(--secondary-text)">Most skipped tracks</h2>
+                    <ul class="space-y-2 text-sm">
+                        {#each skipedTracksStats.slice(0, 10) as { artist, skip_count, spotify_track_uri, track_name }, i}
+                            <li class="flex justify-between items-center">
+                                <span 
+                                    class="text-(--primary-text) max-w-[85%] truncate"
+                                    title={`${track_name} by ${artist}`}>
+                                    <span class="font-bold text-(--accent-text)">{i + 1}.</span> {track_name} <span class="text-(--secondary-text)">by</span> {artist}
+                                </span>
+                                <span class="font-semibold text-right tabular-nums">{skip_count}</span>
+                            </li>
+                        {/each}
+                    </ul>
+                </div>
+
+                <!-- End reasons Card -->
+                <div class="bg-(--surface) shadow rounded-xl p-5 flex flex-col gap-3">
+                    <h2 class="text-sm text-(--secondary-text)">End reasons</h2>
+                    <ul class="space-y-2 text-sm">
+                        {#each endreasonsData as { count, reason_end }, i}
+                            <li class="flex justify-between items-center">
+                                <span 
+                                    class="text-(--primary-text) max-w-[85%] truncate"
+                                    title={reason_end}>
+                                    <span class="font-bold text-(--accent-text)">{i + 1}.</span>
+                                    {reasonLabels[reason_end] || reason_end}
+                                </span>
+                                <span class="font-semibold text-right tabular-nums">{count.toLocaleString()}</span>
+                            </li>
+                        {/each}
+                    </ul>
+                </div>
+
+            </section>
+        {/await}
     </div>
 
 
