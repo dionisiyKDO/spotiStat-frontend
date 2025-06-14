@@ -65,9 +65,7 @@ export async function fetchTrackStats(username: string, track_id: string): Promi
         }
 
         const data = (await response.json()) as TrackStats;
-        data.timeline_data = fillMissingDates(data);
-        console.log(data);
-        
+        data.timeline_data = fillMissingDates(data);        
         return data;
     } catch (err) {
         console.log(err);

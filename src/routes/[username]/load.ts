@@ -127,7 +127,6 @@ export async function fetchAllStats(username: string): Promise<Stats | null> {
         }
 
         const data: Stats = await response.json();
-        console.log(data);
         return data;
     } catch (err) {
         console.error("Network or parsing error in fetchAllStats():", err);

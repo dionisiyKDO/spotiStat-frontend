@@ -35,7 +35,6 @@
             }
 
             const data: Meta = await response.json();
-            console.log(data);
             return data;
         } catch (err) {
             console.error("Network or parsing error in fetchAllStats():", err);
