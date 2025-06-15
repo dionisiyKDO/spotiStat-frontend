@@ -211,5 +211,36 @@
 			</section>
 		{/if}
 
+		<!-- Artist Tracks List -->
+		{#await playedTracksReq}
+			<div class="flex justify-center items-center p-8">
+				<p class="text-(--primary-text)">Loading artist tracks...</p>
+			</div>
+		{:then playedTracks}
+			{#if playedTracks && playedTracks.length > 0}
+				<section class="mt-10">
+					<div class="bg-(--surface) shadow rounded-xl p-4">
+						<h2 class="text-lg font-semibold mb-4 text-(--primary-text)">Tracks by {artistStats.artist_name}</h2>
+						<div class="space-y-3">
+							{#each playedTracks as track (track.spotify_track_uri)}
+								<div class="flex justify-between items-center p-3 bg-(--background) rounded-lg border border-(--border)">
+									<div class="flex-1">
+										<h3 class="font-medium text-(--primary-text)">{track.track_name}</h3>
+									</div>
+									<div class="flex gap-4 text-sm text-(--secondary-text)">
+										<div class="w-22 text-right">
+											<div class="font-medium">{track.play_count} plays</div>
+										</div>
+										<div class="w-22 text-right">
+											<div class="font-medium">{formatDuration(track.total_ms_played)}</div>
+										</div>
+									</div>
+								</div>
+							{/each}
+						</div>
+					</div>
+				</section>
+			{/if}
+		{/await}
 	{/await}
 </section>
