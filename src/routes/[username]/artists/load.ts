@@ -5,6 +5,17 @@ export interface TopArtist {
     total_ms_played: number;
 }
 
+export interface ArtistStats {
+  artist_name: string
+  avg_playtime_per_play: number
+  distinct_days_played: number
+  first_played: string
+  last_played: string
+  timeline_data: TimelineData[]
+  total_ms_played: number
+  total_plays: number
+}
+
 export interface TimelineData {
   date: string | Date
   play_count: number
@@ -12,15 +23,20 @@ export interface TimelineData {
   total_minutes_played?: number
 }
 
+export interface ArtistTrack {
+  play_count: number
+  spotify_track_uri: string
+  total_hours: number
+  total_ms_played: number
+  track_name: string
+}
 
-export async function fetchTracks(
-    username,
-    limit_count: number = 10,
-    limit_play: number = 1000
-): Promise<Track[] | null> {
+
+
+export async function fetchArtists(username: string): Promise<TopArtist[] | null> {
     try {
         const response = await fetch(
-            `/api/db/history/played-tracks?username=${username}&limit_count=${limit_count}&limit_play=${limit_play}&group_by=artist`
+            `/api/db/stats/${username}/listened-artists`
         );
 
         if (!response.ok) {
@@ -30,20 +46,17 @@ export async function fetchTracks(
             return null;
         }
 
-        const data = (await response.json()) as { played_tracks: Track[] };
-        return data.played_tracks;
+        const data: TopArtist[] = await response.json();
+        return data;
     } catch (err) {
         console.log(err);
         return null;
     }
 }
 
-export async function fetchArtistStats(
-    username,
-    artist: string
-): Promise<ArtistStats | null> {
+export async function fetchArtistStats(username: string, artist: string): Promise<ArtistStats | null> { 
     try {
-        const response = await fetch(`/api/db/history/${username}/artist/${artist}/stats`);
+        const response = await fetch(`/api/db/stats/${username}/artist/${artist}`);
 
         if (!response.ok) {
             const data = await response.json();
@@ -61,37 +74,19 @@ export async function fetchArtistStats(
     }
 }
 
-export async function fetchPlayedTracks(
-    username,
-    limit: number,
-    date: string,
-    artist: string
-): Promise<Track[] | null> {
+export async function fetchPlayedTracks(username: string,artist: string): Promise<ArtistTrack[] | null> {
     try {
-        const sortby = "total_ms_played";
-        const response = await fetch(
-            `/api/db/history/top-tracks?username=${username}limit=${limit}&date=${date}&artist=${artist}&sort_by=${sortby}`
-        );
+        const response = await fetch(`/api/db/stats/${username}/artist/${artist}/listened-tracks`);
+        
         if (!response.ok) {
             const data = await response.json();
             const error = data.error || "Failed to fetch top tracks";
             console.log(error);
             return null;
         }
-        const data = (await response.json()) as {
-            tracks: Track[];
-        };
 
-        // Find the maximum total_ms_played
-        const max = Math.max(...data.map((track: Track) => track[sortby]));
-
-        // Add percentage key to each track
-        const tracksWithPercentage = data.map((track: Track) => ({
-            ...track, // Spread the existing properties
-            percentage_of_max: (track[sortby] / max) * 100,
-        }));
-
-        return tracksWithPercentage;
+        const data: ArtistTrack[] = await response.json();
+        return data;
     } catch (err) {
         console.log(err);
         return null;
