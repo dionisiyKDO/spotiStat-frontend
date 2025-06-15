@@ -82,8 +82,10 @@
 	}
 
 	function handleBlur(): void {
-		showSuggestions = false;
-		selectedIndex = -1;
+		setTimeout(() => {
+			showSuggestions = false;
+			selectedIndex = -1;
+		}, 150); // timeout for mouse click to get through
 	}
 
 	// Utility functions
