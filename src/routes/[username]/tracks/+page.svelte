@@ -135,7 +135,7 @@
 				{#if showSuggestions}
 					{@const displayTracks = getDisplayTracks(tracks)}
 					{#if displayTracks.length > 0}
-						<ul class="absolute top-full left-0 right-0 bg-(--surface) border border-(--border) rounded-md mt-1 max-h-56 overflow-y-auto z-10 shadow-lg">
+						<ul class="w-96 absolute top-full left-0 right-0 bg-(--surface) border border-(--border) rounded-md mt-1 max-h-56 overflow-y-auto z-10 shadow-lg">
 							{#each displayTracks as track, i (track.spotify_track_uri)}
 								<li class="border-b border-(--border) last:border-b-0">
 									<button

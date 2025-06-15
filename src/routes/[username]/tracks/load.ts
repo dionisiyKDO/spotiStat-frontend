@@ -1,7 +1,3 @@
-import { tick } from "svelte";
-
-
-
 export interface TopTrack {
     artist: string;
     play_count: number;
@@ -55,7 +51,7 @@ export async function fetchTracks(username: string): Promise<TopTrack[] | null> 
 
 export async function fetchTrackStats(username: string, track_id: string): Promise<TrackStats | null> {
     try {
-        const response = await fetch(`/api/db/stats/${username}/track/${track_id}/stats`);
+        const response = await fetch(`/api/db/stats/${username}/track/${track_id}`);
 
         if (!response.ok) {
             const data = await response.json();
@@ -65,7 +61,7 @@ export async function fetchTrackStats(username: string, track_id: string): Promi
         }
 
         const data = (await response.json()) as TrackStats;
-        data.timeline_data = fillMissingDates(data);        
+        data.timeline_data = fillMissingDates(data);
         return data;
     } catch (err) {
         console.log(err);
