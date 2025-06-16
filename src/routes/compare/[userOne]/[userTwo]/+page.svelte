@@ -2,7 +2,7 @@
     import type { PageProps } from "./$types";
     import BarChart from "$lib/dashboard/BarChart.svelte";
     import TimelineChart from "$lib/dashboard/TimelineChart.svelte";
-    import { fetchAllStats, numberWithCommas, type TopArtist, type TopTrack } from "./load";
+    import { fetchAllStats, numberWithCommas, type TopArtist, type TopTrack, type MostSkippedTrack, type EndReason } from "./load";
 
     let { data }: PageProps = $props();
     const userOne = data.userOne;
@@ -268,7 +268,6 @@
             </section>
         {/if}
     {/await}
-    
 
     <!-- Top Artists and Tracks - Side by Side -->
     {#await topPromise}
@@ -325,7 +324,7 @@
                         <div class="grid grid-cols-2 gap-6">
                             {#each [[data.topTracks.one, userOne, 'blue'], [data.topTracks.two, userTwo, 'emerald']] as [tracksData, userName, color]}
                                 <div class="space-y-3">
-                                    <div class="flex items-center gap-2 pb-2 border-b border-blue-500/20">
+                                    <div class="flex items-center gap-2 pb-2 border-b border-{color}-500/20">
                                         <div class="w-3 h-3 rounded-full bg-{color}-500"></div>
                                         <h3 class="font-medium text-{color}-400 text-sm">{userName}</h3>
                                     </div>
@@ -488,7 +487,62 @@
         {/if}
     {/await}
 
+    <!-- Listening Patterns Comparison -->
+    <!-- {#await trendsPromise}
+        <p class="loading">Loading listening patterns...</p>
+    {:then data}
+        {#if data}
+            <section class="grid grid-cols-1 gap-6">
+                <div class="bg-(--surface) shadow rounded-xl p-4">
+                    <h3 class="text-lg font-semibold mb-2">Hourly Patterns</h3>
+                    <BarChart
+                        data={[data.hourly.one, data.hourly.two]}
+                        yAxisLabel="total_ms_played"
+                        xAxisLabel="hour"
+                        userLabels = {[userOne, userTwo]}
+                        barColors = {["oklch(70.7% 0.165 254.624)", "oklch(79.2% 0.209 151.711)"]} 
+                        showProportional = {true}
+                        proportionalMode = "max"
+                    />
+                </div>
+                <div class="bg-(--surface) shadow rounded-xl p-4">
+                    <h3 class="text-lg font-semibold mb-2">Weekly Patterns</h3>
+                    <BarChart
+                        data={[data.weekly.one, data.weekly.two]}
+                        yAxisLabel="total_ms_played"
+                        xAxisLabel="weekday"
+                        userLabels = {[userOne, userTwo]}
+                        barColors = {["oklch(70.7% 0.165 254.624)", "oklch(79.2% 0.209 151.711)"]} 
+                        showProportional = {true}
+                        proportionalMode = "max"
+                    />
+                </div>
+                <div class="bg-(--surface) shadow rounded-xl p-4">
+                    <h3 class="text-lg font-semibold mb-2">Yearly Patterns</h3>
+                    <BarChart
+                        data={[data.yearly.one, data.yearly.two]}
+                        yAxisLabel="total_ms_played"
+                        xAxisLabel="year"
+                        userLabels = {[userOne, userTwo]}
+                        barColors = {["oklch(70.7% 0.165 254.624)", "oklch(79.2% 0.209 151.711)"]} 
+                        showProportional = {false}
+                        proportionalMode = "max"
+                    />
+                </div>
+                <div class="bg-(--surface) shadow rounded-xl p-4">
+                    <h3 class="text-lg font-semibold mb-2">Monthly Patterns</h3>
+                    <TimelineChart
+                        data={[data.monthly.one, data.monthly.two]}
+                        yAxisLabel="total_ms_played"
+                        xAxisLabel="month"
+                        userLabels = {[userOne, userTwo]}
+                        lineColors = {["oklch(70.7% 0.165 254.624)", "oklch(79.2% 0.209 151.711)"]} 
 
-
+                    />
+                </div>
+            </section>
+        {/if}
+    {/await} -->
+  
     
 </div>
