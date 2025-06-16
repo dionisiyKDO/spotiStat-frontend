@@ -269,8 +269,6 @@
         {/if}
     {/await}
     
-
-
     <!-- Top Artists and Tracks - Side by Side -->
     {#await topPromise}
         <div class="flex justify-center">
@@ -278,8 +276,8 @@
         </div>
     {:then data}
         {#if data}
-            <section class="grid grid-cols-1 xl:grid-cols-2 gap-4 items-stretch">
-                
+            <section class="grid grid-cols-1 xl:grid-cols-2 gap-4">
+
                  <div>
                     <h2 class="ml-5 text-base text-(--secondary-text)">Top Artists</h2>
                     <div class="bg-(--surface) border border-gray-200/10 rounded-2xl px-6 py-5">
@@ -362,6 +360,40 @@
         {/if}
     {/await}
 
+    <!-- Listening Timeline Comparison -->
+    {#await listeningHistoryPromise}
+        <p class="loading">Loading listening history...</p>
+    {:then data}
+        {#if data}
+            <section>
+                <div class="bg-(--surface) border border-gray-200/10 rounded-2xl px-6 py-5">
+                    <div class="flex justify-between gap-6">
+                        <h3 class="text-lg font-semibold mb-2">Timeline of Activity Comparison</h3>
+                        <div class="flex items-center gap-4 mr-3 text-base">
+                            <div class="flex items-center gap-2">
+                                <div class="w-3 h-3 bg-blue-400 rounded"></div>
+                                <span>{userOne}</span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <div class="w-3 h-3 bg-green-400 rounded"></div>
+                                <span>{userTwo}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <TimelineChart
+                        data={[data.daily.one, data.daily.two]}
+                        yAxisLabel={"total_ms_played"}
+                        xAxisLabel={"date"}
+                        userLabels = {[userOne, userTwo]}
+                        lineColors = {["oklch(70.7% 0.165 254.624)", "oklch(79.2% 0.209 151.711)"]} 
+                    />  <!-- hardcoded tailwind blue-400 and green-400 colors -->
+                </div>
+            </section>
+        {/if}
+    {/await}
 
 
+
+
+    
 </div>
