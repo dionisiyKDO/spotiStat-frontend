@@ -269,6 +269,7 @@
         {/if}
     {/await}
     
+
     <!-- Top Artists and Tracks - Side by Side -->
     {#await topPromise}
         <div class="flex justify-center">
@@ -392,6 +393,100 @@
         {/if}
     {/await}
 
+    <!-- Behavior Comparison (idontcareanymoreffs)-->
+    {#await behaviorPromise}
+        <p class="loading">Loading behavior stats...</p>
+    {:then data}
+        {#if data}            
+            <section class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Skip Rate Comparison -->
+                <div class="flex flex-col">
+                    <h2 class="ml-5 text-sm text-(--secondary-text)">Skip rate</h2>
+                    <div class="flex-1 bg-(--surface) border border-gray-200/10 shadow rounded-xl p-5 py-3">
+                        <!-- <h2 class="text-sm text-(--secondary-text) mb-4">Skip Rate</h2> -->
+                        <div class="space-y-3">
+                            <div class="flex items-center justify-between">
+
+                                <!-- User One Stats -->
+                                <div class="flex-1 text-center">
+                                    <p class="text-xs text-(--secondary-text) mb-1">{userOne}</p>
+                                    <p class="text-2xl font-bold ">
+                                        {(data.skip.one.skip_rate * 100).toFixed(2)}%
+                                    </p>
+                                    <div class="space-y-0.5 text-sm text-(--secondary-text)">
+                                        <p>Total Plays: {numberWithCommas(data.skip.one.total_plays)}</p>
+                                        <p>Skipped: {numberWithCommas(data.skip.one.skipped_tracks)}</p>
+                                    </div>
+                                </div>
+
+                                <!-- Comparison Icon -->
+                                <div class="flex items-center px-2">
+                                    <span class="text-4xl {getComparisonColor(data.skip.comparison.winner)}">
+                                        {getComparisonIcon(data.skip.comparison.winner)}
+                                    </span>
+                                </div>
+
+                                <!-- User Two Stats -->
+                                <div class="flex-1 text-center">
+                                    <p class="text-xs text-(--secondary-text) mb-1">{userTwo}</p>
+                                    <p class="text-2xl font-bold ">
+                                        {(data.skip.two.skip_rate * 100).toFixed(2)}%
+                                    </p>
+                                    <div class="space-y-0.5 text-sm text-(--secondary-text)">
+                                        <p>Total Plays: {numberWithCommas(data.skip.two.total_plays)}</p>
+                                        <p>Skipped: {numberWithCommas(data.skip.two.skipped_tracks)}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Platform Usage -->
+                <div class="flex flex-col">
+                    <h2 class="ml-5 text-sm text-(--secondary-text)">Platform Usage</h2>
+                    <div class="flex-1 bg-(--surface) border border-gray-200/10 shadow rounded-xl p-5 py-3">
+                        <!-- <h2 class="text-sm text-(--secondary-text) mb-3">Platform Usage</h2> -->
+                        <div class="grid grid-cols-2 gap-4">
+                            <!-- User One Platforms -->
+                            <div class="flex flex-col">
+                                <h3 class="text-center text-xs text-(--secondary-text) mb-1">{userOne}</h3>
+                                <ul class="space-y-1 text-sm">
+                                    {#each data.platf.one.sort((a, b) => b.total_ms_played - a.total_ms_played) as { platform, total_ms_played }}
+                                        {#if total_ms_played > 0}
+                                            <li class="flex justify-between">
+                                                <span class="text-(--primary-text)">{platform}</span>
+                                                <span class="font-semibold tabular-nums text-xs">
+                                                    {numberWithCommas((total_ms_played / 3600000).toFixed(1))}h
+                                                </span>
+                                            </li>
+                                        {/if}
+                                    {/each}
+                                </ul>
+                            </div>
+
+                            <!-- User Two Platforms -->
+                            <div class="flex flex-col">
+                                <h3 class="text-center text-xs text-(--secondary-text) mb-1">{userTwo}</h3>
+                                <ul class="space-y-1 text-sm">
+                                    {#each data.platf.two.sort((a, b) => b.total_ms_played - a.total_ms_played) as { platform, total_ms_played }}
+                                        {#if total_ms_played > 0}
+                                            <li class="flex justify-between">
+                                                <span class="font-semibold tabular-nums text-xs">
+                                                    {numberWithCommas((total_ms_played / 3600000).toFixed(1))}h
+                                                </span>
+                                                <span class="text-(--primary-text)">{platform}</span>
+                                            </li>
+                                        {/if}
+                                    {/each}
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        {/if}
+    {/await}
 
 
 
