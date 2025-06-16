@@ -111,17 +111,18 @@
 
     // Helper function to get comparison icon
     function getComparisonIcon(winner: 'one' | 'two' | 'tie'): string {
-        if (winner === 'tie') return '=';
-        if (winner === 'two') return '↗';
-        return '↘';
+        if (winner === 'tie') return '==';
+        if (winner === 'one') return '>';
+        if (winner === 'two') return '<';
     }
 
     // Helper function to get comparison color
     function getComparisonColor(winner: 'one' | 'two' | 'tie'): string {
         if (winner === 'tie') return 'text-yellow-400';
-        if (winner === 'two') return 'text-green-400';
-        return 'text-red-400';
+        if (winner === 'one') return 'text-blue-400';
+        if (winner === 'two') return 'text-emerald-400';
     }
+
 </script>
 
 
@@ -166,4 +167,116 @@
         </div>
         <div class="w-72 h-px bg-gradient-to-r from-blue-500 to-emerald-500 mx-auto"></div>
     </header>
+
+    <!-- Summary Cards Comparison -->
+    {#await summaryPromise}
+        <p class="loading">Loading comparison data...</p>
+    {:then data}
+        {#if data}
+            <section class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <!-- Total Listening Time -->
+                <div class="bg-(--surface) shadow rounded-xl p-5">
+                    <h2 class="text-sm text-(--secondary-text) mb-2">Total Listening Time</h2>
+                    <!-- <div class="h-px bg-gradient-to-r from-blue-500 to-emerald-500 mx-auto mb-2"></div> -->
+                    <div class="space-y-3">
+                        <div class="flex items-center justify-between">
+                            <div class="text-left">
+                                <p class="text-xs text-(--secondary-text)">{userOne}</p>
+                                <p class="text-lg font-semibold">
+                                    {numberWithCommas(data.tlt.one.total_listening_hours.toFixed(0))}h
+                                </p>
+                            </div>
+                            <div class="flex flex-col items-center px-3">
+                                <span class="text-2xl {getComparisonColor(data.tlt.comparison.winner)}">
+                                    {getComparisonIcon(data.tlt.comparison.winner)}
+                                </span>
+                                {#if data.tlt.comparison.winner !== 'tie'}
+                                    <span class="text-xs text-(--secondary-text) text-center">
+                                        {data.tlt.comparison.percentage.toFixed(0)}%
+                                    </span>
+                                {/if}
+                            </div>
+                            <div class="text-right">
+                                <p class="text-xs text-(--secondary-text)">{userTwo}</p>
+                                <p class="text-lg font-semibold">
+                                    {numberWithCommas(data.tlt.two.total_listening_hours.toFixed(0))}h
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Unique Tracks -->
+                <div class="bg-(--surface) shadow rounded-xl p-5">
+                    <h2 class="text-sm text-(--secondary-text) mb-2">Unique Tracks</h2>
+                    <!-- <div class="h-px bg-gradient-to-r from-blue-500 to-emerald-500 mx-auto mb-2"></div> -->
+                    <div class="space-y-3">
+                        <div class="flex items-center justify-between">
+                            <div class="text-left">
+                                <p class="text-xs text-(--secondary-text)">{userOne}</p>
+                                <p class="text-lg font-semibold">
+                                    {numberWithCommas(data.uniq.one.unique_tracks_count)}
+                                </p>
+                            </div>
+                            <div class="flex flex-col items-center px-3">
+                                <span class="text-2xl {getComparisonColor(data.uniq.comparison.winner)}">
+                                    {getComparisonIcon(data.uniq.comparison.winner)}
+                                </span>
+                                {#if data.uniq.comparison.winner !== 'tie'}
+                                    <span class="text-xs text-(--secondary-text) text-center">
+                                        {data.uniq.comparison.percentage.toFixed(0)}%
+                                    </span>
+                                {/if}
+                            </div>
+                            <div class="text-right">
+                                <p class="text-xs text-(--secondary-text)">{userTwo}</p>
+                                <p class="text-lg font-semibold">
+                                    {numberWithCommas(data.uniq.two.unique_tracks_count)}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Longest Session -->
+                <div class="bg-(--surface) shadow rounded-xl p-5">
+                    <h2 class="text-sm text-(--secondary-text) mb-2">Longest Session</h2>
+                    <!-- <div class="h-px bg-gradient-to-r from-blue-500 to-emerald-500 mx-auto mb-2"></div> -->
+                    <div class="space-y-3">
+                        <div class="flex items-center justify-between">
+                            <div class="text-left">
+                                <p class="text-xs text-(--secondary-text)">{userOne}</p>
+                                <p class="text-lg font-semibold">
+                                    {(data.sess.one.total_ms_played / 3600000).toFixed(2)}h
+                                </p>
+                            </div>
+                            <div class="flex flex-col items-center px-3">
+                                <span class="text-2xl {getComparisonColor(data.sess.comparison.winner)}">
+                                    {getComparisonIcon(data.sess.comparison.winner)}
+                                </span>
+                                {#if data.sess.comparison.winner !== 'tie'}
+                                    <span class="text-xs text-(--secondary-text) text-center">
+                                        {data.sess.comparison.percentage.toFixed(0)}%
+                                    </span>
+                                {/if}
+                            </div>
+                            <div class="text-right">
+                                <p class="text-xs text-(--secondary-text)">{userTwo}</p>
+                                <p class="text-lg font-semibold">
+                                    {(data.sess.two.total_ms_played / 3600000).toFixed(2)}h
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        {/if}
+    {/await}
+    
+
+
+
+
+
+
 </div>
