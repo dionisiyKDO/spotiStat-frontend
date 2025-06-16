@@ -69,7 +69,7 @@
         };
     });
 
-    // Listening history promis
+    // Listening history promise
     const listeningHistoryPromise = Promise.all([StatsReqOne, StatsReqTwo]).then(([dataOne, dataTwo]) => {
         if (!dataOne || !dataTwo) return null;
         return {
@@ -108,4 +108,62 @@
             skippedTracks: { one: dataOne.most_skipped_tracks, two: dataTwo.most_skipped_tracks }
         };
     });
+
+    // Helper function to get comparison icon
+    function getComparisonIcon(winner: 'one' | 'two' | 'tie'): string {
+        if (winner === 'tie') return '=';
+        if (winner === 'two') return '↗';
+        return '↘';
+    }
+
+    // Helper function to get comparison color
+    function getComparisonColor(winner: 'one' | 'two' | 'tie'): string {
+        if (winner === 'tie') return 'text-yellow-400';
+        if (winner === 'two') return 'text-green-400';
+        return 'text-red-400';
+    }
 </script>
+
+
+
+<div class="space-y-8">
+    <!-- Header -->
+    <!-- Grey text -->
+    <!-- <header class="text-center space-y-4">
+        <div class="flex items-center justify-center gap-6 text-(--secondary-text) text-xl">
+            <span class="w-40 px-3 py-1 bg-(--surface) rounded-lg">{userOne}</span>
+            <span class="text-xl">vs</span>
+            <span class="w-40 px-3 py-1 bg-(--surface) rounded-lg">{userTwo}</span>
+        </div>
+    </header> -->
+
+    <!-- Colored line, text and dots -->
+    <!-- <header class="text-center space-y-4">
+        <div class="flex items-center justify-center gap-6">
+            <div class="w-40 flex justify-end items-center gap-3 text-right px-3 py-1 bg-(--surface) rounded-lg">
+                <span class="text-xl font-semibold text-blue-400">{userOne}</span>
+                <div class="w-4 h-4 rounded-full bg-blue-500"></div>
+            </div>
+            <div class="text-2xl font-light text-(--secondary-text)">vs</div>
+            <div class="w-40 flex justify-start items-center gap-3 text-left px-3 py-1 bg-(--surface) rounded-lg">
+                <div class="w-4 h-4 rounded-full bg-emerald-500"></div>
+                <span class="text-xl font-semibold text-emerald-400">{userTwo}</span>
+            </div>
+        </div>
+        <div class="w-72 h-px bg-gradient-to-r from-blue-500 to-emerald-500 mx-auto"></div>
+    </header> -->
+
+    <!-- Colored line and text -->
+    <header class="text-center space-y-4">
+        <div class="flex items-center justify-center gap-6">
+            <div class="w-40 flex justify-center items-center gap-3 px-3 py-1 bg-(--surface) rounded-lg">
+                <span class="text-xl font-semibold text-blue-400">{userOne}</span>
+            </div>
+            <div class="text-2xl font-light text-(--secondary-text)">vs</div>
+            <div class="w-40 flex justify-center items-center gap-3 px-3 py-1 bg-(--surface) rounded-lg">
+                <span class="text-xl font-semibold text-emerald-400">{userTwo}</span>
+            </div>
+        </div>
+        <div class="w-72 h-px bg-gradient-to-r from-blue-500 to-emerald-500 mx-auto"></div>
+    </header>
+</div>
