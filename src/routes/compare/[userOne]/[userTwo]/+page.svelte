@@ -544,5 +544,85 @@
         {/if}
     {/await} -->
   
+    <!-- Most Skipped & End Reasons -->
+    {#await skipPromise}
+        <p class="loading">Loading skip stats...</p>
+    {:then data}
+        {#if data}
+            <section class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <!-- Most Skipped Tracks -->
+                <div>
+                    <h2 class="text-sm text-(--secondary-text) text-center">Most Skipped Tracks</h2>
+                    <div class="bg-(--surface) border border-gray-200/10 rounded-2xl px-6 pb-5 pt-3">
+                        <div class="grid grid-cols-2 gap-6">
+                            {#each [[data.skippedTracks.one, userOne, 'blue'], [data.skippedTracks.two, userTwo, 'emerald']] as [tracksData, userName, color]}
+                                <div class="space-y-2">
+                                    <div class="flex items-center gap-2 pb-3 border-b border-{color}-500/20">
+                                        <h3 class="w-full text-center font-medium text-{color}-400 text-sm">{userName}</h3>
+                                    </div>
+                                    <ul class="space-y-2 text-sm">
+                                        {#each (tracksData as MostSkippedTrack[]).slice(0, 10) as { artist, track_name, skip_count }, i}
+                                            <li class="flex items-center justify-between group">
+                                                <div class="flex items-center gap-3 min-w-0 flex-1">
+                                                    <span class="flex-shrink-0 flex items-center justify-center font-semibold text-{color}-400">
+                                                        {i + 1}
+                                                    </span>
+                                                    <div class="min-w-0 flex-1">
+                                                        <div class="truncate text-sm text-(--primary-text) group-hover:text-{color}-400 transition-colors" title={`${track_name} by ${artist}`}>
+                                                            {track_name}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <span class="font-medium text-sm text-(--secondary-text) ml-2">
+                                                    {skip_count}
+                                                </span>
+                                            </li>
+                                        {/each}
+                                    </ul>
+                                </div>
+                            {/each}
+                            
+                        </div>
+                    </div>
+                </div>
+
+                <!-- End Reasons -->
+                <div>
+                    <h2 class="text-sm text-(--secondary-text) text-center">End Reasons</h2>
+                    <div class="bg-(--surface) border border-gray-200/10 rounded-2xl px-6 pb-5 pt-3">
+                        <div class="grid grid-cols-2 gap-6">
+                            {#each [[data.endReasons.one, userOne, 'blue'], [data.endReasons.two, userTwo, 'emerald']] as [reasonsData, userName, color]}
+                                <div class="space-y-2">
+                                    <div class="flex items-center gap-2 pb-3 border-b border-{color}-500/20">
+                                        <h3 class="w-full text-center font-medium text-{color}-400 text-sm">{userName}</h3>
+                                    </div>
+                                    <ul class="space-y-2 text-sm">
+                                        {#each (reasonsData as EndReason[]).slice(0, 10) as { count, reason_end }, i}
+                                            <li class="flex items-center justify-between group">
+                                                <div class="flex items-center gap-3 min-w-0 flex-1">
+                                                    <span class="flex-shrink-0 flex items-center justify-center font-semibold text-{color}-400">
+                                                        {i + 1}
+                                                    </span>
+                                                    <div class="min-w-0 flex-1">
+                                                        <div class="truncate text-sm text-(--primary-text) group-hover:text-{color}-400 transition-colors" title={reason_end}>
+                                                            {reasonLabels[reason_end] || reason_end}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <span class="font-medium text-sm text-(--secondary-text) ml-2">
+                                                    {count.toLocaleString()}
+                                                </span>
+                                            </li>
+                                        {/each}
+                                    </ul>
+                                </div>
+                            {/each}
+                            
+                        </div>
+                    </div>
+                </div>
+            </section>
+        {/if}
+    {/await}
     
 </div>
