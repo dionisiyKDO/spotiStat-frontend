@@ -153,11 +153,11 @@
 
         <!-- Colored line and text -->
         <div class="flex items-center justify-center gap-6">
-            <div class="w-40 flex justify-center items-center gap-3 px-3 py-1 bg-(--surface) rounded-lg">
+            <div class="w-40 border border-gray-200/10  flex justify-center items-center gap-3 px-3 py-1 bg-(--surface) rounded-lg">
                 <span class="text-xl font-semibold text-blue-400">{userOne}</span>
             </div>
             <div class="text-2xl font-light text-(--secondary-text)">vs</div>
-            <div class="w-40 flex justify-center items-center gap-3 px-3 py-1 bg-(--surface) rounded-lg">
+            <div class="w-40 border border-gray-200/10  flex justify-center items-center gap-3 px-3 py-1 bg-(--surface) rounded-lg">
                 <span class="text-xl font-semibold text-emerald-400">{userTwo}</span>
             </div>
         </div>
@@ -171,7 +171,7 @@
         {#if data}
             <section class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 <!-- Total Listening Time -->
-                <div class="bg-(--surface) shadow rounded-xl p-5">
+                <div class="bg-(--surface) border border-gray-200/10  shadow rounded-xl p-5">
                     <h2 class="text-sm text-(--secondary-text) mb-2">Total Listening Time</h2>
                     <!-- <div class="h-px bg-gradient-to-r from-blue-500 to-emerald-500 mx-auto mb-2"></div> -->
                     <div class="space-y-3">
@@ -203,7 +203,7 @@
                 </div>
 
                 <!-- Unique Tracks -->
-                <div class="bg-(--surface) shadow rounded-xl p-5">
+                <div class="bg-(--surface) border border-gray-200/10  shadow rounded-xl p-5">
                     <h2 class="text-sm text-(--secondary-text) mb-2">Unique Tracks</h2>
                     <!-- <div class="h-px bg-gradient-to-r from-blue-500 to-emerald-500 mx-auto mb-2"></div> -->
                     <div class="space-y-3">
@@ -235,7 +235,7 @@
                 </div>
 
                 <!-- Longest Session -->
-                <div class="bg-(--surface) shadow rounded-xl p-5">
+                <div class="bg-(--surface) border border-gray-200/10  shadow rounded-xl p-5">
                     <h2 class="text-sm text-(--secondary-text) mb-2">Longest Session</h2>
                     <!-- <div class="h-px bg-gradient-to-r from-blue-500 to-emerald-500 mx-auto mb-2"></div> -->
                     <div class="space-y-3">
