@@ -127,20 +127,18 @@
 
 
 
-<div class="space-y-8">
+<div class="space-y-5">
     <!-- Header -->
-    <!-- Grey text -->
-    <!-- <header class="text-center space-y-4">
-        <div class="flex items-center justify-center gap-6 text-(--secondary-text) text-xl">
+    <header class="text-center space-y-4">
+        <!-- Grey text -->
+        <!-- <div class="flex items-center justify-center gap-6 text-(--secondary-text) text-xl">
             <span class="w-40 px-3 py-1 bg-(--surface) rounded-lg">{userOne}</span>
             <span class="text-xl">vs</span>
             <span class="w-40 px-3 py-1 bg-(--surface) rounded-lg">{userTwo}</span>
-        </div>
-    </header> -->
+        </div> -->
 
-    <!-- Colored line, text and dots -->
-    <!-- <header class="text-center space-y-4">
-        <div class="flex items-center justify-center gap-6">
+        <!-- Colored line, text and dots -->
+        <!-- <div class="flex items-center justify-center gap-6">
             <div class="w-40 flex justify-end items-center gap-3 text-right px-3 py-1 bg-(--surface) rounded-lg">
                 <span class="text-xl font-semibold text-blue-400">{userOne}</span>
                 <div class="w-4 h-4 rounded-full bg-blue-500"></div>
@@ -151,11 +149,9 @@
                 <span class="text-xl font-semibold text-emerald-400">{userTwo}</span>
             </div>
         </div>
-        <div class="w-72 h-px bg-gradient-to-r from-blue-500 to-emerald-500 mx-auto"></div>
-    </header> -->
+        <div class="w-72 h-px bg-gradient-to-r from-blue-500 to-emerald-500 mx-auto"></div> -->
 
-    <!-- Colored line and text -->
-    <header class="text-center space-y-4">
+        <!-- Colored line and text -->
         <div class="flex items-center justify-center gap-6">
             <div class="w-40 flex justify-center items-center gap-3 px-3 py-1 bg-(--surface) rounded-lg">
                 <span class="text-xl font-semibold text-blue-400">{userOne}</span>
@@ -275,7 +271,152 @@
     
 
 
+    <!-- Top Artists and Tracks - Side by Side -->
+    {#await topPromise}
+        <div class="flex justify-center">
+            <div class="animate-pulse text-(--secondary-text)">Loading top stats...</div>
+        </div>
+    {:then data}
+        {#if data}
+            <section class="grid grid-cols-1 xl:grid-cols-2 gap-4 items-stretch">
+                <!-- Top Artists Comparison -->
+                 <div>
+                    <h2 class="ml-5 text-base text-(--secondary-text)">Top Artists</h2>
+                    <div class="bg-(--surface) border border-gray-200/10 rounded-2xl px-6 py-5">
 
+                        <div class="grid grid-cols-2 gap-6">
+                            <div class="space-y-3">
+                                <div class="flex items-center gap-2 pb-2 border-b border-blue-500/20">
+                                    <div class="w-3 h-3 rounded-full bg-blue-500"></div>
+                                    <h3 class="font-medium text-blue-400 text-sm">{userOne}</h3>
+                                </div>
+                                <ul class="space-y-2">
+                                    {#each data.topArtists.one.slice(0, 10) as { artist, total_hours, distinct_track_count }, i}
+                                        <li class="flex items-center justify-between group">
+                                            <div class="flex items-center gap-3 min-w-0 flex-1">
+                                                <span class="flex-shrink-0 w-6 h-6 rounded-full bg-blue-500/10 flex items-center justify-center text-[11px] font-semibold text-blue-400">
+                                                    {i + 1}
+                                                </span>
+                                                <div class="min-w-0 flex-1">
+                                                    <div class="truncate text-sm text-(--primary-text) group-hover:text-blue-400 transition-colors" title={artist}>
+                                                        {artist}
+                                                    </div>
+                                                    <div class="flex truncate text-xs text-(--secondary-text)">
+                                                        Tracks listened: {distinct_track_count}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <span class="font-medium text-sm text-(--secondary-text) ml-2">
+                                                {total_hours.toFixed(1)}h
+                                            </span>
+                                        </li>
+                                    {/each}
+                                </ul>
+                            </div>
+    
+                            <div class="space-y-3">
+                                <div class="flex items-center gap-2 pb-2 border-b border-emerald-500/20">
+                                    <div class="w-3 h-3 rounded-full bg-emerald-500"></div>
+                                    <h3 class="font-medium text-emerald-400 text-sm">{userTwo}</h3>
+                                </div>
+                                <ul class="space-y-2">
+                                    {#each data.topArtists.two.slice(0, 10) as { artist, total_hours, distinct_track_count }, i}
+                                        <li class="flex items-center justify-between group">
+                                            <div class="flex items-center gap-3 min-w-0 flex-1">
+                                                <span class="flex-shrink-0 w-6 h-6 rounded-full bg-emerald-500/10 flex items-center justify-center text-[11px] font-semibold text-emerald-400">
+                                                    {i + 1}
+                                                </span>
+                                                <div class="min-w-0 flex-1">
+                                                    <div class="truncate text-sm text-(--primary-text) group-hover:text-emerald-400 transition-colors" title={artist}>
+                                                        {artist}
+                                                    </div>
+                                                    <div class="flex truncate text-xs text-(--secondary-text)">
+                                                        Tracks listened: {distinct_track_count}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <span class="font-medium text-sm text-(--secondary-text) ml-2">
+                                                {total_hours.toFixed(1)}h
+                                            </span>
+                                        </li>
+                                    {/each}
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                 </div>
+
+                <!-- Top Tracks Comparison -->
+                <div>
+                    <h2 class="ml-5 text-base text-(--secondary-text)">Top Tracks</h2>
+                    <div class="bg-(--surface) border border-gray-200/10 rounded-2xl px-6 py-5">
+                        <div class="grid grid-cols-2 gap-6">
+                            <!-- User One Tracks -->
+                            <div class="space-y-3">
+                                <div class="flex items-center gap-2 pb-2 border-b border-blue-500/20">
+                                    <div class="w-3 h-3 rounded-full bg-blue-500"></div>
+                                    <h3 class="font-medium text-blue-400 text-sm">{userOne}</h3>
+                                </div>
+                                <ul class="space-y-2">
+                                    {#each data.topTracks.one.slice(0, 10) as { artist, track_name, total_hours }, i}
+                                        <li class="flex items-center justify-between group">
+                                            <div class="flex items-center gap-3 min-w-0 flex-1">
+                                                <span class="flex-shrink-0 w-6 h-6 rounded-full bg-blue-500/10 flex items-center justify-center text-[11px] font-semibold text-blue-400">
+                                                    {i + 1}
+                                                </span>
+                                                <div class="min-w-0 flex-1">
+                                                    <div class="truncate text-sm text-(--primary-text) group-hover:text-blue-400 transition-colors" title={`${track_name} by ${artist}`}>
+                                                        {track_name}
+                                                    </div>
+                                                    <div class="truncate text-xs text-(--secondary-text)">
+                                                        {artist}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <span class="font-medium text-sm text-(--secondary-text) ml-2">
+                                                {total_hours.toFixed(1)}h
+                                            </span>
+                                        </li>
+                                    {/each}
+                                </ul>
+                            </div>
+                            
+                            <!-- User Two Tracks -->
+                            <div class="space-y-3">
+                                <div class="flex items-center gap-2 pb-2 border-b border-emerald-500/20">
+                                    <div class="w-3 h-3 rounded-full bg-emerald-500"></div>
+                                    <h3 class="font-medium text-emerald-400 text-sm">{userTwo}</h3>
+                                </div>
+                                <ul class="space-y-2">
+                                    {#each data.topTracks.two.slice(0, 10) as { artist, track_name, total_hours }, i}
+                                        <li class="flex items-center justify-between group">
+                                            <div class="flex items-center gap-3 min-w-0 flex-1">
+                                                <span class="flex-shrink-0 w-6 h-6 rounded-full bg-emerald-500/10 flex items-center justify-center text-[11px] font-semibold text-emerald-400">
+                                                    {i + 1}
+                                                </span>
+                                                <div class="min-w-0 flex-1">
+                                                    <div class="truncate text-sm text-(--primary-text) group-hover:text-emerald-400 transition-colors" title={`${track_name} by ${artist}`}>
+                                                        {track_name}
+                                                    </div>
+                                                    <div class="truncate text-xs text-(--secondary-text)">
+                                                        {artist}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <span class="font-medium text-sm text-(--secondary-text) ml-2">
+                                                {total_hours.toFixed(1)}h
+                                            </span>
+                                        </li>
+                                    {/each}
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </section>
+        {/if}
+    {/await}
 
 
 
