@@ -22,14 +22,18 @@
         xAxisLabel: string;
         userLabels?: [string?, string?]; // Optional labels for the users/datasets
         barColors?: [string?, string?]; // Optional custom colors for the bars
+        useProportionalScaling?: boolean; // Scale each dataset to 0-100% based on its max value
     }
 
-    let { data, yAxisLabel, xAxisLabel, userLabels = ["User 1", "User 2"], barColors }: Props = $props();
+    let { data, yAxisLabel, xAxisLabel, userLabels = ["User 1", "User 2"], barColors, useProportionalScaling = false }: Props = $props();
 
     let chartContainer: HTMLDivElement;
     let chartSvg: SVGSVGElement;
     let resizeObserver: ResizeObserver;
     let tooltip: d3.Selection<HTMLDivElement, unknown, null, undefined>;
+    
+    // State for toggling bars
+    let visibleDatasets = $state([true, true]); // [user1Visible, user2Visible]
 
     // Determine if we have dual data
     const isDualData = $derived(() => Array.isArray(data) && Array.isArray(data[0]) && data.length === 2);
@@ -41,8 +45,8 @@
     const colors = $derived(() => barColors || defaultColors);
 
     // Process data for both datasets
-    const processedData1 = $derived(() => 
-        dataset1().map((d) => ({
+    const processedData1 = $derived(() => {
+        const rawData = dataset1().map((d) => ({
             ...d,
             value: yAxisLabel === "total_ms_played" 
                 ? (d.total_ms_played ?? 0) / 3.6e6 
@@ -57,11 +61,26 @@
                 ? d.month ?? ""
                 : d[xAxisLabel] ?? "",
             user: userLabels[0] || "User 1"
-        }))
-    );
+        }));
 
-    const processedData2 = $derived(() => 
-        dataset2().map((d) => ({
+        if (useProportionalScaling && rawData.length > 0) {
+            const maxValue = Math.max(...rawData.map(d => d.value));
+            if (maxValue > 0) {
+                return rawData.map(d => ({
+                    ...d,
+                    value: (d.value / maxValue) * 100,
+                    originalValue: yAxisLabel === "total_ms_played" 
+                        ? (d.total_ms_played ?? 0) / 3.6e6 
+                        : d.play_count ?? 0
+                }));
+            }
+        }
+
+        return rawData;
+    });
+
+    const processedData2 = $derived(() => {
+        const rawData = dataset2().map((d) => ({
             ...d,
             value: yAxisLabel === "total_ms_played" 
                 ? (d.total_ms_played ?? 0) / 3.6e6 
@@ -76,8 +95,23 @@
                 ? d.month ?? ""
                 : d[xAxisLabel] ?? "",
             user: userLabels[1] || "User 2"
-        }))
-    );
+        }));
+
+        if (useProportionalScaling && rawData.length > 0) {
+            const maxValue = Math.max(...rawData.map(d => d.value));
+            if (maxValue > 0) {
+                return rawData.map(d => ({
+                    ...d,
+                    value: (d.value / maxValue) * 100,
+                    originalValue: yAxisLabel === "total_ms_played" 
+                        ? (d.total_ms_played ?? 0) / 3.6e6 
+                        : d.play_count ?? 0
+                }));
+            }
+        }
+
+        return rawData;
+    });
 
     // Get all unique labels for consistent x-axis
     const allLabels = $derived(() => {
@@ -100,17 +134,22 @@
             const data1Item = processedData1().find(d => d.label === label);
             const data2Item = processedData2().find(d => d.label === label);
             
-            if (data1Item) {
+            if (data1Item && visibleDatasets[0]) {
                 result.push({ ...data1Item, datasetIndex: 0 });
             }
             
-            if (data2Item && isDualData()) {
+            if (data2Item && isDualData() && visibleDatasets[1]) {
                 result.push({ ...data2Item, datasetIndex: 1 });
             }
         });
         
         return result;
     });
+
+    // Helper function to toggle dataset visibility
+    function toggleDataset(index: number) {
+        visibleDatasets[index] = !visibleDatasets[index];
+    }
 
     function drawChart() {
         if (!chartContainer || !chartSvg || !processedData1().length) return;
@@ -120,7 +159,7 @@
 
         // Get actual container dimensions
         const containerRect = chartContainer.getBoundingClientRect();
-        const margin = { top: 20, right: isDualData() ? 120 : 20, bottom: 40, left: 60 };
+        const margin = { top: isDualData() ? 60 : 20, right: isDualData() ? 120 : 20, bottom: 40, left: 60 };
         const width = containerRect.width - margin.left - margin.right;
         const height = 350 - margin.top - margin.bottom;
 
@@ -139,14 +178,16 @@
             .range([0, width])
             .padding(0.1);
 
+        // Determine which datasets are visible for sub-scale
+        const visibleIndices = visibleDatasets.map((visible, i) => visible ? i.toString() : null).filter(Boolean) as string[];
         const xSubScale = d3.scaleBand()
-            .domain(isDualData() ? ["0", "1"] : ["0"])
+            .domain(isDualData() ? visibleIndices : ["0"])
             .range([0, xScale.bandwidth()])
             .padding(0.05);
 
-        const maxValue = Math.max(
-            d3.max(processedData1(), d => d.value) || 0,
-            isDualData() ? (d3.max(processedData2(), d => d.value) || 0) : 0
+        const maxValue = useProportionalScaling ? 100 : Math.max(
+            visibleDatasets[0] ? (d3.max(processedData1(), d => d.value) || 0) : 0,
+            (isDualData() && visibleDatasets[1]) ? (d3.max(processedData2(), d => d.value) || 0) : 0
         );
 
         const yScale = d3.scaleLinear()
@@ -168,11 +209,14 @@
             .style("stroke", chartStroke)
             .style("stroke-opacity", 0);
 
-        svg.append("g")
+        // Add y-axis with appropriate label
+        const yAxis = svg.append("g")
             .attr("class", "y-axis")
             .style("font-size", chartFontSize)
             .style("color", chartColor)
-            .call(d3.axisLeft(yScale))
+            .call(d3.axisLeft(yScale).tickFormat(d => 
+                useProportionalScaling ? `${d}%` : d.toString()
+            ))
             .call(g => g.select(".domain").remove())
             .selectAll(".tick line")
             .style("stroke", chartStroke)
@@ -206,7 +250,11 @@
             .data(combinedData())
             .join("rect")
             .attr("class", "bar")
-            .attr("x", d => (xScale(d.label) || 0) + (xSubScale(d.datasetIndex.toString()) || 0))
+            .attr("x", d => {
+                const baseX = xScale(d.label) || 0;
+                const subX = xSubScale(d.datasetIndex.toString()) || 0;
+                return baseX + subX;
+            })
             .attr("y", d => yScale(d.value))
             .attr("width", xSubScale.bandwidth())
             .attr("height", d => height - yScale(d.value))
@@ -225,7 +273,7 @@
                 hideTooltip();
             });
 
-        // Add legend if dual data
+        // Add legend and controls if dual data
         if (isDualData()) {
             const legend = svg.append("g")
                 .attr("class", "legend")
@@ -233,31 +281,61 @@
 
             const legendItems = legend.selectAll(".legend-item")
                 .data([
-                    { label: userLabels[0] || "User 1", color: colors()[0] },
-                    { label: userLabels[1] || "User 2", color: colors()[1] }
+                    { label: userLabels[0] || "User 1", color: colors()[0], index: 0 },
+                    { label: userLabels[1] || "User 2", color: colors()[1], index: 1 }
                 ])
                 .join("g")
                 .attr("class", "legend-item")
-                .attr("transform", (d, i) => `translate(0, ${i * 25})`);
+                .attr("transform", (d, i) => `translate(0, ${i * 25})`)
+                .style("cursor", "pointer")
+                .on("click", function(event, d) {
+                    toggleDataset(d.index);
+                });
 
             legendItems.append("rect")
                 .attr("width", 15)
                 .attr("height", 15)
-                .attr("fill", d => d.color);
+                .attr("fill", d => d.color)
+                .attr("opacity", (d, i) => visibleDatasets[i] ? 1 : 0.3)
+                .attr("stroke", chartStroke)
+                .attr("stroke-width", 1);
 
             legendItems.append("text")
                 .attr("x", 20)
                 .attr("y", 12)
                 .style("font-size", chartFontSize)
                 .style("fill", chartColor)
+                .attr("opacity", (d, i) => visibleDatasets[i] ? 1 : 0.5)
                 .text(d => d.label);
+
+            // Add instructions
+            legend.append("text")
+                .attr("x", 0)
+                .attr("y", 70)
+                .style("font-size", "11px")
+                .style("fill", chartColor)
+                .attr("opacity", 0.7)
+                .text("Click to toggle");
         }
 
         function showTooltip(event: MouseEvent, d: any) {
             // Position and show tooltip
-            const tooltipContent = yAxisLabel === 'total_ms_played'
-                ? `${d.user}<br/>At ${d.label}: ${d.value.toFixed(2)} Hours`
-                : `${d.user}<br/>At ${d.label}: ${Math.round(d.value)} ${d.value === 1 ? 'play' : 'plays'}`;
+            const actualValue = useProportionalScaling && d.originalValue !== undefined ? d.originalValue : d.value;
+            
+            let tooltipContent: string;
+            if (useProportionalScaling) {
+                if (yAxisLabel === 'total_ms_played') {
+                    tooltipContent = `${d.user}<br/>At ${d.label}: ${d.value.toFixed(1)}%<br/>(${actualValue.toFixed(2)} Hours)`;
+                } else {
+                    tooltipContent = `${d.user}<br/>At ${d.label}: ${d.value.toFixed(1)}%<br/>(${Math.round(actualValue)} ${actualValue === 1 ? 'play' : 'plays'})`;
+                }
+            } else {
+                if (yAxisLabel === 'total_ms_played') {
+                    tooltipContent = `${d.user}<br/>At ${d.label}: ${d.value.toFixed(2)} Hours`;
+                } else {
+                    tooltipContent = `${d.user}<br/>At ${d.label}: ${Math.round(d.value)} ${d.value === 1 ? 'play' : 'plays'}`;
+                }
+            }
 
             tooltip
                 .style("opacity", 1)
@@ -338,7 +416,7 @@
     });
 
     $effect(() => {
-        // Redraw when data changes
+        // Redraw when data changes or visibility toggles
         if (processedData1().length > 0) {
             drawChart();
         }
@@ -346,5 +424,19 @@
 </script>
 
 <div bind:this={chartContainer} class="chart-container w-full h-full">
+    <!-- Controls for dual data -->
+    {#if isDualData()}
+        <div class="controls mb-4 flex gap-4 items-center">
+            <label class="flex items-center gap-2 text-sm">
+                <input 
+                    type="checkbox" 
+                    bind:checked={useProportionalScaling}
+                    class="rounded"
+                />
+                Proportional scaling (normalize to 100%)
+            </label>
+        </div>
+    {/if}
+    
     <svg bind:this={chartSvg} class="w-full"></svg>
 </div>
