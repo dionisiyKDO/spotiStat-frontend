@@ -125,7 +125,7 @@
 	}
 </script>
 
-<section class="max-w-6xl mx-auto p-8">
+<div>
 	<!-- Track Search -->
 	{#await tracksReq}
 		<div class="flex justify-center items-center p-8">
@@ -134,17 +134,51 @@
 	{:then tracks}
 		<header class="mb-8">
 			<h1 class="text-3xl font-semibold mb-4 text-(--primary-text)">Track Stats</h1>
+			<!-- <h2 class="ml-1 text-sm text-(--secondary-text)">Search through {tracks.length} tracks</h2> -->
+			
+			<!-- Top Tracks Carousel -->
+			<!-- <div class="mb-6">
+				<h3 class="text-sm font-medium text-(--secondary-text) mb-3 uppercase tracking-wide">Your Top Tracks</h3>
+				<div class="flex gap-3 overflow-x-auto pb-2">
+					{#each tracks.slice(0, 8) as track, i}
+						<button
+							type="button"
+							class="flex-shrink-0 bg-(--surface) hover:bg-(--surface-hover) rounded-lg p-3 min-w-48 transition-colors duration-200 text-left border border-transparent hover:border-(--border)"
+							onclick={() => selectTrack(track)}
+						>
+							<div class="flex items-center gap-2 mb-2">
+								<div class="w-6 h-6 rounded-full bg-(--primary) text-white text-xs flex items-center justify-center font-medium">
+									{i + 1}
+								</div>
+								<div class="text-xs text-(--secondary-text)">{track.total_hours.toFixed(1)}h</div>
+							</div>
+							<div class="font-medium text-(--primary-text) text-sm mb-1 line-clamp-1">{track.track_name}</div>
+							<div class="text-xs text-(--secondary-text) line-clamp-1">{track.artist}</div>
+							<div class="text-xs text-(--secondary-text) mt-1">{track.play_count.toLocaleString()} plays</div>
+						</button>
+					{/each}
+				</div>
+			</div> -->
+			
+			
 			
 			<div class="relative mb-4">
-				<input
-					class="input"
-					type="text"
-					placeholder="Search track or artist..."
-					bind:value={searchInput}
-					onfocus={handleFocus}
-					onblur={handleBlur}
-					onkeydown={(e) => handleKeyDown(e, tracks)}
-				/>
+				<div class="relative">
+					<input
+						class="input pl-10 pr-4"
+						type="text"
+						placeholder={`Search through ${tracks.length.toLocaleString()} tracks...`}
+						bind:value={searchInput}
+						onfocus={handleFocus}
+						onblur={handleBlur}
+						onkeydown={(e) => handleKeyDown(e, tracks)}
+					/>
+					<div class="absolute left-3 top-1/2 transform -translate-y-1/2 text-(--secondary-text)">
+						<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+						</svg>
+					</div>
+				</div>
 
 				{#if showSuggestions}
 					{@const displayTracks = getDisplayTracks(tracks)}
@@ -235,4 +269,4 @@
 			{/if}
 		{/if}
 	{/await}
-</section>
+</div>
