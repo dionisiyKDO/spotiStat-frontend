@@ -49,24 +49,36 @@
 
 <!-- <header class="p-6 pb-4 mb-6 border-b border-gray-500"> -->
 <header class="px-4 py-2 mb-2 border-b border-gray-500">
-    <nav class="flex items-center justify-between">
-        <div class="flex flex-col">
-            <h1 class="text-3xl font-bold">Listening Dashboard</h1>
-            
-            {#await metaReq}
-                <p class="loading">Loading Total Listening Time...</p>
-            {:then {stats_exist, last_calculated}}
-                <h2 class="text-sm text-(--secondary-text)">Calculated at: {new Date(last_calculated).toLocaleString()}</h2>
-            {/await}
-        </div>
+    {#if username}
+
+        <!-- Header -->
+        <nav class="flex items-center justify-between">
+            <div class="flex flex-col">
+                <h1 class="text-3xl font-bold">Listening Dashboard</h1>
+                {#await metaReq}
+                    <p class="loading">Loading Total Listening Time...</p>
+                {:then {stats_exist, last_calculated}}
+                    <h2 class="text-sm text-(--secondary-text)">Calculated at: {new Date(last_calculated).toLocaleString()}</h2>
+                {/await}
+            </div>
+            <!-- Links -->
+            <div class="flex"> 
+                {#each historyLinks as { name, link }}
+                    <a class="text-base text-(--secondary-text) hover:text-(--primary-text-hover) px-3 py-1 transition duration-150"
+                    href={link}>{name}</a>
+                {/each}
+            </div>
+        </nav>
 
 
-        <!-- Links -->
-        <div class="flex"> 
-            {#each historyLinks as { name, link }}
-                <a class="text-base text-(--secondary-text) hover:text-(--primary-text-hover) px-3 py-1 transition duration-150"
-                 href={link}>{name}</a>
-            {/each}
-        </div>
-    </nav>
+    {:else}
+        
+        <!-- Header for the /compare page -->
+        <nav class="flex items-center justify-between">
+            <div class="flex flex-col">
+                <h1 class="text-3xl font-bold">Listening Dashboard</h1>
+            </div>
+        </nav>
+    {/if}
+   
 </header>
