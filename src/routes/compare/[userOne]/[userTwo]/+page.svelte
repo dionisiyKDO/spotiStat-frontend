@@ -488,7 +488,7 @@
     {/await}
 
     <!-- Listening Patterns Comparison -->
-    <!-- {#await trendsPromise}
+    {#await trendsPromise}
         <p class="loading">Loading listening patterns...</p>
     {:then data}
         {#if data}
@@ -501,8 +501,7 @@
                         xAxisLabel="hour"
                         userLabels = {[userOne, userTwo]}
                         barColors = {["oklch(70.7% 0.165 254.624)", "oklch(79.2% 0.209 151.711)"]} 
-                        showProportional = {true}
-                        proportionalMode = "max"
+                        useProportionalScaling = {true}
                     />
                 </div>
                 <div class="bg-(--surface) shadow rounded-xl p-4">
@@ -513,8 +512,7 @@
                         xAxisLabel="weekday"
                         userLabels = {[userOne, userTwo]}
                         barColors = {["oklch(70.7% 0.165 254.624)", "oklch(79.2% 0.209 151.711)"]} 
-                        showProportional = {true}
-                        proportionalMode = "max"
+                        useProportionalScaling = {true}
                     />
                 </div>
                 <div class="bg-(--surface) shadow rounded-xl p-4">
@@ -525,8 +523,7 @@
                         xAxisLabel="year"
                         userLabels = {[userOne, userTwo]}
                         barColors = {["oklch(70.7% 0.165 254.624)", "oklch(79.2% 0.209 151.711)"]} 
-                        showProportional = {false}
-                        proportionalMode = "max"
+                        useProportionalScaling = {false}
                     />
                 </div>
                 <div class="bg-(--surface) shadow rounded-xl p-4">
@@ -537,12 +534,11 @@
                         xAxisLabel="month"
                         userLabels = {[userOne, userTwo]}
                         lineColors = {["oklch(70.7% 0.165 254.624)", "oklch(79.2% 0.209 151.711)"]} 
-
                     />
                 </div>
             </section>
         {/if}
-    {/await} -->
+    {/await}
   
     <!-- Most Skipped & End Reasons -->
     {#await skipPromise}
