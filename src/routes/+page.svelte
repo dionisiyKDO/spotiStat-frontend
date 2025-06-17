@@ -25,26 +25,21 @@
 <!-- 
 
 TODO: handle no data
-TODO: normal logging in
-TODO: Track stats - input more pleasant, keys navigation in dropdown
-TODO: Track stats - chart x axis and overall
-TODO: navbar trackstats and artists stats
-TODO: in track and artist stats selecting the artist and track more thoughtfull make
-    maybe suggest the most popular tracks and artists as images?
 TODO: maybe track pictures request
-TODO: artist - fetch artists, not tracks
 TODO: make skeletons for all components
 TODO: write redirect logic to land/ or dashboard/
-TODO: upload history, in args put username 
 TODO: Genre Distribution to dashboard
 TODO: Maybe most skipped artists
 TODO: shuffle stats
+TODO: upload history, in args put username 
+TODO: uplaod history with actual files uploading
 TODO: 
 TODO: 
-TODO: 
-TODO: 
-TODO: 
-TODO: 
+TODO: Overhaul and redesign of the /compare page
+TODO: !! Refactor dashboard/TimelineChart   - It became cluttered
+TODO: !! Refactor dashboard/BarChart        - It became cluttered
+TODO: Think how to handle header with compare page
+TODO: Overall compare apge brought kind of disbalance to frontend
 
 
 src/routes/
