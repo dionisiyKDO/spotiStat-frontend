@@ -25,12 +25,20 @@
     } from "$lib/chartStyles";
 
     interface Props {
-        data: any[];
+        data: any[] | [any[], any?]; // Can be single array or tuple of two arrays
         yAxisLabel: string;
         xAxisLabel: string;
+        userLabels?: [string?, string?]; // Optional labels for the users/datasets
+        lineColors?: [string?, string?]; // Optional custom colors for the lines
     }
 
-    let { data, yAxisLabel, xAxisLabel }: Props = $props();
+    let { 
+        data, 
+        yAxisLabel, 
+        xAxisLabel, 
+        userLabels = ["User 1", "User 2"], 
+        lineColors = ["#3b82f6", "#ef4444"] // Default blue and red
+    }: Props = $props();
 
     let chartContainer: HTMLDivElement;
     let chartSvg: SVGSVGElement;
@@ -48,27 +56,44 @@
     let panStart: number | null = null;
     let panStartDomain: [Date, Date] | null = null;
 
-    // Process data once
-    const processedData = $derived(() => 
-        data.map((d) => ({
-            ...d,
-            value: yAxisLabel === "total_ms_played" 
-                ? d.total_ms_played / 3.6e6 
-                : d.play_count,
+    // Process data - handle both single array and dual array formats
+    const processedData = $derived(() => {
+        const processDataset = (dataset: any[]) => 
+            dataset.map((d) => ({
+                ...d,
+                value: yAxisLabel === "total_ms_played" 
+                    ? d.total_ms_played / 3.6e6 
+                    : d.play_count,
+                label: xAxisLabel === "date"
+                    ? new Date(d.date) ?? ""
+                    : xAxisLabel === "month"
+                    ? new Date(d.month) ?? ""
+                    : d[xAxisLabel] ?? ""
+            }));
 
-            label: xAxisLabel === "date"
-                ? new Date(d.date) ?? ""
-                : xAxisLabel === "month"
-                ? new Date(d.month) ?? ""
-                : d[xAxisLabel] ?? ""
-        }))
-    );
+        // Check if data is a tuple of two arrays or a single array
+        if (Array.isArray(data) && data.length === 2 && Array.isArray(data[0])) {
+            // Dual dataset format: [dataset1, dataset2]
+            const [dataset1, dataset2] = data as [any[], any[]];
+            return {
+                dataset1: processDataset(dataset1),
+                dataset2: dataset2 ? processDataset(dataset2) : [],
+                isDual: true
+            };
+        } else {
+            // Single dataset format
+            return {
+                dataset1: processDataset(data as any[]),
+                dataset2: [],
+                isDual: false
+            };
+        }
+    });
 
     function calculateOptimalTicks(scale: d3.ScaleTime<number, number, never>, width: number): Date[] {
-        const minTickSpacing = 80; // Minimum pixels between ticks
+        const minTickSpacing = 80;
         const maxTicks = Math.floor(width / minTickSpacing);
         
-        // Get the time extent
         const [startDate, endDate] = scale.domain();
         const timeSpan = endDate.getTime() - startDate.getTime();
         const daySpan = timeSpan / (24 * 60 * 60 * 1000);
@@ -93,14 +118,16 @@
     }
 
     function drawChart() {
-        if (!chartContainer || !chartSvg || !processedData().length) return;
+        if (!chartContainer || !chartSvg || !processedData().dataset1.length) return;
+
+        const { dataset1, dataset2, isDual } = processedData();
 
         // Clear previous chart
         d3.select(chartSvg).selectAll("*").remove();
 
         // Get container dimensions
         const containerRect = chartContainer.getBoundingClientRect();
-        const margin = { top: 20, right: 20, bottom: 40, left: 60 };
+        const margin = { top: 15, right: 10, bottom: 25, left: 30 }; // Increased top margin for legend
         const width = containerRect.width - margin.left - margin.right;
         const height = 350 - margin.top - margin.bottom;
 
@@ -113,9 +140,12 @@
             .append("g")
             .attr("transform", `translate(${margin.left},${margin.top})`);
 
+        // Combine datasets to find overall domain
+        const allData = [...dataset1, ...dataset2];
+
         // Set up domains
         if (!originalXDomain) {
-            originalXDomain = d3.extent(processedData(), d => d.label) as [Date, Date];
+            originalXDomain = d3.extent(allData, d => d.label) as [Date, Date];
             currentXDomain = [...originalXDomain];
         }
 
@@ -124,14 +154,20 @@
             .domain(currentXDomain || originalXDomain!)
             .range([0, width]);
 
-        // Filter data to current domain for better performance
-        const visibleData = processedData().filter(d => 
+        // Filter data to current domain
+        const visibleData1 = dataset1.filter(d => 
             d.label >= (currentXDomain?.[0] || originalXDomain![0]) && 
             d.label <= (currentXDomain?.[1] || originalXDomain![1])
         );
 
+        const visibleData2 = dataset2.filter(d => 
+            d.label >= (currentXDomain?.[0] || originalXDomain![0]) && 
+            d.label <= (currentXDomain?.[1] || originalXDomain![1])
+        );
+
+        // Use combined data for Y scale to ensure both lines fit
         const yScale = d3.scaleLinear()
-            .domain([0, d3.max(processedData(), d => d.value) || 0]) // Keep original Y domain
+            .domain([0, d3.max(allData, d => d.value) || 0])
             .range([height, 0])
             .nice();
 
@@ -161,20 +197,19 @@
             .style("stroke", chartStroke)
             .style("stroke-opacity", 0);
 
-        // Make x-axis draggable when zoomed
+        // Handle panning for zoomed state
         const isZoomed = currentXDomain && (
             currentXDomain[0].getTime() !== originalXDomain![0].getTime() ||
             currentXDomain[1].getTime() !== originalXDomain![1].getTime()
         );
 
         if (isZoomed) {
-            // Add a draggable area over the x-axis
             const xAxisDragArea = svg.append("rect")
                 .attr("class", "x-axis-drag-area")
                 .attr("x", 0)
                 .attr("y", height)
                 .attr("width", width)
-                .attr("height", 30) // Extend below the axis for easier grabbing
+                .attr("height", 30)
                 .attr("fill", "transparent")
                 .style("cursor", "grab")
                 .on("mousedown", function(event) {
@@ -186,19 +221,17 @@
                     panStartDomain = currentXDomain ? [...currentXDomain] : null;
                     d3.select(this).style("cursor", "grabbing");
                     
-                    // Add global mouse events for panning
                     const handlePanMove = (e: MouseEvent) => {
                         if (!isPanning || panStart === null || !panStartDomain) return;
                         
                         const rect = chartContainer.getBoundingClientRect();
-                        const mouseX = e.clientX - rect.left - 60; // Adjust for margin.left
+                        const mouseX = e.clientX - rect.left - 60;
                         const dx = mouseX - panStart;
                         const timeDiff = xScale.invert(dx).getTime() - xScale.invert(0).getTime();
                         
                         const newStart = new Date(panStartDomain[0].getTime() - timeDiff);
                         const newEnd = new Date(panStartDomain[1].getTime() - timeDiff);
                         
-                        // Constrain panning to original domain bounds
                         const originalStart = originalXDomain![0];
                         const originalEnd = originalXDomain![1];
                         const domainWidth = panStartDomain[1].getTime() - panStartDomain[0].getTime();
@@ -224,17 +257,14 @@
                         panStartDomain = null;
                         svg.selectAll(".x-axis-drag-area").style("cursor", "grab");
                         
-                        // Remove global listeners
                         document.removeEventListener('mousemove', handlePanMove);
                         document.removeEventListener('mouseup', handlePanEnd);
                     };
                     
-                    // Add global listeners
                     document.addEventListener('mousemove', handlePanMove);
                     document.addEventListener('mouseup', handlePanEnd);
                 });
 
-            // Add visual indicator that axis is draggable
             xAxisGroup.style("cursor", "grab");
         }
 
@@ -283,19 +313,74 @@
             .attr("stroke-width", chartStrokeWidth)
             .attr("fill", "none");
 
-        // Add line (use visible data for better performance)
+        // Create line generator
         const line = d3.line<any>()
             .x(d => xScale(d.label))
             .y(d => yScale(d.value))
             .curve(d3.curveLinear);
 
+        // Add first line (always present)
         svg.append("path")
-            .datum(visibleData)
+            .datum(visibleData1)
+            .attr("class", "line-1")
             .attr("fill", "none")
-            .attr("stroke", chartLineStroke)
+            .attr("stroke", lineColors[0] || chartLineStroke)
             .attr("stroke-width", chartLineStrokeWidth)
             .attr("stroke-opacity", chartLineStrokeOpacity)
             .attr("d", line);
+
+        // Add second line if data exists
+        if (isDual && dataset2.length > 0) {
+            svg.append("path")
+                .datum(visibleData2)
+                .attr("class", "line-2")
+                .attr("fill", "none")
+                .attr("stroke", lineColors[1] || "#ef4444")
+                .attr("stroke-width", chartLineStrokeWidth)
+                .attr("stroke-opacity", chartLineStrokeOpacity)
+                .attr("d", line);
+        }
+
+        // Add legend if dual mode
+        // if (isDual && dataset2.length > 0) {
+        //     const legend = svg.append("g")
+        //         .attr("class", "legend")
+        //         .attr("transform", `translate(${width - 120}, -25)`);
+
+        //     // Legend for first line
+        //     legend.append("line")
+        //         .attr("x1", 0)
+        //         .attr("x2", 15)
+        //         .attr("y1", 0)
+        //         .attr("y2", 0)
+        //         .attr("stroke", lineColors[0] || chartLineStroke)
+        //         .attr("stroke-width", 2);
+
+        //     legend.append("text")
+        //         .attr("x", 20)
+        //         .attr("y", 0)
+        //         .attr("dy", "0.35em")
+        //         .style("font-size", "12px")
+        //         .style("fill", chartColor)
+        //         .text(userLabels[0] || "User 1");
+
+        //     // Legend for second line
+        //     legend.append("line")
+        //         .attr("x1", 0)
+        //         .attr("x2", 15)
+        //         .attr("y1", 15)
+        //         .attr("y2", 15)
+        //         .attr("stroke", lineColors[1] || "#ef4444")
+        //         .attr("stroke-width", 2);
+
+        //     legend.append("text")
+        //         .attr("x", 20)
+        //         .attr("y", 15)
+        //         .attr("dy", "0.35em")
+        //         .style("font-size", "12px")
+        //         .style("fill", chartColor)
+        //         .text(userLabels[1] || "User 2");
+        // }
 
         // Tooltip elements
         const tooltipLine = svg.append("line")
@@ -321,21 +406,19 @@
             .attr("pointer-events", "all")
             .style("cursor", isZoomed ? "default" : "crosshair")
             .on("mousedown", function(event) {
-                if (isPanning) return; // Don't start selection if panning
+                if (isPanning) return;
                 
                 event.preventDefault();
                 const [mouseX] = d3.pointer(event);
                 isSelecting = true;
                 selectionStart = mouseX;
                 
-                // Hide tooltip during selection
                 hideTooltip();
             })
             .on("mousemove", function(event) {
                 const [mouseX] = d3.pointer(event);
                 
                 if (isSelecting && selectionStart !== null) {
-                    // Update selection rectangle
                     const x = Math.min(selectionStart, mouseX);
                     const width = Math.abs(mouseX - selectionStart);
                     
@@ -346,15 +429,24 @@
                         .attr("height", height)
                         .style("opacity", 1);
                 } else if (!isPanning) {
-                    // Normal tooltip behavior (only when not panning)
                     const x0 = xScale.invert(mouseX);
-                    const i = bisectDate(visibleData, x0, 1);
-                    const d0 = visibleData[i - 1];
-                    const d1 = visibleData[i];
-                    const d = d1 && (x0.getTime() - d0?.label.getTime() > d1.label.getTime() - x0.getTime()) ? d1 : d0;
+                    
+                    // Find closest data points for both datasets
+                    const i1 = bisectDate(visibleData1, x0, 1);
+                    const d0_1 = visibleData1[i1 - 1];
+                    const d1_1 = visibleData1[i1];
+                    const d1 = d1_1 && (x0.getTime() - d0_1?.label.getTime() > d1_1.label.getTime() - x0.getTime()) ? d1_1 : d0_1;
 
-                    if (d) {
-                        showTooltip(event, d, xScale(d.label));
+                    let d2 = null;
+                    if (isDual && visibleData2.length > 0) {
+                        const i2 = bisectDate(visibleData2, x0, 1);
+                        const d0_2 = visibleData2[i2 - 1];
+                        const d1_2 = visibleData2[i2];
+                        d2 = d1_2 && (x0.getTime() - d0_2?.label.getTime() > d1_2.label.getTime() - x0.getTime()) ? d1_2 : d0_2;
+                    }
+
+                    if (d1 || d2) {
+                        showTooltip(event, d1, d2, mouseX);
                     }
                 }
             })
@@ -364,7 +456,6 @@
                     const minX = Math.min(selectionStart, mouseX);
                     const maxX = Math.max(selectionStart, mouseX);
                     
-                    // Only zoom if selection is wide enough (at least 10 pixels)
                     if (Math.abs(maxX - minX) > 10) {
                         const newDomain: [Date, Date] = [
                             xScale.invert(minX),
@@ -372,10 +463,9 @@
                         ];
                         
                         currentXDomain = newDomain;
-                        drawChart(); // Redraw with new domain
+                        drawChart();
                     }
                     
-                    // Reset selection
                     isSelecting = false;
                     selectionStart = null;
                     selectionRect.style("opacity", 0);
@@ -387,7 +477,6 @@
                 }
             })
             .on("dblclick", function() {
-                // Reset zoom on double click
                 if (originalXDomain) {
                     currentXDomain = [...originalXDomain];
                     drawChart();
@@ -405,12 +494,11 @@
                 isPanning = false;
                 panStart = null;
                 panStartDomain = null;
-                // Reset cursor
                 svg.selectAll(".x-axis-drag-area").style("cursor", "grab");
             }
         });
 
-        function showTooltip(event: MouseEvent, d: any, xPos: number) {
+        function showTooltip(event: MouseEvent, d1: any, d2: any, xPos: number) {
             // Show tooltip line
             tooltipLine
                 .attr("x1", xPos)
@@ -422,42 +510,73 @@
                 .attr("stroke-opacity", tooltipLineStrokeOpacity)
                 .style("opacity", 1);
 
-            // Show tooltip circle
+            // Show tooltip circles
             svg.selectAll(".tooltip-circle").remove();
-            svg.append("circle")
-                .attr("class", "tooltip-circle")
-                .attr("cx", xPos)
-                .attr("cy", yScale(d.value))
-                .attr("r", tooltipCircleRadius)
-                .attr("fill", tooltipCircleFill)
-                .attr("fill-opacity", tooltipCircleOpacity);
+            
+            if (d1) {
+                svg.append("circle")
+                    .attr("class", "tooltip-circle")
+                    .attr("cx", xScale(d1.label))
+                    .attr("cy", yScale(d1.value))
+                    .attr("r", tooltipCircleRadius)
+                    .attr("fill", lineColors[0] || tooltipCircleFill)
+                    .attr("fill-opacity", tooltipCircleOpacity);
+            }
 
-            // Position and show tooltip
-            const tooltipContent =
+            if (d2) {
+                svg.append("circle")
+                    .attr("class", "tooltip-circle")
+                    .attr("cx", xScale(d2.label))
+                    .attr("cy", yScale(d2.value))
+                    .attr("r", tooltipCircleRadius)
+                    .attr("fill", lineColors[1] || "#ef4444")
+                    .attr("fill-opacity", tooltipCircleOpacity);
+            }
+
+            // Format tooltip content
+            const formatValue = (d: any) => 
                 yAxisLabel === "total_ms_played"
-                    ? `${d.value.toFixed(2)} Hours<br/>${
-                        xAxisLabel === "date"
-                        ? d3.timeFormat("%Y-%m-%d")(new Date(d.date))
-                        : xAxisLabel === "month"
-                        ? d3.timeFormat("%Y-%m")(new Date(d.month))
-                        : xAxisLabel === "year"
-                        ? d3.timeFormat("%Y")(new Date(d.year))
-                        : xAxisLabel === "weekday"
-                        ? d3.timeFormat("%A")(new Date(d.weekday))
-                        : d[xAxisLabel] ?? ""
-                    }`
-                    : `${Math.round(d.value)} plays<br/>${
-                        xAxisLabel === "date"
-                        ? d3.timeFormat("%Y-%m-%d")(new Date(d.date))
-                        : xAxisLabel === "month"
-                        ? d3.timeFormat("%Y-%m")(new Date(d.month))
-                        : xAxisLabel === "year"
-                        ? d3.timeFormat("%Y")(new Date(d.year))
-                        : xAxisLabel === "weekday"
-                        ? d3.timeFormat("%A")(new Date(d.weekday))
-                        : d[xAxisLabel] ?? ""
-                    }`;
+                    ? `${d.value.toFixed(2)} Hours`
+                    : `${Math.round(d.value)} plays`;
 
+            const formatDate = (d: any) => {
+                if (xAxisLabel === "date") return d3.timeFormat("%Y-%m-%d")(new Date(d.date));
+                if (xAxisLabel === "month") return d3.timeFormat("%Y-%m")(new Date(d.month));
+                if (xAxisLabel === "year") return d3.timeFormat("%Y")(new Date(d.year));
+                if (xAxisLabel === "weekday") return d3.timeFormat("%A")(new Date(d.weekday));
+                return d[xAxisLabel] ?? "";
+            };
+
+            let tooltipContent = "";
+            
+            if (d1 && d2) {
+                // Both datasets have data at this point
+                tooltipContent = `
+                    <div style="margin-bottom: 8px;">${formatDate(d1)}</div>
+                    <div style="color: ${lineColors[0] || chartLineStroke};">
+                        <strong>${userLabels[0] || "User 1"}:</strong> ${formatValue(d1)}
+                    </div>
+                    <div style="color: ${lineColors[1] || "#ef4444"};">
+                        <strong>${userLabels[1] || "User 2"}:</strong> ${formatValue(d2)}
+                    </div>
+                `;
+            } else if (d1) {
+                // Only first dataset has data
+                tooltipContent = `
+                    <div style="margin-bottom: 4px;">${formatDate(d1)}</div>
+                    <div style="color: ${lineColors[0] || chartLineStroke};">
+                        <strong>${userLabels[0] || "User 1"}:</strong> ${formatValue(d1)}
+                    </div>
+                `;
+            } else if (d2) {
+                // Only second dataset has data
+                tooltipContent = `
+                    <div style="margin-bottom: 4px;">${formatDate(d2)}</div>
+                    <div style="color: ${lineColors[1] || "#ef4444"};">
+                        <strong>${userLabels[1] || "User 2"}:</strong> ${formatValue(d2)}
+                    </div>
+                `;
+            }
 
             tooltip
                 .style("opacity", 1)
@@ -465,12 +584,10 @@
 
             const tooltipNode = tooltip.node() as HTMLElement;
             const tooltipRect = tooltipNode.getBoundingClientRect();
-            const containerRect = chartContainer.getBoundingClientRect();
             
             let left = event.clientX + 15;
             let top = event.clientY - 15;
 
-            // Adjust if tooltip goes off screen
             if (left + tooltipRect.width > window.innerWidth) {
                 left = event.clientX - tooltipRect.width - 15;
             }
@@ -528,7 +645,6 @@
         if (tooltip) {
             tooltip.remove();
         }
-        // Clean up global mouse event
         d3.select("body").on("mouseup.chart", null);
     }
 
@@ -543,8 +659,7 @@
     });
 
     $effect(() => {
-        // Redraw when data changes
-        if (processedData().length > 0) {
+        if (processedData().dataset1.length > 0) {
             drawChart();
         }
     });
