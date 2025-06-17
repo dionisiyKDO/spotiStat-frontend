@@ -160,6 +160,7 @@
                     data={dailyTrends}
                     yAxisLabel={"total_ms_played"}
                     xAxisLabel={"date"}
+                    lineColors={["#7b8495"]}
                 />
             </div>
         </section>
@@ -250,6 +251,7 @@
                     data={monthsTrends}
                     yAxisLabel={"total_ms_played"}
                     xAxisLabel={"month"}
+                    lineColors={["#7b8495"]}
                 />
             </div>
         </section>
